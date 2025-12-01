@@ -44,10 +44,11 @@ import { ReportMarketingScreen } from './screens/admin/ReportMarketingScreen';
 import { JobdeskMonitorScreen } from './screens/admin/JobdeskMonitorScreen';
 import { BroadcastScreen } from './screens/employee/BroadcastScreen';
 import { HRDailyMonitorHubScreen } from './screens/admin/HRDailyMonitorHubScreen';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const App = () => {
   const { isAuthenticated, user, isImpersonating } = useAuthStore();
-  const [currentScreen, setCurrentScreen] = useState('dashboard');
+  const [currentScreen, setCurrentScreen] = useState('shiftScheduler');
   const [screenParams, setScreenParams] = useState<any>(null);
   const [selectedEmpId, setSelectedEmpId] = useState<string | null>(null);
 
@@ -197,22 +198,25 @@ const App = () => {
     'reportFinancial', 'reportRevenueCost', 'reportOperational', 'reportHR', 'reportMarketing'
   ];
 
+
   return (
-    <div className="min-h-screen bg-gray-200 flex justify-center font-sans" style={{ backgroundColor: '#e5e7eb' }}>
-      <div className="w-full max-w-md bg-gray-50 min-h-screen relative overflow-hidden border-x border-gray-200">
-        <ImpersonationBanner />
-        <ToastContainer />
-        <SpecialNotificationBanner />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-200 flex justify-center font-sans" style={{ backgroundColor: '#e5e7eb' }}>
+        <div className="w-full max-w-md bg-gray-50 min-h-screen relative overflow-hidden border-x border-gray-200">
+          <ImpersonationBanner />
+          <ToastContainer />
+          <SpecialNotificationBanner />
 
-        <div className={`${isImpersonating ? 'pt-12' : ''} h-full`}>
-          {renderScreen()}
+          <div className={`${isImpersonating ? 'pt-12' : ''} h-full`}>
+            {renderScreen()}
+          </div>
+
+          {isAuthenticated && user && !exclusionList.includes(currentScreen) && (
+            <BottomTab role={user.role} currentScreen={currentScreen} onNavigate={handleNavigate} />
+          )}
         </div>
-
-        {isAuthenticated && user && !exclusionList.includes(currentScreen) && (
-          <BottomTab role={user.role} currentScreen={currentScreen} onNavigate={handleNavigate} />
-        )}
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 

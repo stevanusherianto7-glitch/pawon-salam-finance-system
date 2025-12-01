@@ -444,6 +444,7 @@ export interface Message {
   timestamp: string; // ISO String
   audience: MessageAudience;
   readBy: string[]; // Array of employee IDs who have read it
+  senderArea: EmployeeArea;
 }
 
 

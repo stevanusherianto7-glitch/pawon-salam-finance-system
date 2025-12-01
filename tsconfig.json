@@ -29,6 +29,7 @@
   "exclude": [
     "node_modules",
     "pawon-salam-resto-glass-edition",
-    "dist"
+    "dist",
+    "src"
   ]
 }

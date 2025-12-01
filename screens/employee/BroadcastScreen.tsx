@@ -38,23 +38,23 @@ const MessageCard: React.FC<{ message: Message; isUnread: boolean; onRead: () =>
     }, [isUnread, onRead]);
 
     return (
-        <div className={`group relative bg-white/70 backdrop-blur-xl border rounded-3xl p-5 transition-all duration-500 overflow-hidden ${isUnread ? 'border-orange-400 shadow-xl shadow-orange-500/20' : 'border-white/40 shadow-lg shadow-black/5 hover:border-white/60 hover:-translate-y-1'}`}>
+        <div className={`group relative bg-white/70 backdrop-blur-xl border rounded-3xl p-4 transition-all duration-500 overflow-hidden ${isUnread ? 'border-orange-400 shadow-xl shadow-orange-500/20' : 'border-white/40 shadow-lg shadow-black/5 hover:border-white/60 hover:-translate-y-1'}`}>
             {/* Ambient Glow */}
             <div className={`absolute -top-16 -left-16 w-48 h-48 rounded-full blur-3xl opacity-40 transition-opacity duration-500 pointer-events-none ${isUnread ? 'bg-orange-500/20' : 'bg-blue-500/10 group-hover:bg-blue-500/20'}`}></div>
 
-            {isUnread && <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_theme(colors.orange.500)] animate-pulse"></div>}
+            {isUnread && <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_theme(colors.orange.500)] animate-pulse"></div>}
 
-            <div className="relative flex items-start gap-4">
-                <img src={message.senderAvatarUrl} alt={message.senderName} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md flex-shrink-0" />
+            <div className="relative flex items-start gap-3">
+                <img src={message.senderAvatarUrl} alt={message.senderName} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
                         <div>
-                            <p className="font-extrabold text-gray-800 text-sm truncate">{message.senderName}</p>
-                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{message.senderRole.replace(/_/g, ' ')}</p>
+                            <p className="font-extrabold text-gray-800 text-xs truncate">{message.senderName}</p>
+                            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">{message.senderRole.replace(/_/g, ' ')}</p>
                         </div>
-                        <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2 font-medium bg-white/50 px-2 py-1 rounded-lg border border-white/20">{new Date(message.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="text-[9px] text-gray-400 flex-shrink-0 ml-2 font-medium bg-white/50 px-1.5 py-0.5 rounded-lg border border-white/20">{new Date(message.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
-                    <p className="text-gray-700 text-sm mt-3 leading-relaxed whitespace-pre-wrap font-medium">{message.content}</p>
+                    <p className="text-gray-700 text-xs mt-2 leading-relaxed whitespace-pre-wrap font-medium">{message.content}</p>
                 </div>
             </div>
         </div>
@@ -162,30 +162,30 @@ export const BroadcastScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
         <div className="min-h-screen w-full relative overflow-hidden font-sans">
             <BackgroundPattern />
 
-            <div className="relative z-10 px-6 pt-10 h-screen flex flex-col">
+            <div className="relative z-10 px-4 pt-8 h-screen flex flex-col">
                 {/* Header - Glass Style */}
-                <div className="flex flex-col gap-4 mb-6 flex-shrink-0 bg-white/60 backdrop-blur-md p-4 rounded-3xl border border-white/40 shadow-sm">
+                <div className="flex flex-col gap-3 mb-4 flex-shrink-0 bg-white/60 backdrop-blur-md p-3 rounded-3xl border border-white/40 shadow-sm">
                     <div className="flex items-center gap-3">
-                        {onBack && <button onClick={onBack} className="p-2 bg-white rounded-full text-gray-600 hover:bg-gray-100 transition-colors shadow-sm"><ArrowLeft size={20} /></button>}
-                        <div className="p-2 bg-orange-100 rounded-xl"><MessageSquare size={20} className="text-orange-600" /></div>
+                        {onBack && <button onClick={onBack} className="p-2 bg-white rounded-full text-gray-600 hover:bg-gray-100 transition-colors shadow-sm"><ArrowLeft size={18} /></button>}
+                        <div className="p-1.5 bg-orange-100 rounded-xl"><MessageSquare size={18} className="text-orange-600" /></div>
                         <div>
-                            <h2 className="text-lg font-extrabold text-gray-800 leading-tight">Ruang Pengumuman</h2>
-                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Update & Informasi Tim</p>
+                            <h2 className="text-base font-extrabold text-gray-800 leading-tight">Ruang Pengumuman</h2>
+                            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Update & Informasi Tim</p>
                         </div>
                     </div>
 
                     {/* Filter Tabs */}
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                        <button onClick={() => setActiveFilter('ALL')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeFilter === 'ALL' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
+                        <button onClick={() => setActiveFilter('ALL')} className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap ${activeFilter === 'ALL' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
                             Semua
                         </button>
-                        <button onClick={() => setActiveFilter('MANAGERS')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeFilter === 'MANAGERS' ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
+                        <button onClick={() => setActiveFilter('MANAGERS')} className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap ${activeFilter === 'MANAGERS' ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
                             Manajer
                         </button>
-                        <button onClick={() => setActiveFilter('FOH')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeFilter === 'FOH' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
+                        <button onClick={() => setActiveFilter('FOH')} className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap ${activeFilter === 'FOH' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
                             Staff FOH
                         </button>
-                        <button onClick={() => setActiveFilter('BOH')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeFilter === 'BOH' ? 'bg-red-500 text-white shadow-lg shadow-red-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
+                        <button onClick={() => setActiveFilter('BOH')} className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap ${activeFilter === 'BOH' ? 'bg-red-500 text-white shadow-lg shadow-red-500/30' : 'bg-white/50 text-gray-600 hover:bg-white'}`}>
                             Staff BOH
                         </button>
                     </div>
@@ -216,20 +216,20 @@ export const BroadcastScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
                 )}
 
                 {canSendMessage && (
-                    <div className="fixed bottom-[110px] left-6 right-6 z-20">
+                    <div className="fixed bottom-[100px] left-4 right-4 z-20">
                         {!showForm ? (
-                            <button onClick={() => setShowForm(true)} className="w-full py-4 bg-white/80 backdrop-blur-xl border border-white/50 text-orange-600 font-extrabold rounded-2xl shadow-xl shadow-orange-500/10 flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-white hover:border-orange-200 group">
-                                <div className="p-1 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors"><Send size={16} className="text-orange-600" /></div>
+                            <button onClick={() => setShowForm(true)} className="w-full py-3 bg-white/80 backdrop-blur-xl border border-white/50 text-orange-600 font-extrabold rounded-2xl shadow-xl shadow-orange-500/10 flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-white hover:border-orange-200 group text-sm">
+                                <div className="p-1 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors"><Send size={14} className="text-orange-600" /></div>
                                 Tulis Pengumuman Baru
                             </button>
                         ) : (
-                            <div className="bg-white/90 backdrop-blur-2xl border border-white/60 rounded-3xl p-5 space-y-4 animate-fade-in shadow-2xl shadow-black/10 relative">
-                                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-                                    <h4 className="text-sm font-extrabold text-gray-800 flex items-center gap-2">
-                                        <div className="w-1.5 h-4 bg-orange-500 rounded-full"></div>
+                            <div className="bg-white/90 backdrop-blur-2xl border border-white/60 rounded-3xl p-4 space-y-3 animate-fade-in shadow-2xl shadow-black/10 relative">
+                                <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                                    <h4 className="text-xs font-extrabold text-gray-800 flex items-center gap-2">
+                                        <div className="w-1.5 h-3 bg-orange-500 rounded-full"></div>
                                         Pesan Baru
                                     </h4>
-                                    <button onClick={() => setShowForm(false)} className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500"><X size={16} /></button>
+                                    <button onClick={() => setShowForm(false)} className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500"><X size={14} /></button>
                                 </div>
 
                                 <div className="relative">
@@ -239,43 +239,43 @@ export const BroadcastScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
                                         onChange={handleContentChange}
                                         rows={3}
                                         placeholder="Ketik pesan... Gunakan @ untuk mention"
-                                        className="w-full bg-gray-50 text-gray-800 placeholder:text-gray-400 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:border-orange-400 focus:bg-white transition-all resize-none"
+                                        className="w-full bg-gray-50 text-gray-800 placeholder:text-gray-400 border border-gray-200 rounded-xl p-2.5 text-xs outline-none focus:border-orange-400 focus:bg-white transition-all resize-none"
                                     />
 
                                     {/* Mention Dropdown */}
                                     {showMentionList && mentionCandidates.length > 0 && (
                                         <div className="absolute bottom-full left-0 w-full bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden mb-2 animate-fade-in z-50">
-                                            <div className="p-2 bg-gray-50 text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Mention User</div>
+                                            <div className="p-2 bg-gray-50 text-[9px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Mention User</div>
                                             {mentionCandidates.map(emp => (
                                                 <button
                                                     key={emp.id}
                                                     onClick={() => insertMention(emp.name)}
                                                     className="w-full text-left px-3 py-2 hover:bg-orange-50 flex items-center gap-2 transition-colors"
                                                 >
-                                                    <img src={emp.avatarUrl || `https://ui-avatars.com/api/?name=${emp.name}`} className="w-6 h-6 rounded-full" />
-                                                    <span className="text-sm font-medium text-gray-700">{emp.name}</span>
-                                                    <span className="text-[10px] text-gray-400 ml-auto">{emp.role.replace(/_/g, ' ')}</span>
+                                                    <img src={emp.avatarUrl || `https://ui-avatars.com/api/?name=${emp.name}`} className="w-5 h-5 rounded-full" />
+                                                    <span className="text-xs font-medium text-gray-700">{emp.name}</span>
+                                                    <span className="text-[9px] text-gray-400 ml-auto">{emp.role.replace(/_/g, ' ')}</span>
                                                 </button>
                                             ))}
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="flex gap-3">
+                                <div className="flex gap-2">
                                     <div className="relative flex-1">
                                         <select
                                             value={audience}
                                             onChange={e => setAudience(e.target.value as MessageAudience)}
-                                            className="w-full appearance-none bg-gray-50 text-gray-700 font-bold border border-gray-200 rounded-xl px-3 py-2.5 text-xs outline-none focus:border-orange-400"
+                                            className="w-full appearance-none bg-gray-50 text-gray-700 font-bold border border-gray-200 rounded-xl px-2.5 py-2 text-[10px] outline-none focus:border-orange-400"
                                         >
                                             {availableAudiences.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                                         </select>
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                            <Users size={12} />
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                            <Users size={10} />
                                         </div>
                                     </div>
-                                    <button onClick={handleSendMessage} disabled={isSending || !content.trim()} className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60 shadow-lg shadow-orange-500/30">
-                                        {isSending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Kirim
+                                    <button onClick={handleSendMessage} disabled={isSending || !content.trim()} className="px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60 shadow-lg shadow-orange-500/30 text-xs">
+                                        {isSending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />} Kirim
                                     </button>
                                 </div>
                             </div>

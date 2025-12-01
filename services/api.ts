@@ -501,6 +501,7 @@ export const messageApi = {
             timestamp: new Date().toISOString(),
             audience,
             readBy: [sender.id], // Sender automatically reads it
+            senderArea: sender.area
         };
         MOCK_MESSAGES.unshift(newMessage); // Add to the top of the list
         return createSuccessResponse(newMessage, "Pesan terkirim!");
@@ -663,21 +664,31 @@ export interface StockItem {
     id: string;
     name: string;
     unit: string;
+    category: 'FOH' | 'BOH'; // Added category
     systemStock: number;
     physicalStock: number | '';
     lastOpname: string;
-    pricePerUnit: number; // Added for financial calculation
+    pricePerUnit: number;
 }
 
 let MOCK_INVENTORY: StockItem[] = [
-    { id: 'inv-1', name: 'Beras Premium', unit: 'kg', systemStock: 50, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 15000 },
-    { id: 'inv-2', name: 'Minyak Goreng', unit: 'liter', systemStock: 25, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 14000 },
-    { id: 'inv-3', name: 'Ayam Potong', unit: 'ekor', systemStock: 120, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 35000 },
-    { id: 'inv-4', name: 'Telur Ayam', unit: 'kg', systemStock: 15.5, physicalStock: '', lastOpname: '2025-11-28', pricePerUnit: 28000 },
-    { id: 'inv-5', name: 'Tepung Terigu', unit: 'kg', systemStock: 30, physicalStock: '', lastOpname: '2025-11-20', pricePerUnit: 12000 },
-    { id: 'inv-6', name: 'Bawang Merah', unit: 'kg', systemStock: 8, physicalStock: '', lastOpname: '2025-11-29', pricePerUnit: 45000 },
-    { id: 'inv-7', name: 'Bawang Putih', unit: 'kg', systemStock: 5, physicalStock: '', lastOpname: '2025-11-29', pricePerUnit: 40000 },
-    { id: 'inv-8', name: 'Cabai Rawit', unit: 'kg', systemStock: 3.5, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 80000 },
+    // BOH Items (Kitchen Ingredients)
+    { id: 'inv-1', name: 'Beras Premium', unit: 'kg', category: 'BOH', systemStock: 50, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 15000 },
+    { id: 'inv-2', name: 'Minyak Goreng', unit: 'liter', category: 'BOH', systemStock: 25, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 14000 },
+    { id: 'inv-3', name: 'Ayam Potong', unit: 'ekor', category: 'BOH', systemStock: 120, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 35000 },
+    { id: 'inv-4', name: 'Telur Ayam', unit: 'kg', category: 'BOH', systemStock: 15.5, physicalStock: '', lastOpname: '2025-11-28', pricePerUnit: 28000 },
+    { id: 'inv-5', name: 'Tepung Terigu', unit: 'kg', category: 'BOH', systemStock: 30, physicalStock: '', lastOpname: '2025-11-20', pricePerUnit: 12000 },
+    { id: 'inv-6', name: 'Bawang Merah', unit: 'kg', category: 'BOH', systemStock: 8, physicalStock: '', lastOpname: '2025-11-29', pricePerUnit: 45000 },
+    { id: 'inv-7', name: 'Bawang Putih', unit: 'kg', category: 'BOH', systemStock: 5, physicalStock: '', lastOpname: '2025-11-29', pricePerUnit: 40000 },
+    { id: 'inv-8', name: 'Cabai Rawit', unit: 'kg', category: 'BOH', systemStock: 3.5, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 80000 },
+
+    // FOH Items (Service Supplies)
+    { id: 'inv-foh-1', name: 'Cup 16oz (Es)', unit: 'pcs', category: 'FOH', systemStock: 500, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 800 },
+    { id: 'inv-foh-2', name: 'Cup 12oz (Panas)', unit: 'pcs', category: 'FOH', systemStock: 300, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 600 },
+    { id: 'inv-foh-3', name: 'Sedotan Steril', unit: 'pack', category: 'FOH', systemStock: 20, physicalStock: '', lastOpname: '2025-11-28', pricePerUnit: 5000 },
+    { id: 'inv-foh-4', name: 'Tisu Makan', unit: 'pack', category: 'FOH', systemStock: 45, physicalStock: '', lastOpname: '2025-11-29', pricePerUnit: 3500 },
+    { id: 'inv-foh-5', name: 'Kantong Plastik Takeaway', unit: 'pack', category: 'FOH', systemStock: 15, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 8000 },
+    { id: 'inv-foh-6', name: 'Kertas Nasi', unit: 'pack', category: 'FOH', systemStock: 25, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 12000 },
 ];
 
 export const inventoryApi = {
@@ -685,30 +696,33 @@ export const inventoryApi = {
         await delay(500);
         return createSuccessResponse(MOCK_INVENTORY);
     },
-    submitOpname: async (items: StockItem[]): Promise<ApiResponse<boolean>> => {
+    submitOpname: async (items: StockItem[]): Promise<ApiResponse<any>> => {
         await delay(1500); // Simulate processing
 
         let totalVarianceValue = 0;
         const todayStr = new Date().toISOString().split('T')[0];
+        let generatedTransaction = null;
 
         // 1. Update Inventory & Calculate Variance Value
         items.forEach(submittedItem => {
             const idx = MOCK_INVENTORY.findIndex(i => i.id === submittedItem.id);
             if (idx > -1) {
                 const currentSystem = MOCK_INVENTORY[idx].systemStock;
-                const physical = submittedItem.physicalStock === '' ? currentSystem : (submittedItem.physicalStock as number);
+                // If physical is empty, assume it matches system (no variance) OR skip? 
+                // Let's assume if empty, we ignore it for variance but don't update system stock?
+                // Or better: treat empty as "not counted" -> ignore.
+                if (submittedItem.physicalStock !== '') {
+                    const physical = submittedItem.physicalStock as number;
+                    const varianceQty = physical - currentSystem;
+                    const varianceRupiah = varianceQty * MOCK_INVENTORY[idx].pricePerUnit;
 
-                const varianceQty = physical - currentSystem;
-                const varianceRupiah = varianceQty * MOCK_INVENTORY[idx].pricePerUnit;
+                    totalVarianceValue += varianceRupiah;
 
-                totalVarianceValue += varianceRupiah;
-
-                // Update Mock DB
-                MOCK_INVENTORY[idx].physicalStock = physical; // Reset or keep? Usually reset for next day, but for demo keep.
-                MOCK_INVENTORY[idx].lastOpname = todayStr;
-                // In real app, we might adjust systemStock to match physical after approval.
-                // For demo, let's say system stock is corrected.
-                MOCK_INVENTORY[idx].systemStock = physical;
+                    // Update Mock DB
+                    MOCK_INVENTORY[idx].physicalStock = physical;
+                    MOCK_INVENTORY[idx].lastOpname = todayStr;
+                    MOCK_INVENTORY[idx].systemStock = physical; // Sync system to physical
+                }
             }
         });
 
@@ -717,7 +731,7 @@ export const inventoryApi = {
             const isLoss = totalVarianceValue < 0;
             const absValue = Math.abs(totalVarianceValue);
 
-            const transaction = {
+            generatedTransaction = {
                 id: `trx-auto-${Date.now()}`,
                 date: todayStr,
                 desc: isLoss ? 'Biaya Selisih Stok (Shrinkage)' : 'Penyesuaian Stok (Surplus)',
@@ -726,10 +740,13 @@ export const inventoryApi = {
                 outlet: 'Jakarta' // Default for demo
             };
 
-            MOCK_TRANSACTIONS.unshift(transaction);
-            console.log("[AUTO-FINANCE] Generated Transaction:", transaction);
+            MOCK_TRANSACTIONS.unshift(generatedTransaction);
+            console.log("[AUTO-FINANCE] Generated Transaction:", generatedTransaction);
         }
 
-        return createSuccessResponse(true, "Laporan Stok Opname Berhasil & Jurnal Keuangan Diupdate");
+        return createSuccessResponse({
+            totalVariance: totalVarianceValue,
+            transaction: generatedTransaction
+        }, "Laporan Stok Opname Berhasil & Jurnal Keuangan Diupdate");
     }
 };

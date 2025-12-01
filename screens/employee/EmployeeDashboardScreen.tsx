@@ -240,77 +240,77 @@ export const EmployeeDashboardScreen: React.FC<DashboardProps> = ({ onNavigate }
       )}
 
       {/* === HEADER COMPACT LUXURY === */}
-      <div className="pt-10 pb-16 px-5 rounded-b-[2.5rem] relative overflow-hidden shadow-lg" style={{ background: colors.gradientMain }}>
+      <div className="pt-8 pb-12 px-4 rounded-b-[2rem] relative overflow-hidden shadow-lg" style={{ background: colors.gradientMain }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/food.png")' }}></div>
         <div className="relative flex items-center gap-3">
           <div className="relative shrink-0 group cursor-pointer" onClick={handleAvatarClick}>
-            <img src={user?.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full border-2 border-white/80 object-cover shadow-md" />
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm"><Camera size={10} className="text-orange-600" /></div>
+            <img src={user?.avatarUrl} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-white/80 object-cover shadow-md" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm"><Camera size={8} className="text-orange-600" /></div>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] text-orange-100 font-medium tracking-wide uppercase">Welcome back,</p>
-            <h2 className="text-lg font-bold text-white truncate leading-tight">{user?.name}</h2>
+            <p className="text-[9px] text-orange-100 font-medium tracking-wide uppercase">Welcome back,</p>
+            <h2 className="text-base font-bold text-white truncate leading-tight">{user?.name}</h2>
             {/* Role/Department Display */}
-            <p className="text-[10px] text-orange-100/80 font-medium truncate mt-0.5 bg-white/10 w-fit px-2 py-0.5 rounded-md backdrop-blur-sm">{user?.department}</p>
+            <p className="text-[9px] text-orange-100/80 font-medium truncate mt-0.5 bg-white/10 w-fit px-2 py-0.5 rounded-md backdrop-blur-sm">{user?.department}</p>
           </div>
-          <button onClick={logout} className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-sm transition-all border border-white/10"><LogOut size={16} /></button>
+          <button onClick={logout} className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-sm transition-all border border-white/10"><LogOut size={14} /></button>
         </div>
       </div>
 
-      <div className="px-4 -mt-10 relative z-10 space-y-3">
+      <div className="px-4 -mt-8 relative z-10 space-y-2.5">
 
         {/* EMPLOYEE OF THE MONTH WIDGET (Persistent & Unobtrusive) */}
         {eotm && (
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-3 shadow-lg border border-white/60 flex items-center gap-3 relative overflow-hidden group">
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-2.5 shadow-lg border border-white/60 flex items-center gap-3 relative overflow-hidden group">
             {/* Golden Glow Effect */}
             <div className="absolute -right-10 -top-10 w-32 h-32 bg-amber-400/20 blur-3xl rounded-full pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
 
             <div className="relative">
-              <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-amber-300 to-amber-600 shadow-sm">
+              <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-br from-amber-300 to-amber-600 shadow-sm">
                 <img src={eotm.avatarUrl} alt={eotm.name} className="w-full h-full rounded-full object-cover border-2 border-white" />
               </div>
               <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white p-0.5 rounded-full border border-white shadow-sm">
-                <Crown size={10} fill="currentColor" />
+                <Crown size={8} fill="currentColor" />
               </div>
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="text-[10px] font-extrabold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md border border-amber-200 uppercase tracking-wider">
+                <span className="text-[9px] font-extrabold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md border border-amber-200 uppercase tracking-wider">
                   Star of {new Date().toLocaleString('default', { month: 'long' })}
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-gray-800 truncate">{eotm.name}</h3>
-              <p className="text-[10px] text-gray-500 font-medium truncate">{eotm.achievementBadge}</p>
+              <h3 className="text-xs font-bold text-gray-800 truncate">{eotm.name}</h3>
+              <p className="text-[9px] text-gray-500 font-medium truncate">{eotm.achievementBadge}</p>
             </div>
 
-            <div className="p-2 bg-amber-50 rounded-xl border border-amber-100 shadow-inner">
-              <Trophy size={18} className="text-amber-500" />
+            <div className="p-1.5 bg-amber-50 rounded-xl border border-amber-100 shadow-inner">
+              <Trophy size={16} className="text-amber-500" />
             </div>
           </div>
         )}
 
         {/* MANAGER FEEDBACK WIDGET (NEW) */}
         {isFeedbackVisible && currentJobdesk?.managerNote && (
-          <div className="glass p-4 rounded-2xl shadow-lg relative overflow-hidden animate-fade-in-down border border-blue-200/50">
+          <div className="glass p-3 rounded-2xl shadow-lg relative overflow-hidden animate-fade-in-down border border-blue-200/50">
             <button
               onClick={handleDismissFeedback}
-              className="absolute top-3 right-3 p-1 bg-black/5 rounded-full hover:bg-black/10 transition-colors z-20"
+              className="absolute top-2 right-2 p-1 bg-black/5 rounded-full hover:bg-black/10 transition-colors z-20"
             >
-              <X size={16} className="text-gray-600" />
+              <X size={14} className="text-gray-600" />
             </button>
 
             <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 bg-blue-100 rounded-lg">
-                  <MessageSquare size={14} className="text-blue-600" />
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="p-1 bg-blue-100 rounded-lg">
+                  <MessageSquare size={12} className="text-blue-600" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-800">Catatan Operasional</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-800">Catatan Operasional</span>
               </div>
-              <p className="text-sm font-medium leading-relaxed italic text-gray-700">
+              <p className="text-xs font-medium leading-relaxed italic text-gray-700">
                 "{currentJobdesk.managerNote}"
               </p>
-              <div className="mt-2 text-[10px] text-gray-500 text-right font-bold">
+              <div className="mt-1.5 text-[9px] text-gray-500 text-right font-bold">
                 - Restaurant Manager
               </div>
             </div>
@@ -319,54 +319,54 @@ export const EmployeeDashboardScreen: React.FC<DashboardProps> = ({ onNavigate }
 
         {/* SCORE STRIP (Sticky Top Visual) */}
         {currentSnapshot && (
-          <div onClick={() => onNavigate && onNavigate('performanceDetail')} className="bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-sm border border-white/50 flex items-center justify-between cursor-pointer active:scale-98">
+          <div onClick={() => onNavigate && onNavigate('performanceDetail')} className="bg-white/90 backdrop-blur-md rounded-xl p-1.5 shadow-sm border border-white/50 flex items-center justify-between cursor-pointer active:scale-98">
             <div className="flex items-center gap-2 px-2">
-              <div className="p-1.5 bg-orange-100 rounded-full"><TrendingUp size={14} className="text-orange-600" /></div>
-              <span className="text-xs font-bold text-gray-700">Skor Harian</span>
+              <div className="p-1 bg-orange-100 rounded-full"><TrendingUp size={12} className="text-orange-600" /></div>
+              <span className="text-[10px] font-bold text-gray-700">Skor Harian</span>
             </div>
             <div className="flex items-center gap-2 px-2">
-              <span className="text-lg font-bold font-heading" style={{ color: getScoreColor(currentSnapshot.punctualityScore) }}>{currentSnapshot.punctualityScore}</span>
-              <span className="text-[10px] text-gray-400">/ 5.0</span>
-              <ChevronRight size={14} className="text-gray-300" />
+              <span className="text-base font-bold font-heading" style={{ color: getScoreColor(currentSnapshot.punctualityScore) }}>{currentSnapshot.punctualityScore}</span>
+              <span className="text-[9px] text-gray-400">/ 5.0</span>
+              <ChevronRight size={12} className="text-gray-300" />
             </div>
           </div>
         )}
 
         {/* CHECK IN/OUT CARD (Compact) */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-4 shadow-md border border-white/50 relative overflow-hidden">
-          <div className="flex justify-between items-center mb-3">
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-3 shadow-md border border-white/50 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-2">
             <div>
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Jadwal Hari Ini</p>
-              <p className="text-sm font-bold text-gray-800 mt-0.5">
+              <p className="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Jadwal Hari Ini</p>
+              <p className="text-xs font-bold text-gray-800 mt-0.5">
                 {schedule ? `${schedule.shiftName} (${schedule.startTime}-${schedule.endTime})` : 'Jadwal Reguler'}
               </p>
             </div>
-            <div className={`px-2 py-1 rounded-lg border text-[10px] font-bold flex items-center gap-1 ${isLocationValid ? 'bg-green-50 text-green-700 border-green-100' : 'bg-orange-50 text-orange-700 border-orange-100'}`}>
+            <div className={`px-2 py-1 rounded-lg border text-[9px] font-bold flex items-center gap-1 ${isLocationValid ? 'bg-green-50 text-green-700 border-green-100' : 'bg-orange-50 text-orange-700 border-orange-100'}`}>
               <MapPin size={10} /> {distanceLabel}
             </div>
           </div>
 
           {!todayLog?.checkInTime ? (
-            <button onClick={initCheckIn} disabled={locationStatus === 'locating'} className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-orange-200 active:scale-95 transition-all flex items-center justify-center gap-2">
-              <Camera size={18} /> {locationStatus === 'locating' ? 'Mencari Lokasi...' : 'Check In Kehadiran'}
+            <button onClick={initCheckIn} disabled={locationStatus === 'locating'} className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-orange-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+              <Camera size={16} /> {locationStatus === 'locating' ? 'Mencari Lokasi...' : 'Check In Kehadiran'}
             </button>
           ) : !todayLog.checkOutTime ? (
-            <div className="flex gap-3">
-              <div className="flex-1 bg-orange-50 rounded-xl p-2 border border-orange-100 text-center">
-                <p className="text-[10px] text-gray-500">Masuk</p>
-                <p className="text-lg font-bold text-orange-700">{getTimeString(todayLog.checkInTime)}</p>
+            <div className="flex gap-2">
+              <div className="flex-1 bg-orange-50 rounded-xl p-1.5 border border-orange-100 text-center">
+                <p className="text-[9px] text-gray-500">Masuk</p>
+                <p className="text-base font-bold text-orange-700">{getTimeString(todayLog.checkInTime)}</p>
               </div>
               <button onClick={handleCheckOut} className="flex-1 bg-gray-800 text-white rounded-xl font-bold text-xs shadow-lg active:scale-95">Check Out</button>
             </div>
           ) : (
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-3 border border-emerald-200 text-center text-emerald-800 text-xs font-bold">
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-2.5 border border-emerald-200 text-center text-emerald-800 text-xs font-bold">
               Shift Selesai • Pulang {getTimeString(todayLog.checkOutTime)}
             </div>
           )}
         </div>
 
         {/* BENTO GRID MENU - PREMIUM GLASS STYLE */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <PremiumGlassCard
             title="Daily Jobdesk"
             subtitle="Tugas Harian Anda"
@@ -408,12 +408,12 @@ export const EmployeeDashboardScreen: React.FC<DashboardProps> = ({ onNavigate }
         </div>
 
         {/* FOOTER REPORTS SHORTCUT */}
-        <div className="bg-orange-50 rounded-xl p-3 flex items-center justify-between border border-orange-100 shadow-sm">
+        <div className="bg-orange-50 rounded-xl p-2.5 flex items-center justify-between border border-orange-100 shadow-sm">
           <div className="flex items-center gap-2">
-            <Trophy size={16} className="text-orange-600" />
-            <span className="text-xs font-bold text-orange-800">Lihat Leaderboard</span>
+            <Trophy size={14} className="text-orange-600" />
+            <span className="text-[10px] font-bold text-orange-800">Lihat Leaderboard</span>
           </div>
-          <button onClick={() => onNavigate && onNavigate('hrTopPerformance')} className="bg-white px-3 py-1.5 rounded-lg text-[10px] font-bold text-gray-600 shadow-sm active:scale-95 border border-orange-100">
+          <button onClick={() => onNavigate && onNavigate('hrTopPerformance')} className="bg-white px-3 py-1.5 rounded-lg text-[9px] font-bold text-gray-600 shadow-sm active:scale-95 border border-orange-100">
             Buka
           </button>
         </div>

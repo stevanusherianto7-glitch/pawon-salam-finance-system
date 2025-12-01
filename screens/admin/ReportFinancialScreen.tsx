@@ -34,22 +34,22 @@ const KPICard = ({ label, value, trend, icon: Icon, colorClass, inverseTrend = f
   const iconColorClass = `text-${baseColor}-500`;
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-lg border border-white/50 flex flex-col justify-between h-full relative overflow-hidden group hover:bg-white/90 transition-all">
+    <div className="bg-white/80 backdrop-blur-xl p-3.5 rounded-2xl shadow-lg border border-white/50 flex flex-col justify-between h-full relative overflow-hidden group hover:bg-white/90 transition-all">
       <div className="flex justify-between items-start mb-2">
         <div>
-          <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">{label}</p>
-          <h3 className="text-2xl font-extrabold text-gray-800 leading-tight">{value}</h3>
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">{label}</p>
+          <h3 className="text-xl font-extrabold text-gray-800 leading-tight">{value}</h3>
         </div>
         {/* Icon with Pastel Background */}
-        <div className={`p-3 rounded-2xl ${iconBgClass} ${iconColorClass} shadow-sm`}>
-          <Icon size={24} />
+        <div className={`p-2.5 rounded-xl ${iconBgClass} ${iconColorClass} shadow-sm`}>
+          <Icon size={20} />
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-2">
+      <div className="flex items-center justify-between mt-1.5">
         {trend ? <TrendBadge data={trend} inverseColor={inverseTrend} /> : <span className="h-4"></span>}
-        <div className={`p-1.5 rounded-lg ${colorClass} bg-opacity-10`}>
-          <Icon size={14} className={colorClass.split(' ')[0]} />
+        <div className={`p-1 rounded-lg ${colorClass} bg-opacity-10`}>
+          <Icon size={12} className={colorClass.split(' ')[0]} />
         </div>
       </div>
     </div>
@@ -136,49 +136,49 @@ export const ReportFinancialScreen: React.FC<Props> = ({ onBack }) => {
       <BackgroundPattern />
 
       {/* Header - Transparent to match original layout */}
-      <div className="relative z-10 p-4 pt-10 flex items-center justify-between">
+      <div className="relative z-10 p-4 pt-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="p-2 bg-white/20 rounded-full text-gray-700 hover:bg-white/40 transition-colors backdrop-blur-sm border border-white/20 shadow-sm">
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} />
           </button>
           <div>
-            <h2 className="font-extrabold text-gray-800 text-xl leading-tight">Laporan Keuangan</h2>
-            <p className="text-xs text-gray-600 font-medium mt-0.5">Kinerja Finansial Bisnis</p>
+            <h2 className="font-extrabold text-gray-800 text-lg leading-tight">Laporan Keuangan</h2>
+            <p className="text-[10px] text-gray-600 font-medium mt-0.5">Kinerja Finansial Bisnis</p>
           </div>
         </div>
         {/* Real-time Clock & Export */}
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <p className="text-2xl font-black text-gray-800 tracking-tighter leading-none">
+            <p className="text-xl font-black text-gray-800 tracking-tighter leading-none">
               {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(':', '.')}
             </p>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">
+            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">
               {currentTime.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '')}
             </p>
           </div>
           <button
             onClick={handleExportPDF}
             disabled={exporting}
-            className="p-3 bg-white/60 text-gray-700 rounded-2xl shadow-sm border border-white/40 hover:bg-white hover:shadow-md transition-all active:scale-95 disabled:opacity-50"
+            className="p-2.5 bg-white/60 text-gray-700 rounded-2xl shadow-sm border border-white/40 hover:bg-white hover:shadow-md transition-all active:scale-95 disabled:opacity-50"
             title="Export PDF"
           >
-            <Download size={18} />
+            <Download size={16} />
           </button>
         </div>
       </div>
 
       <div className="relative z-10 p-4 space-y-4 max-w-3xl mx-auto">
         {/* Filter Bar - High Z-Index */}
-        <div className="relative z-50 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="relative z-50 flex flex-col sm:flex-row items-center justify-center gap-3">
           {/* Outlet Dropdown */}
-          <div className="relative w-[280px] h-[52px] group">
+          <div className="relative w-[240px] h-[44px] group">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
-              <MapPin size={18} />
+              <MapPin size={16} />
             </div>
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full h-full bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl pl-11 pr-4 text-sm font-bold text-gray-800 outline-none focus:bg-white focus:border-orange-300 transition appearance-none cursor-pointer shadow-sm text-center"
+              className="w-full h-full bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl pl-10 pr-4 text-xs font-bold text-gray-800 outline-none focus:bg-white focus:border-orange-300 transition appearance-none cursor-pointer shadow-sm text-center"
             >
               <option value="ALL">Semua Outlet</option>
               <option value="Jakarta">Jakarta</option>
@@ -189,7 +189,7 @@ export const ReportFinancialScreen: React.FC<Props> = ({ onBack }) => {
           </div>
 
           {/* Date Picker */}
-          <div className="w-[280px] h-[52px] relative z-50">
+          <div className="w-[240px] h-[44px] relative z-50">
             <GlassDatePicker
               selectedDate={selectedDate}
               onChange={setSelectedDate}
@@ -244,38 +244,38 @@ export const ReportFinancialScreen: React.FC<Props> = ({ onBack }) => {
               {/* Decorative gradient blob */}
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-400/10 rounded-full blur-3xl pointer-events-none group-hover:bg-orange-400/20 transition-all duration-700"></div>
 
-              <div className="p-5 border-b border-white/40 flex justify-between items-center relative z-10">
+              <div className="p-4 border-b border-white/40 flex justify-between items-center relative z-10">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 bg-orange-100 rounded-lg text-orange-600">
-                    <Activity size={14} />
+                    <Activity size={12} />
                   </div>
-                  <h3 className="font-extrabold text-gray-800 text-sm tracking-wide">Jurnal Transaksi Bisnis</h3>
+                  <h3 className="font-extrabold text-gray-800 text-xs tracking-wide">Jurnal Transaksi Bisnis</h3>
                 </div>
-                <span className="text-[10px] bg-white/80 backdrop-blur-md text-gray-600 px-3 py-1 rounded-full font-bold border border-white/50 shadow-sm">
+                <span className="text-[9px] bg-white/80 backdrop-blur-md text-gray-600 px-2.5 py-0.5 rounded-full font-bold border border-white/50 shadow-sm">
                   {transactions.length} Data
                 </span>
               </div>
 
-              <div className="p-3 max-h-[320px] overflow-y-auto space-y-2 custom-scrollbar">
+              <div className="p-2.5 max-h-[320px] overflow-y-auto space-y-2 custom-scrollbar">
                 {transactions.length > 0 ? transactions.map((trx, idx) => (
-                  <div key={idx} className="group/item relative bg-white/40 hover:bg-white/90 backdrop-blur-sm p-3 rounded-2xl border border-white/50 hover:border-orange-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-between cursor-default">
-                    <div className="flex items-center gap-3.5">
+                  <div key={idx} className="group/item relative bg-white/40 hover:bg-white/90 backdrop-blur-sm p-2.5 rounded-2xl border border-white/50 hover:border-orange-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-between cursor-default">
+                    <div className="flex items-center gap-3">
                       {/* Icon Container */}
-                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover/item:scale-110 ${trx.type === 'IN'
+                      <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover/item:scale-110 ${trx.type === 'IN'
                         ? 'bg-gradient-to-br from-emerald-100 to-green-200 text-emerald-600'
                         : 'bg-gradient-to-br from-rose-100 to-red-200 text-rose-600'
                         }`}>
-                        {trx.type === 'IN' ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
+                        {trx.type === 'IN' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                       </div>
 
                       {/* Text Info */}
                       <div>
-                        <p className="text-xs font-bold text-gray-800 group-hover/item:text-orange-900 transition-colors line-clamp-1">{trx.desc}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] font-medium text-gray-500 flex items-center gap-1">
-                            <Calendar size={10} /> {trx.date}
+                        <p className="text-[10px] font-bold text-gray-800 group-hover/item:text-orange-900 transition-colors line-clamp-1">{trx.desc}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[9px] font-medium text-gray-500 flex items-center gap-1">
+                            <Calendar size={9} /> {trx.date}
                           </span>
-                          <span className="text-[9px] bg-white/50 px-1.5 py-0.5 rounded-md border border-white/30 text-gray-500 font-semibold uppercase tracking-wider">
+                          <span className="text-[8px] bg-white/50 px-1.5 py-0.5 rounded-md border border-white/30 text-gray-500 font-semibold uppercase tracking-wider">
                             {trx.outlet}
                           </span>
                         </div>
@@ -284,22 +284,22 @@ export const ReportFinancialScreen: React.FC<Props> = ({ onBack }) => {
 
                     {/* Amount */}
                     <div className="text-right pl-2">
-                      <span className={`block text-sm font-black tracking-tight ${trx.type === 'IN' ? 'text-emerald-600' : 'text-rose-600'
+                      <span className={`block text-xs font-black tracking-tight ${trx.type === 'IN' ? 'text-emerald-600' : 'text-rose-600'
                         }`}>
                         {trx.type === 'IN' ? '+' : '-'} {formatCurrency(trx.amount)}
                       </span>
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full inline-block mt-0.5 ${trx.type === 'IN' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                      <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full inline-block mt-0.5 ${trx.type === 'IN' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
                         }`}>
                         {trx.type === 'IN' ? 'Income' : 'Expense'}
                       </span>
                     </div>
                   </div>
                 )) : (
-                  <div className="py-12 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300">
-                      <DollarSign size={24} />
+                  <div className="py-10 text-center">
+                    <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 text-gray-300">
+                      <DollarSign size={20} />
                     </div>
-                    <p className="text-gray-400 text-xs font-medium">Belum ada transaksi tercatat</p>
+                    <p className="text-gray-400 text-[10px] font-medium">Belum ada transaksi tercatat</p>
                   </div>
                 )}
               </div>

@@ -36,12 +36,12 @@ export const PremiumGlassCard: React.FC<PremiumGlassCardProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`group relative w-full ${variant === 'compact' ? 'h-32 p-3' : 'h-40 p-4'} text-left
+      className={`group relative w-full ${variant === 'compact' ? 'h-28 p-2.5' : 'h-36 p-3.5'} text-left
                  flex flex-col items-start justify-between
                  bg-white/10 backdrop-blur-xl border border-white/20 
-                 rounded-3xl shadow-2xl shadow-black/5
+                 rounded-2xl shadow-xl shadow-black/5
                  overflow-hidden transition-all duration-300 ease-out 
-                 hover:-translate-y-2 hover:scale-[1.02] 
+                 hover:-translate-y-1.5 hover:scale-[1.01] 
                  hover:border-white/40 ${t.hoverShadow}
                  cursor-pointer`}
     >
@@ -52,14 +52,14 @@ export const PremiumGlassCard: React.FC<PremiumGlassCardProps> = ({
 
       {/* Pop-out Icon */}
       <div className="relative">
-        <div className={`bg-white rounded-2xl p-4 shadow-lg 
+        <div className={`bg-white rounded-xl p-3 shadow-md 
                         transition-all duration-300
-                        group-hover:shadow-xl group-hover:scale-105
+                        group-hover:shadow-lg group-hover:scale-105
                         ${t.iconContainer}`}>
-          <Icon size={28} />
+          <Icon size={24} />
         </div>
         {badgeCount > 0 && (
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md border border-white animate-bounce">
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md border border-white animate-bounce">
             {badgeCount}
           </div>
         )}
@@ -68,13 +68,13 @@ export const PremiumGlassCard: React.FC<PremiumGlassCardProps> = ({
       {/* Content */}
       <div className="relative z-10 w-full flex items-end justify-between">
         <div className="flex flex-col items-start min-w-0">
-          <h4 className="text-sm font-extrabold text-gray-800 tracking-tight truncate">{title}</h4>
-          <p className="text-[10px] text-gray-500 font-medium mt-0.5 truncate">{subtitle}</p>
+          <h4 className="text-xs font-extrabold text-gray-800 tracking-tight truncate">{title}</h4>
+          <p className="text-[9px] text-gray-500 font-medium mt-0.5 truncate">{subtitle}</p>
         </div>
-        <div className="w-8 h-8 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center 
+        <div className="w-7 h-7 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center 
                        border border-white/50 group-hover:bg-white group-hover:text-orange-500 
                        transition-colors shadow-sm">
-          <ChevronRight size={14} className="opacity-60 group-hover:opacity-100" />
+          <ChevronRight size={12} className="opacity-60 group-hover:opacity-100" />
         </div>
       </div>
     </button>

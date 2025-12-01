@@ -408,7 +408,8 @@ export const MOCK_MESSAGES: Message[] = [
     content: 'Selamat pagi tim! Ingat, besok kita ada event catering outdoor besar di Balai Kota. Mohon semua manajer pastikan staff di bawahnya sudah briefing dan siap tempur. Semangat!',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
     audience: MessageAudience.ALL_MANAGERS,
-    readBy: ['emp-005', 'emp-003']
+    readBy: ['emp-005', 'emp-003'],
+    senderArea: EmployeeArea.MANAGEMENT
   },
   {
     id: 'msg-2',
@@ -419,7 +420,8 @@ export const MOCK_MESSAGES: Message[] = [
     content: 'Perhatian untuk semua staff. Sehubungan dengan event besok, akan ada penyesuaian jadwal shift sore. Mohon cek jadwal terbaru yang sudah di-publish oleh Manajer Resto. Terima kasih.',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
     audience: MessageAudience.ALL_STAFF,
-    readBy: ['emp-006', 'emp-008', 'emp-009', 'emp-010']
+    readBy: ['emp-006', 'emp-008', 'emp-009', 'emp-010'],
+    senderArea: EmployeeArea.MANAGEMENT
   },
   {
     id: 'msg-3',
@@ -430,6 +432,7 @@ export const MOCK_MESSAGES: Message[] = [
     content: 'Koordinasi untuk para manajer: Saya sudah alokasikan 2 staff FOH tambahan untuk membantu loading logistik besok pagi jam 7. Tolong HR dan Finance take note untuk insentif transport mereka.',
     timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
     audience: MessageAudience.ALL_MANAGERS,
-    readBy: []
+    readBy: [],
+    senderArea: EmployeeArea.MANAGEMENT
   }
 ];
