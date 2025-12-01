@@ -291,6 +291,15 @@ export interface PerformanceRecord {
   description: string;
 }
 
+export interface Transaction {
+  id: string;
+  date: string;
+  desc: string;
+  amount: number;
+  type: 'IN' | 'OUT';
+  outlet: string;
+}
+
 export interface OperationalReport {
   id: string;
   date: string;

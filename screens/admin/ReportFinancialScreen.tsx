@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { colors } from '../../theme/colors';
-import { ownerApi } from '../../services/api';
+import { ownerApi, mockExportApi } from '../../services/api';
 import { ArrowLeft, DollarSign, Activity, Utensils, Users, TrendingUp, TrendingDown, Filter, Calendar, MapPin, Clock, Download } from 'lucide-react';
 import { OwnerDashboardData, TrendData } from '../../types';
 import { BackgroundPattern } from '../../components/layout/BackgroundPattern';
@@ -119,8 +119,12 @@ export const ReportFinancialScreen: React.FC<Props> = ({ onBack }) => {
       });
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
       pdf.save(`Laporan_Keuangan_${selectedDate.toISOString().split('T')[0]}.pdf`);
+      // After successful local PDF generation, simulate API call for confirmation/logging
+      const res = await mockExportApi.exportPDF("Laporan Keuangan");
+      if (res.success) alert(res.message);
     } catch (error) {
       console.error("Export failed", error);
+      // If html2canvas/jsPDF fails, or mockExportApi fails, show generic error
       alert("Gagal mengexport PDF");
     } finally {
       setExporting(false);

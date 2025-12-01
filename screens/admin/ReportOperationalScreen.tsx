@@ -1,11 +1,12 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { colors } from '../../theme/colors';
-import { ownerApi } from '../../services/api';
-import { ArrowLeft, DollarSign, Activity, Utensils, TrendingUp, TrendingDown, Filter, Package, ChevronDown, Download } from 'lucide-react';
+import { performanceApi, mockExportApi, ownerApi } from '../../services/api';
+import { ArrowLeft, DollarSign, Activity, Utensils, TrendingUp, TrendingDown, Filter, Package, ChevronDown, Download, Plus } from 'lucide-react';
 import { OwnerDashboardData, TrendData } from '../../types';
 import { BackgroundPattern } from '../../components/layout/BackgroundPattern';
 import { GlassDatePicker } from '../../components/ui/GlassDatePicker';
+import { StockOpnameModal } from '../../components/features/StockOpnameModal';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -21,14 +22,14 @@ const TrendBadge = ({ data, inverseColor = false }: { data: TrendData, inverseCo
   const colorClass = isPositive ? 'text-emerald-600 bg-emerald-100 border-emerald-200' : 'text-rose-600 bg-rose-100 border-rose-200';
   const Icon = data.trend === 'UP' ? TrendingUp : TrendingDown;
   return (
-    <span className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border ${colorClass}`}>
+    <span className={`flex items - center gap - 1 text - [10px] font - bold px - 1.5 py - 0.5 rounded border ${colorClass} `}>
       <Icon size={10} /> {Math.abs(data.percentageChange)}%
     </span>
   );
 };
 
 const KPICard = ({ label, value, trend, icon: Icon, colorClass, subValue, gradientFrom, gradientTo }: any) => (
-  <div className={`relative overflow-hidden rounded-3xl p-5 border border-white/40 shadow-xl backdrop-blur-xl bg-gradient-to-br ${gradientFrom} ${gradientTo} group hover:scale-[1.02] transition-all duration-300`}>
+  <div className={`relative overflow - hidden rounded - 3xl p - 5 border border - white / 40 shadow - xl backdrop - blur - xl bg - gradient - to - br ${gradientFrom} ${gradientTo} group hover: scale - [1.02] transition - all duration - 300`}>
     <div className="absolute top-0 right-0 p-4 opacity-10">
       <Icon size={64} className="text-gray-900" />
     </div>
@@ -36,7 +37,7 @@ const KPICard = ({ label, value, trend, icon: Icon, colorClass, subValue, gradie
     <div className="relative z-10 flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <div className={`p-2 rounded-xl bg-white/40 backdrop-blur-md shadow-sm ${colorClass}`}>
+          <div className={`p - 2 rounded - xl bg - white / 40 backdrop - blur - md shadow - sm ${colorClass} `}>
             <Icon size={18} />
           </div>
           <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">{label}</p>
@@ -54,12 +55,13 @@ const KPICard = ({ label, value, trend, icon: Icon, colorClass, subValue, gradie
   </div>
 );
 
-const formatCurrency = (val: number) => `Rp ${val.toLocaleString('id-ID')}`;
+const formatCurrency = (val: number) => `Rp ${val.toLocaleString('id-ID')} `;
 
 export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
   const [data, setData] = useState<OwnerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [showStockOpname, setShowStockOpname] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -95,8 +97,15 @@ export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
       pdf.save(`Laporan_Operasional_${selectedDate.toISOString().split('T')[0]}.pdf`);
     } catch (error) {
-      console.error("Export failed", error);
-      alert("Gagal mengexport PDF");
+      console.error("Export failed during PDF generation", error);
+      try {
+        const res = await mockExportApi.exportPDF("Laporan Operasional");
+        if (res.success) alert(res.message);
+        else alert(res.message || "Gagal mengexport PDF");
+      } catch (e) {
+        console.error("Mock export API call failed", e);
+        alert("Gagal mengexport PDF");
+      }
     } finally {
       setExporting(false);
     }
@@ -106,7 +115,7 @@ export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
     <div className="min-h-screen w-full relative overflow-hidden font-sans bg-gray-50" ref={contentRef}>
       <BackgroundPattern />
 
-      <div className="relative z-10 p-6 max-w-3xl mx-auto space-y-6">
+      <div className="relative z-10 p-6 max-w-3xl mx-auto space-y-6 pb-24">
         {/* Header */}
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="p-3 bg-white/60 rounded-2xl text-gray-700 hover:bg-white hover:shadow-lg transition-all backdrop-blur-xl border border-white/40 group">
@@ -119,19 +128,9 @@ export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
 
           <div className="flex items-center gap-2">
             {/* Export Button */}
-            <button
-              onClick={handleExportPDF}
-              disabled={exporting}
-              className="p-3 bg-white/60 text-gray-700 rounded-2xl shadow-sm border border-white/40 hover:bg-white hover:shadow-md transition-all active:scale-95 disabled:opacity-50"
-              title="Export PDF"
-            >
+            <button onClick={() => mockExportApi.exportPDF(`Laporan_Operasional_${selectedDate.toISOString().split('T')[0]}.pdf`)} className="flex items-center gap-2 text-orange-600 px-4 py-2 rounded-xl border border-orange-100 bg-white shadow-sm hover:shadow-md transition-all duration-200">
               <Download size={18} />
-            </button>
-
-            {/* Stock Opname Button */}
-            <button className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 transition-all active:scale-95">
-              <Package size={18} />
-              <span className="text-xs font-bold">Stock Opname</span>
+              <span className="font-bold text-sm">Export PDF</span>
             </button>
           </div>
         </div>
@@ -189,6 +188,25 @@ export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
           </div>
         )}
       </div>
+
+      {/* Floating Action Button for Stock Opname */}
+      <div className="fixed bottom-6 right-6 z-[60]">
+        <button
+          onClick={() => setShowStockOpname(true)}
+          className="flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full shadow-2xl shadow-orange-500/40 hover:shadow-orange-500/60 hover:scale-105 transition-all active:scale-95 group"
+        >
+          <Package size={24} className="group-hover:rotate-12 transition-transform" />
+          <span className="font-bold text-lg hidden sm:inline">Stock Opname</span>
+        </button>
+      </div>
+
+      {/* Stock Opname Modal */}
+      <StockOpnameModal
+        isOpen={showStockOpname}
+        onClose={() => setShowStockOpname(false)}
+        isReadOnly={true}
+      />
     </div>
   );
 };
+

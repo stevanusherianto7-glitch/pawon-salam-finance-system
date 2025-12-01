@@ -1,6 +1,6 @@
 
 // FIX: Added EmployeeArea and SHIFT_COLORS to the import from ../types to resolve reference errors.
-import { ApiResponse, AttendanceLog, Employee, UserRole, ShiftAssignment, ShiftType, JobdeskSubmission, DailyPerformanceSnapshot, PerformanceReview, Payslip, LeaveRequest, EmployeeArea, SHIFT_COLORS, Message, MessageAudience } from "../types";
+import { ApiResponse, AttendanceLog, Employee, UserRole, ShiftAssignment, ShiftType, JobdeskSubmission, DailyPerformanceSnapshot, PerformanceReview, Payslip, LeaveRequest, EmployeeArea, SHIFT_COLORS, Message, MessageAudience, Transaction } from "../types";
 import { MOCK_EMPLOYEES, MOCK_ATTENDANCE, MOCK_SHIFTS, MOCK_DAILY_SNAPSHOTS, MOCK_PERFORMANCE_REVIEWS, MOCK_PAYSLIPS, MOCK_LEAVE_REQUESTS, MOCK_MESSAGES } from "./mockData";
 
 // --- SIMULATED MOCK API ---
@@ -247,9 +247,101 @@ export const performanceApi = {
         return createSuccessResponse(review);
     },
     // Other manager functions can be simple success messages for now
-    saveHRRecord: async (data: any) => { await delay(500); return { success: true, message: "Saved" }; },
-    saveSalarySlip: async (data: any) => { await delay(500); return { success: true, message: "Saved" }; },
-    saveOperationalReport: async (data: any) => { await delay(500); return { success: true, message: "Saved" }; },
+    saveHRRecord: async (data: { type: string, desc: string, empId: string }) => {
+        await delay(500);
+        const emp = MOCK_EMPLOYEES.find(e => e.id === data.empId);
+        if (!emp) return createErrorResponse("Karyawan tidak ditemukan");
+
+        // Logic: Deduct Score based on SP type
+        let deduction = 0;
+        if (data.type === 'SP1') deduction = 10;
+        if (data.type === 'SP2') deduction = 20;
+
+        // Create Performance Review Record
+        const newReview: PerformanceReview = {
+            id: `pr-${Date.now()}`,
+            employeeId: data.empId,
+            reviewerId: "hr-manager",
+            periodMonth: new Date().getMonth() + 1,
+            periodYear: new Date().getFullYear(),
+            area: EmployeeArea.MANAGEMENT, // Default for now
+            scores: { "Discipline": 1 },
+            notes: { hr_note: `[${data.type}] ${data.desc}` },
+            overallScore: 1,
+            overallComment: "Disciplinary Action",
+            isFinalized: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        MOCK_PERFORMANCE_REVIEWS.unshift(newReview);
+
+        return createSuccessResponse(newReview, `HR Record disimpan. Score dikurangi ${deduction} poin.`);
+    },
+    saveSalarySlip: async (data: Partial<Payslip>) => {
+        await delay(500);
+        const newSlip: Payslip = {
+            id: `slip-${Date.now()}`,
+            employeeId: data.employeeId || '',
+            periodMonth: data.periodMonth || new Date().getMonth() + 1,
+            periodYear: data.periodYear || new Date().getFullYear(),
+            payDate: new Date().toISOString(),
+            basicSalary: data.basicSalary || 0,
+            allowanceMeal: 0,
+            allowanceTransport: 0,
+            allowanceOther: data.allowanceOther || 0,
+            overtimeHours: 0,
+            overtimeAmount: 0,
+            bonus: 0,
+            commission: 0,
+            bpjsKesehatan: 0,
+            bpjsKetenagakerjaan: 0,
+            taxPPh21: 0,
+            otherDeductions: data.otherDeductions || 0,
+            totalEarnings: (data.basicSalary || 0) + (data.allowanceOther || 0),
+            totalDeductions: data.otherDeductions || 0,
+            netSalary: (data.basicSalary || 0) + (data.allowanceOther || 0) - (data.otherDeductions || 0),
+            status: 'SENT',
+            isVisibleToEmployee: true,
+            createdByHrId: 'hr-admin',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        MOCK_PAYSLIPS.unshift(newSlip);
+        return createSuccessResponse(newSlip, "Slip Gaji berhasil dibuat & dikirim.");
+    },
+    saveOperationalReport: async (data: { sales: number, notes: string }) => {
+        await delay(500);
+        // Auto-Journal Revenue
+        const newTrx: Transaction = {
+            id: `trx-sales-${Date.now()}`,
+            date: new Date().toISOString().split('T')[0],
+            desc: `Omzet Harian: ${data.notes}`,
+            amount: data.sales,
+            type: 'IN',
+            outlet: 'Jakarta'
+        };
+        MOCK_TRANSACTIONS.unshift(newTrx);
+        return createSuccessResponse(newTrx, "Laporan Omzet Tersimpan & Jurnal Masuk.");
+    },
+    saveIncentive: async (data: { empName: string, amount: number }) => {
+        await delay(500);
+        // Auto-Journal Expense
+        const newTrx: Transaction = {
+            id: `trx-inc-${Date.now()}`,
+            date: new Date().toISOString().split('T')[0],
+            desc: `Insentif/Lembur: ${data.empName}`,
+            amount: data.amount,
+            type: 'OUT',
+            outlet: 'Jakarta'
+        };
+        MOCK_TRANSACTIONS.unshift(newTrx);
+        return createSuccessResponse(newTrx, "Insentif Tersimpan & Jurnal Keluar.");
+    },
+    saveCampaign: async (data: { name: string }) => {
+        await delay(500);
+        // Mock Campaign Logic
+        return createSuccessResponse({ id: `cmp-${Date.now()}`, name: data.name, status: 'Active' }, "Campaign Baru Diluncurkan!");
+    },
     savePayroll: async (data: any) => { await delay(500); return { success: true, message: "Saved" }; },
 
     getDashboardStats: async (month: number, year: number): Promise<ApiResponse<any>> => {
@@ -531,6 +623,19 @@ export const adminApi = {
     logImpersonationStart: async (adminId?: string, targetId?: string) => { await delay(100); return createSuccessResponse(true); }
 };
 
+export const mockExportApi = {
+    exportPDF: async (reportTitle: string): Promise<ApiResponse<boolean>> => {
+        await delay(1500); // Simulate generation time
+        console.log(`[Mock Export] Generating PDF for: ${reportTitle}`);
+        return createSuccessResponse(true, `Laporan "${reportTitle}" berhasil diexport ke PDF!`);
+    },
+    exportExcel: async (reportTitle: string): Promise<ApiResponse<boolean>> => {
+        await delay(1000);
+        console.log(`[Mock Export] Generating Excel for: ${reportTitle}`);
+        return createSuccessResponse(true, `Data "${reportTitle}" berhasil diexport ke Excel!`);
+    }
+};
+
 // --- LEGACY MOCK FUNCTIONS ---
 // These are kept to avoid breaking changes but should be phased out.
 
@@ -551,3 +656,80 @@ export const checkConnection = async (): Promise<boolean> => {
 
 export const getStoredBaseUrl = () => "mock_mode";
 export const saveBaseUrl = (url: string) => { /* Does nothing in mock mode */ };
+
+// --- INVENTORY & STOCK OPNAME LOGIC ---
+
+export interface StockItem {
+    id: string;
+    name: string;
+    unit: string;
+    systemStock: number;
+    physicalStock: number | '';
+    lastOpname: string;
+    pricePerUnit: number; // Added for financial calculation
+}
+
+let MOCK_INVENTORY: StockItem[] = [
+    { id: 'inv-1', name: 'Beras Premium', unit: 'kg', systemStock: 50, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 15000 },
+    { id: 'inv-2', name: 'Minyak Goreng', unit: 'liter', systemStock: 25, physicalStock: '', lastOpname: '2025-11-25', pricePerUnit: 14000 },
+    { id: 'inv-3', name: 'Ayam Potong', unit: 'ekor', systemStock: 120, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 35000 },
+    { id: 'inv-4', name: 'Telur Ayam', unit: 'kg', systemStock: 15.5, physicalStock: '', lastOpname: '2025-11-28', pricePerUnit: 28000 },
+    { id: 'inv-5', name: 'Tepung Terigu', unit: 'kg', systemStock: 30, physicalStock: '', lastOpname: '2025-11-20', pricePerUnit: 12000 },
+    { id: 'inv-6', name: 'Bawang Merah', unit: 'kg', systemStock: 8, physicalStock: '', lastOpname: '2025-11-29', pricePerUnit: 45000 },
+    { id: 'inv-7', name: 'Bawang Putih', unit: 'kg', systemStock: 5, physicalStock: '', lastOpname: '2025-11-29', pricePerUnit: 40000 },
+    { id: 'inv-8', name: 'Cabai Rawit', unit: 'kg', systemStock: 3.5, physicalStock: '', lastOpname: '2025-11-30', pricePerUnit: 80000 },
+];
+
+export const inventoryApi = {
+    getStock: async (): Promise<ApiResponse<StockItem[]>> => {
+        await delay(500);
+        return createSuccessResponse(MOCK_INVENTORY);
+    },
+    submitOpname: async (items: StockItem[]): Promise<ApiResponse<boolean>> => {
+        await delay(1500); // Simulate processing
+
+        let totalVarianceValue = 0;
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // 1. Update Inventory & Calculate Variance Value
+        items.forEach(submittedItem => {
+            const idx = MOCK_INVENTORY.findIndex(i => i.id === submittedItem.id);
+            if (idx > -1) {
+                const currentSystem = MOCK_INVENTORY[idx].systemStock;
+                const physical = submittedItem.physicalStock === '' ? currentSystem : (submittedItem.physicalStock as number);
+
+                const varianceQty = physical - currentSystem;
+                const varianceRupiah = varianceQty * MOCK_INVENTORY[idx].pricePerUnit;
+
+                totalVarianceValue += varianceRupiah;
+
+                // Update Mock DB
+                MOCK_INVENTORY[idx].physicalStock = physical; // Reset or keep? Usually reset for next day, but for demo keep.
+                MOCK_INVENTORY[idx].lastOpname = todayStr;
+                // In real app, we might adjust systemStock to match physical after approval.
+                // For demo, let's say system stock is corrected.
+                MOCK_INVENTORY[idx].systemStock = physical;
+            }
+        });
+
+        // 2. Auto-Generate Financial Transaction
+        if (totalVarianceValue !== 0) {
+            const isLoss = totalVarianceValue < 0;
+            const absValue = Math.abs(totalVarianceValue);
+
+            const transaction = {
+                id: `trx-auto-${Date.now()}`,
+                date: todayStr,
+                desc: isLoss ? 'Biaya Selisih Stok (Shrinkage)' : 'Penyesuaian Stok (Surplus)',
+                amount: absValue,
+                type: isLoss ? 'OUT' : 'IN', // Loss = Expense (OUT), Surplus = Income (IN)
+                outlet: 'Jakarta' // Default for demo
+            };
+
+            MOCK_TRANSACTIONS.unshift(transaction);
+            console.log("[AUTO-FINANCE] Generated Transaction:", transaction);
+        }
+
+        return createSuccessResponse(true, "Laporan Stok Opname Berhasil & Jurnal Keuangan Diupdate");
+    }
+};

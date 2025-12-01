@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, Users, Utensils, Megaphone, FileText, Calendar, Clock, ChevronRight, ClipboardList, Banknote, CheckSquare, AlertCircle } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, Utensils, Megaphone, FileText, Calendar, Clock, ChevronRight, ClipboardList, Banknote, CheckSquare, AlertCircle, Package } from 'lucide-react';
 import { colors } from '../../theme/colors';
-import { performanceApi, jobdeskApi } from '../../services/api';
-import { SalarySlip } from '../../types';
+import { performanceApi, jobdeskApi, employeeApi, payrollApi } from '../../services/api';
+import { Payslip, Employee } from '../../types';
+import { StockOpnameModal } from '../../components/features/StockOpnameModal';
 
 interface PanelProps {
     onBack: () => void;
@@ -40,22 +41,70 @@ export const HRPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     const [activeTab, setActiveTab] = useState<'SP' | 'SALARY'>('SP');
     const [type, setType] = useState('SP1');
     const [desc, setDesc] = useState('');
-    const [empName, setEmpName] = useState('');
-    const [salaryForm, setSalaryForm] = useState<Partial<SalarySlip>>({
-        employeeName: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(),
-        basicSalary: 0, allowances: 0, deductions: 0, totalSalary: 0
+    const [selectedEmpId, setSelectedEmpId] = useState('');
+    const [employees, setEmployees] = useState<Employee[]>([]);
+    const [salaryForm, setSalaryForm] = useState<Partial<Payslip>>({
+        employeeId: '', periodMonth: new Date().getMonth() + 1, periodYear: new Date().getFullYear(),
+        basicSalary: 0, allowanceOther: 0, otherDeductions: 0, totalEarnings: 0
     });
 
     useEffect(() => {
+        const loadEmployees = async () => {
+            const res = await employeeApi.getAll();
+            if (res.success && res.data) setEmployees(res.data);
+        };
+        loadEmployees();
+    }, []);
+
+    useEffect(() => {
         const basic = Number(salaryForm.basicSalary) || 0;
-        const allow = Number(salaryForm.allowances) || 0;
-        const deduct = Number(salaryForm.deductions) || 0;
-        setSalaryForm(prev => ({ ...prev, totalSalary: basic + allow - deduct }));
-    }, [salaryForm.basicSalary, salaryForm.allowances, salaryForm.deductions]);
+        const allow = Number(salaryForm.allowanceOther) || 0;
+        const deduct = Number(salaryForm.otherDeductions) || 0;
+        setSalaryForm(prev => ({ ...prev, totalEarnings: basic + allow - deduct }));
+    }, [salaryForm.basicSalary, salaryForm.allowanceOther, salaryForm.otherDeductions]);
 
     const handleSaveSP = async () => {
-        await performanceApi.saveHRRecord({ type, desc, empName });
-        alert('Catatan HR Tersimpan'); setEmpName(''); setDesc('');
+        if (!selectedEmpId) return alert("Pilih karyawan dulu");
+        const res = await performanceApi.saveHRRecord({ type, desc, empId: selectedEmpId });
+        if (res.success) {
+            alert(res.message);
+            setDesc('');
+            setSelectedEmpId('');
+        }
+    };
+
+    const handleSaveSalary = async () => {
+        if (!salaryForm.employeeId) return alert("Pilih karyawan dulu");
+        const emp = employees.find(e => e.id === salaryForm.employeeId);
+
+        // Construct full Payslip object
+        const newPayslip: Payslip = {
+            id: `slip-${Date.now()}`,
+            employeeId: salaryForm.employeeId,
+            periodMonth: salaryForm.periodMonth || 1,
+            periodYear: salaryForm.periodYear || 2025,
+            payDate: new Date().toISOString(),
+            basicSalary: salaryForm.basicSalary || 0,
+            allowanceMeal: 0, allowanceTransport: 0,
+            allowanceOther: salaryForm.allowanceOther || 0,
+            overtimeHours: 0, overtimeAmount: 0, bonus: 0, commission: 0,
+            bpjsKesehatan: 0, bpjsKetenagakerjaan: 0, taxPPh21: 0,
+            otherDeductions: salaryForm.otherDeductions || 0,
+            totalEarnings: (salaryForm.basicSalary || 0) + (salaryForm.allowanceOther || 0),
+            totalDeductions: salaryForm.otherDeductions || 0,
+            netSalary: (salaryForm.basicSalary || 0) + (salaryForm.allowanceOther || 0) - (salaryForm.otherDeductions || 0),
+            status: 'SENT',
+            isVisibleToEmployee: true,
+            createdByHrId: 'hr-admin',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        const res = await payrollApi.savePayslip(newPayslip);
+        if (res.success) {
+            alert(res.message);
+            setSalaryForm({ ...salaryForm, basicSalary: 0, allowanceOther: 0, otherDeductions: 0, employeeId: '' });
+        }
     };
 
     return (
@@ -79,7 +128,16 @@ export const HRPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
 
                 {activeTab === 'SP' ? (
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
-                        <input type="text" placeholder="Nama Karyawan" className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-200" value={empName} onChange={e => setEmpName(e.target.value)} />
+                        <select
+                            className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-200"
+                            value={selectedEmpId}
+                            onChange={e => setSelectedEmpId(e.target.value)}
+                        >
+                            <option value="">Pilih Karyawan...</option>
+                            {employees.map(e => (
+                                <option key={e.id} value={e.id}>{e.name} - {e.role}</option>
+                            ))}
+                        </select>
                         <select className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none" value={type} onChange={e => setType(e.target.value)}>
                             <option value="SP1">Surat Peringatan 1</option>
                             <option value="SP2">Surat Peringatan 2</option>
@@ -90,12 +148,23 @@ export const HRPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
                     </div>
                 ) : (
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
-                        <input type="text" placeholder="Nama Karyawan" className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm" value={salaryForm.employeeName} onChange={e => setSalaryForm({ ...salaryForm, employeeName: e.target.value })} />
+                        <select
+                            className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-200"
+                            value={salaryForm.employeeId}
+                            onChange={e => setSalaryForm({ ...salaryForm, employeeId: e.target.value })}
+                        >
+                            <option value="">Pilih Karyawan...</option>
+                            {employees.map(e => (
+                                <option key={e.id} value={e.id}>{e.name} - {e.role}</option>
+                            ))}
+                        </select>
                         <div className="grid grid-cols-2 gap-2">
                             <input type="number" placeholder="Gaji Pokok" className="p-3 bg-gray-50 border-none rounded-xl text-sm" onChange={e => setSalaryForm({ ...salaryForm, basicSalary: parseFloat(e.target.value) })} />
-                            <input type="number" placeholder="Tunjangan" className="p-3 bg-gray-50 border-none rounded-xl text-sm" onChange={e => setSalaryForm({ ...salaryForm, allowances: parseFloat(e.target.value) })} />
+                            <input type="number" placeholder="Tunjangan" className="p-3 bg-gray-50 border-none rounded-xl text-sm" onChange={e => setSalaryForm({ ...salaryForm, allowanceOther: parseFloat(e.target.value) })} />
+                            <input type="number" placeholder="Potongan" className="p-3 bg-gray-50 border-none rounded-xl text-sm" onChange={e => setSalaryForm({ ...salaryForm, otherDeductions: parseFloat(e.target.value) })} />
                         </div>
-                        <div className="bg-green-50 p-3 rounded-xl flex justify-between items-center"><span className="text-xs font-bold text-green-700">Total</span><span className="font-bold text-green-700">Rp {salaryForm.totalSalary?.toLocaleString('id-ID')}</span></div>
+                        <div className="bg-green-50 p-3 rounded-xl flex justify-between items-center"><span className="text-xs font-bold text-green-700">Total</span><span className="font-bold text-green-700">Rp {salaryForm.totalEarnings?.toLocaleString('id-ID')}</span></div>
+                        <button onClick={handleSaveSalary} className="w-full py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg active:scale-95">Kirim Slip Gaji</button>
                     </div>
                 )}
             </div>
@@ -107,6 +176,7 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     const [sales, setSales] = useState('');
     const [notes, setNotes] = useState('');
     const [jobdeskStats, setJobdeskStats] = useState({ fohCount: 0, bohCount: 0 });
+    const [showStockOpname, setShowStockOpname] = useState(false);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -123,8 +193,16 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     }, []);
 
     const handleSave = async () => {
-        await performanceApi.saveOperationalReport({ sales, notes });
-        alert('Laporan Tersimpan'); onBack();
+        const salesValue = parseFloat(sales);
+        if (!salesValue) return alert("Masukkan nominal omzet");
+
+        const res = await performanceApi.saveOperationalReport({ sales: salesValue, notes });
+        if (res.success) {
+            alert(res.message);
+            setSales('');
+            setNotes('');
+            onBack();
+        }
     };
 
     return (
@@ -154,7 +232,18 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
                         onClick={() => onNavigate && onNavigate('shiftScheduler')}
                         icon={Clock} title="Shift" subtitle="Scheduling" colorClass="bg-blue-500 text-white"
                     />
+                    <ActionCard
+                        onClick={() => setShowStockOpname(true)}
+                        icon={Package} title="Stock Opname" subtitle="Input Stok Fisik" colorClass="bg-emerald-500 text-white"
+                    />
                 </div>
+
+                {/* Stock Opname Modal */}
+                <StockOpnameModal
+                    isOpen={showStockOpname}
+                    onClose={() => setShowStockOpname(false)}
+                    isReadOnly={false}
+                />
 
                 {/* Report Form */}
                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
@@ -177,6 +266,19 @@ export const FinancePanel: React.FC<PanelProps> = ({ onBack }) => {
     const [bonus, setBonus] = useState('');
     const [empName, setEmpName] = useState('');
 
+    const handleSave = async () => {
+        const amount = parseFloat(bonus);
+        if (!amount || !empName) return alert("Lengkapi data");
+
+        const res = await performanceApi.saveIncentive({ empName, amount });
+        if (res.success) {
+            alert(res.message);
+            setBonus('');
+            setEmpName('');
+            onBack();
+        }
+    };
+
     return (
         <div className="bg-gray-50 pb-24 min-h-screen">
             <PanelHeader title="Finance" icon={Banknote} onBack={onBack} />
@@ -189,7 +291,7 @@ export const FinancePanel: React.FC<PanelProps> = ({ onBack }) => {
                             <span className="absolute left-3 top-3 text-gray-400 text-xs">Rp</span>
                             <input type="number" placeholder="Nominal" className="w-full p-3 pl-8 bg-gray-50 rounded-xl text-sm border-none outline-none" value={bonus} onChange={e => setBonus(e.target.value)} />
                         </div>
-                        <button onClick={() => { alert('Saved'); onBack(); }} className="w-full py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-sm">Simpan Data</button>
+                        <button onClick={handleSave} className="w-full py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-sm">Simpan Data</button>
                     </div>
                 </div>
             </div>
@@ -198,6 +300,18 @@ export const FinancePanel: React.FC<PanelProps> = ({ onBack }) => {
 };
 
 export const MarketingPanel: React.FC<PanelProps> = ({ onBack }) => {
+    const [campaign, setCampaign] = useState('');
+
+    const handleSave = async () => {
+        if (!campaign) return alert("Isi nama campaign");
+        const res = await performanceApi.saveCampaign({ name: campaign });
+        if (res.success) {
+            alert(res.message);
+            setCampaign('');
+            onBack();
+        }
+    };
+
     return (
         <div className="bg-gray-50 pb-24 min-h-screen">
             <PanelHeader title="Marketing" icon={Megaphone} onBack={onBack} />
@@ -208,8 +322,8 @@ export const MarketingPanel: React.FC<PanelProps> = ({ onBack }) => {
                 </div>
                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                     <h3 className="font-bold text-gray-800 mb-4 text-sm">New Campaign</h3>
-                    <input type="text" placeholder="Nama Campaign" className="w-full p-3 bg-gray-50 rounded-xl text-sm border-none outline-none mb-3" />
-                    <button onClick={() => { alert('Saved'); onBack(); }} className="w-full py-3 bg-purple-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-sm">Simpan</button>
+                    <input type="text" placeholder="Nama Campaign" className="w-full p-3 bg-gray-50 rounded-xl text-sm border-none outline-none mb-3" value={campaign} onChange={e => setCampaign(e.target.value)} />
+                    <button onClick={handleSave} className="w-full py-3 bg-purple-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-sm">Simpan</button>
                 </div>
             </div>
         </div>
