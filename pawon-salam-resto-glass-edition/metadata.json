@@ -1,0 +1,8 @@
+{
+  "name": "Project aplikasi karyawan Pawon Salam Resto11",
+  "description": "Aplikasi Absensi Karyawan (Web/Mobile Prototype) yang memungkinkan karyawan melakukan check-in/out berbasis lokasi dan Admin memonitor kehadiran.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}
