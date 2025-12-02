@@ -84,7 +84,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
             />
 
             {/* Modal Content */}
-            <div className="relative w-full sm:max-w-md md:max-w-lg lg:max-w-4xl mt-[120px] h-[calc(100vh-230px)] mb-[110px] sm:h-[90vh] sm:mb-0 sm:mt-0 bg-gray-50 rounded-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scale-up pointer-events-auto">
+            <div className="fixed top-[12vh] h-[78vh] left-[4%] w-[92%] z-[9999] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 flex flex-col">
 
                 {/* Header */}
                 <div className="p-5 border-b border-gray-100/50 flex items-center justify-between bg-gradient-to-r from-orange-50/50 to-amber-50/50 backdrop-blur-xl">
@@ -128,7 +128,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
                 </div>
 
                 {/* Body - Scrollable */}
-                <div className="flex-1 overflow-y-auto p-5 pb-[200px] custom-scrollbar bg-gray-50/30">
+                <div className="flex-1 overflow-y-auto p-4 pb-32">
                     {success ? (
                         <div className="flex flex-col items-center justify-center h-64 text-center animate-fade-in">
                             <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600 shadow-xl shadow-emerald-200 ring-4 ring-white">

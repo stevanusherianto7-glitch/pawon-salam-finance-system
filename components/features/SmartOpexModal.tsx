@@ -44,7 +44,7 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
     };
 
     const renderUtilities = () => (
-        <div className="space-y-4 p-4 pb-[200px]">
+        <div className="flex-1 overflow-y-auto p-4 pb-32">
             {[
                 { key: 'gas', label: 'Gas LPG', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
                 { key: 'listrik', label: 'Listrik (Token)', icon: Zap, color: 'text-yellow-500', bg: 'bg-yellow-50' },
@@ -74,7 +74,7 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
     );
 
     const renderPettyCash = () => (
-        <div className="p-4 pb-[200px] space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 pb-32">
             {/* Quick Add Form */}
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
                 <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
@@ -145,7 +145,7 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
     );
 
     const renderWaste = () => (
-        <div className="p-4 pb-[200px] space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 pb-32">
             {/* Quick Add Form */}
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
                 <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
@@ -229,10 +229,10 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
     );
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4 pointer-events-none">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity pointer-events-auto" onClick={onClose} />
+        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            <div className="relative w-full sm:max-w-md md:max-w-lg lg:max-w-4xl mt-[120px] h-[calc(100vh-230px)] mb-[110px] sm:h-[90vh] sm:mb-0 sm:mt-0 bg-gray-50 rounded-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scale-up pointer-events-auto">
+            <div className="fixed top-[12vh] h-[78vh] left-[4%] w-[92%] z-[9999] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 flex flex-col">
 
                 {/* Header */}
                 <div className="bg-white p-4 flex justify-between items-center border-b border-gray-100 z-20">
