@@ -554,3 +554,105 @@ export const JOBDESK_BOH_ITEMS: string[] = [
   "Melakukan belanja kecil ke Indomaret sesuai daftar kebutuhan dapur.",
   "Melakukan stok opname berkala untuk seluruh bahan baku dan perlengkapan dapur BOH."
 ];
+
+export interface PayrollData {
+  month: string;
+  employeeName: string;
+  nik: string;
+  position: string;
+  basicSalary: number;
+  allowances: number;
+  positionAllowance: number;
+  attendanceDays: number;
+  overtime: number;
+  tax: number;
+  otherDeductions: number;
+}
+
+// --- GAMIFICATION TYPES (Employee Engagement System) ---
+
+export type BadgeType = 'PUNCTUAL_HERO' | 'OVERTIME_CHAMPION' | 'PERFECT_MONTH' | 'STREAK_WARRIOR';
+export type BadgeColor = 'gold' | 'silver' | 'bronze';
+
+export interface EmployeePoints {
+  id: string;
+  employeeId: string;
+  points: number; // Current balance
+  level: number;
+  totalEarnedPoints: number; // Lifetime total
+  pointsThisMonth: number;
+  attendanceStreak: number; // Consecutive days on-time
+  overtimeCount: number;
+  perfectMonthCount: number;
+  lastPointEarnedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Badge {
+  id: string;
+  employeeId: string;
+  badgeType: BadgeType;
+  badgeName: string;
+  badgeIcon: string; // Emoji or icon name
+  badgeColor: BadgeColor;
+  earnedAt: string;
+  requirementMet: string; // e.g., "100 on-time attendances"
+}
+
+export interface PointTransaction {
+  id: string;
+  employeeId: string;
+  pointsDelta: number; // +10, -5, etc.
+  transactionType: 'ATTENDANCE' | 'OVERTIME' | 'PENALTY' | 'BONUS' | 'REDEMPTION';
+  reason: string;
+  referenceType?: string; // 'ATTENDANCE_LOG', 'OVERTIME_REQUEST'
+  referenceId?: string;
+  createdAt: string;
+  createdBy?: string; // Admin who triggered
+}
+
+export interface LevelTier {
+  level: number;
+  minPoints: number;
+  title: string; // 'Rookie', 'Pro', 'Master', etc.
+  color: string; // Hex color
+}
+
+export const LEVEL_THRESHOLDS: LevelTier[] = [
+  { level: 1, minPoints: 0, title: 'Rookie', color: '#94a3b8' },
+  { level: 2, minPoints: 100, title: 'Regular', color: '#3b82f6' },
+  { level: 3, minPoints: 300, title: 'Pro', color: '#8b5cf6' },
+  { level: 4, minPoints: 600, title: 'Expert', color: '#f59e0b' },
+  { level: 5, minPoints: 1000, title: 'Master', color: '#ef4444' },
+  { level: 6, minPoints: 1500, title: 'Legend', color: '#fbbf24' }
+];
+
+// --- SMART ROSTER / LABOR COST TYPES ---
+
+export type AlertLevel = 'GREEN' | 'YELLOW' | 'RED';
+
+export interface DailyLaborMetrics {
+  id: string;
+  date: string; // YYYY-MM-DD
+  outlet: string;
+  totalStaffScheduled: number;
+  totalStaffAttendance: number;
+  estimatedDailyLaborCost: number;
+  dailyRevenue: number;
+  laborCostPercentage: number; // (Labor Cost / Revenue) * 100
+  revenuePerEmployee: number;
+  efficiencyScore: number;
+  isOverstaffed: boolean;
+  alertLevel: AlertLevel;
+  createdAt: string;
+}
+
+export interface LaborCostSnapshot {
+  laborPercentage: number;
+  alertLevel: AlertLevel;
+  estimatedLaborCost: number;
+  dailyRevenue: number;
+  totalStaffCount: number;
+  revenuePerEmployee: number;
+}

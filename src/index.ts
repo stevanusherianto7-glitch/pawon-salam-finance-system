@@ -1,7 +1,15 @@
 
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
+import type {
+    LoginRequest,
+    AdminLoginRequest,
+    CreateEmployeeRequest,
+    UpdateEmployeeRequest,
+    CheckInRequest,
+    CheckOutRequest
+} from './types/apiTypes';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -9,15 +17,15 @@ const PORT = process.env.PORT || 3000;
 
 // Local Enum Definition for ShiftType to avoid import issues
 enum ShiftType {
-  OFF = 'OFF',
-  MORNING = 'MORNING',
-  MIDDLE = 'MIDDLE'
+    OFF = 'OFF',
+    MORNING = 'MORNING',
+    MIDDLE = 'MIDDLE'
 }
 
 // --- MIDDLEWARE ---
 
 // 1. Logging Middleware (CCTV)
-app.use((req: any, res: any, next: any) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
     next();
 });
@@ -32,12 +40,12 @@ app.use(cors({
             'https://pawonsalam.my.id', // Production Domain
             'https://www.pawonsalam.my.id'
         ];
-        
+
         // Allow requests with no origin (like mobile apps or curl requests) or if origin is in allowed list
         if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.pages.dev')) {
             return callback(null, true);
         }
-        
+
         console.warn(`Blocked CORS request from: ${origin}`);
         return callback(new Error('Not allowed by CORS'), false);
     },
@@ -57,14 +65,14 @@ const getTodayDate = () => {
 };
 
 const SHIFT_COLORS: Record<string, string> = {
-  'OFF': '#EF4444',
-  'MORNING': '#3B82F6',
-  'MIDDLE': '#22C55E'
+    'OFF': '#EF4444',
+    'MORNING': '#3B82F6',
+    'MIDDLE': '#22C55E'
 };
 
 const getShiftTimes = (type: string) => {
     if (type === 'OFF') return { start: '', end: '' };
-    if (type === 'MORNING') return { start: '10:00', end: '20:00' }; 
+    if (type === 'MORNING') return { start: '10:00', end: '20:00' };
     if (type === 'MIDDLE') return { start: '11:00', end: '21:00' };
     return { start: '09:00', end: '18:00' };
 };
@@ -91,57 +99,57 @@ const parsePayslip = (p: any) => ({
 // --- ROUTES ---
 
 // Endpoint Pintu Depan & Health Check
-app.get('/', async (req: any, res: any) => {
-  try {
-    // await prisma.$connect(); // Optional check
-    res.status(200).json({ status: 'OK', message: '✅ PAWON SALAM BACKEND IS ONLINE & SECURE' });
-  } catch (error) {
-    console.error("Connection error:", error);
-    res.status(500).json({ status: 'ERROR', message: '❌ Database Error' });
-  }
+app.get('/', async (req: Request, res: Response) => {
+    try {
+        // await prisma.$connect(); // Optional check
+        res.status(200).json({ status: 'OK', message: '✅ PAWON SALAM BACKEND IS ONLINE & SECURE' });
+    } catch (error) {
+        console.error("Connection error:", error);
+        res.status(500).json({ status: 'ERROR', message: '❌ Database Error' });
+    }
 });
 
 // --- AUTHENTICATION ROUTES ---
 
-app.post('/api/auth/login', async (req: any, res: any) => {
-  const { phone } = req.body; // Removed PIN from request
+app.post('/api/auth/login', async (req: Request<{}, {}, LoginRequest>, res: Response) => {
+    const { phone } = req.body; // Removed PIN from request
 
-  if (!phone) {
-    res.status(400).json({ success: false, message: "Nomor HP wajib diisi." });
-    return;
-  }
-
-  try {
-    console.log(`Login attempt for phone: ${phone}`);
-    const employee = await prisma.employee.findFirst({
-      where: { phone: phone },
-    });
-
-    if (!employee) {
-      console.log("User not found");
-      res.status(404).json({ success: false, message: "Nomor HP tidak terdaftar." });
-      return;
+    if (!phone) {
+        res.status(400).json({ success: false, message: "Nomor HP wajib diisi." });
+        return;
     }
 
-    // --- PIN SECURITY COMPLETELY REMOVED ---
-    console.log(`[AUTH] Login success for ${employee.name} (Phone Only)`);
+    try {
+        console.log(`Login attempt for phone: ${phone}`);
+        const employee = await prisma.employee.findFirst({
+            where: { phone: phone },
+        });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { pin: _, ...employeeData } = employee;
+        if (!employee) {
+            console.log("User not found");
+            res.status(404).json({ success: false, message: "Nomor HP tidak terdaftar." });
+            return;
+        }
 
-    res.status(200).json({
-      success: true,
-      message: "Login Berhasil!",
-      data: employeeData,
-    });
+        // --- PIN SECURITY COMPLETELY REMOVED ---
+        console.log(`[AUTH] Login success for ${employee.name} (Phone Only)`);
 
-  } catch (error) {
-    console.error("Login endpoint error:", error);
-    res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." });
-  }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { pin: _, ...employeeData } = employee;
+
+        res.status(200).json({
+            success: true,
+            message: "Login Berhasil!",
+            data: employeeData,
+        });
+
+    } catch (error) {
+        console.error("Login endpoint error:", error);
+        res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." });
+    }
 });
 
-app.post('/api/auth/admin-login', async (req: any, res: any) => {
+app.post('/api/auth/admin-login', async (req: Request<{}, {}, AdminLoginRequest>, res: Response) => {
     const { email, password } = req.body;
 
     try {
@@ -161,7 +169,7 @@ app.post('/api/auth/admin-login', async (req: any, res: any) => {
             res.status(401).json({ success: false, message: "Password salah." });
             return;
         }
-        
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { pin: _, ...adminData } = admin;
 
@@ -179,81 +187,81 @@ app.post('/api/auth/admin-login', async (req: any, res: any) => {
 
 // --- EMPLOYEE MANAGEMENT ROUTES ---
 
-app.get('/api/employees', async (req: any, res: any) => {
-  try {
-    const employees = await prisma.employee.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
-    
-    const safeEmployees = employees.map((emp: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { pin, ...rest } = emp;
-      return rest;
-    });
+app.get('/api/employees', async (req: Request, res: Response) => {
+    try {
+        const employees = await prisma.employee.findMany({
+            orderBy: { createdAt: 'desc' }
+        });
 
-    res.json({ success: true, message: "Data karyawan berhasil diambil", data: safeEmployees });
-  } catch (error) {
-    console.error("Get employees error:", error);
-    res.status(500).json({ success: false, message: "Gagal mengambil data karyawan" });
-  }
+        const safeEmployees = employees.map((emp: any) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { pin, ...rest } = emp;
+            return rest;
+        });
+
+        res.json({ success: true, message: "Data karyawan berhasil diambil", data: safeEmployees });
+    } catch (error) {
+        console.error("Get employees error:", error);
+        res.status(500).json({ success: false, message: "Gagal mengambil data karyawan" });
+    }
 });
 
-app.post('/api/employees', async (req: any, res: any) => {
-  try {
+app.post('/api/employees', async (req: Request<{}, {}, CreateEmployeeRequest>, res: Response) => {
+    try {
+        const { name, email, phone, pin, role, department, area, address, avatarUrl } = req.body;
+
+        const newEmployee = await prisma.employee.create({
+            data: {
+                name,
+                email,
+                phone: phone || null,
+                pin: pin || '123456',
+                role,
+                department,
+                area,
+                address: address || null,
+                avatarUrl: avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+            }
+        });
+
+        res.status(201).json({ success: true, message: "Karyawan berhasil ditambahkan", data: newEmployee });
+    } catch (error: any) {
+        console.error("Create employee error:", error);
+        if (error.code === 'P2002') {
+            res.status(400).json({ success: false, message: "Email atau Nomor HP sudah terdaftar" });
+            return;
+        }
+        res.status(500).json({ success: false, message: "Gagal menambahkan karyawan" });
+    }
+});
+
+app.put('/api/employees/:id', async (req: Request<{ id: string }, {}, UpdateEmployeeRequest>, res: Response) => {
+    const { id } = req.params;
     const { name, email, phone, pin, role, department, area, address, avatarUrl } = req.body;
 
-    const newEmployee = await prisma.employee.create({
-      data: {
-        name,
-        email,
-        phone: phone || null,
-        pin: pin || '123456',
-        role,
-        department,
-        area,
-        address: address || null,
-        avatarUrl: avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
-      }
-    });
+    try {
+        const updateData: any = {
+            name, email, phone, role, department, area, address
+        };
 
-    res.status(201).json({ success: true, message: "Karyawan berhasil ditambahkan", data: newEmployee });
-  } catch (error: any) {
-    console.error("Create employee error:", error);
-    if (error.code === 'P2002') {
-      res.status(400).json({ success: false, message: "Email atau Nomor HP sudah terdaftar" });
-      return;
+        if (pin) updateData.pin = pin;
+        if (avatarUrl) updateData.avatarUrl = avatarUrl;
+
+        const updatedEmployee = await prisma.employee.update({
+            where: { id },
+            data: updateData
+        });
+
+        res.json({ success: true, message: "Data karyawan berhasil diperbarui", data: updatedEmployee });
+    } catch (error: any) {
+        console.error("Update employee error:", error);
+        res.status(500).json({ success: false, message: "Gagal memperbarui data karyawan" });
     }
-    res.status(500).json({ success: false, message: "Gagal menambahkan karyawan" });
-  }
-});
-
-app.put('/api/employees/:id', async (req: any, res: any) => {
-  const { id } = req.params;
-  const { name, email, phone, pin, role, department, area, address, avatarUrl } = req.body;
-
-  try {
-    const updateData: any = {
-      name, email, phone, role, department, area, address
-    };
-    
-    if (pin) updateData.pin = pin;
-    if (avatarUrl) updateData.avatarUrl = avatarUrl;
-
-    const updatedEmployee = await prisma.employee.update({
-      where: { id },
-      data: updateData
-    });
-
-    res.json({ success: true, message: "Data karyawan berhasil diperbarui", data: updatedEmployee });
-  } catch (error: any) {
-    console.error("Update employee error:", error);
-    res.status(500).json({ success: false, message: "Gagal memperbarui data karyawan" });
-  }
 });
 
 // --- ATTENDANCE ROUTES ---
 
-app.post('/api/attendance/check-in', async (req: any, res: any) => {
+app.post('/api/attendance/check-in', async (req: Request<{}, {}, CheckInRequest>, res: Response) => {
     const { employeeId, latitude, longitude, photoInUrl, status } = req.body;
 
     try {
@@ -289,7 +297,7 @@ app.post('/api/attendance/check-in', async (req: any, res: any) => {
     }
 });
 
-app.post('/api/attendance/check-out', async (req: any, res: any) => {
+app.post('/api/attendance/check-out', async (req: Request<{}, {}, CheckOutRequest>, res: Response) => {
     const { logId } = req.body;
 
     try {
@@ -490,7 +498,7 @@ app.post('/api/performance/review', async (req: any, res: any) => {
     try {
         let result;
         try {
-             result = await prisma.performanceReview.update({
+            result = await prisma.performanceReview.update({
                 where: { id: id },
                 data: {
                     employeeId, reviewerId, periodMonth, periodYear, area,
@@ -563,8 +571,8 @@ app.post('/api/shifts/generate', async (req: any, res: any) => {
         for (const emp of employees) {
             for (let d = 1; d <= daysInMonth; d++) {
                 const date = new Date(year, month - 1, d);
-                const dayOfWeek = date.getDay(); 
-                
+                const dayOfWeek = date.getDay();
+
                 // --- FIX: Use local enum for ShiftType ---
                 let type: ShiftType = ShiftType.MORNING;
                 if (dayOfWeek === 1) type = ShiftType.OFF;
@@ -590,7 +598,7 @@ app.post('/api/shifts/generate', async (req: any, res: any) => {
         const newShifts = await prisma.shiftAssignment.findMany({
             where: { date: { gte: startDate, lte: endDate } }
         });
-        
+
         const formattedShifts = newShifts.map((s: any) => ({
             ...s, date: s.date.toISOString().split('T')[0]
         }));
@@ -603,7 +611,7 @@ app.post('/api/shifts/generate', async (req: any, res: any) => {
 
 app.put('/api/shifts/:id', async (req: any, res: any) => {
     const { id } = req.params;
-    const { type } = req.body; 
+    const { type } = req.body;
     try {
         const times = getShiftTimes(type);
         const updatedShift = await prisma.shiftAssignment.update({
@@ -642,7 +650,7 @@ app.get('/api/payroll', async (req: any, res: any) => {
         let whereClause: any = {};
         if (role === 'EMPLOYEE') {
             whereClause = { employeeId: userId, status: 'SENT', isVisibleToEmployee: true };
-        } 
+        }
         const payslips = await prisma.payslip.findMany({
             where: whereClause,
             orderBy: { createdAt: 'desc' }
@@ -697,12 +705,12 @@ app.post('/api/payroll', async (req: any, res: any) => {
         };
 
         if (data.id && !data.id.startsWith('slip-')) {
-             const existing = await prisma.payslip.findUnique({ where: { id: data.id } });
-             if (existing) {
-                 const result = await prisma.payslip.update({ where: { id: data.id }, data: payload });
-                 res.json({ success: true, message: "Payslip updated", data: parsePayslip(result) });
-                 return;
-             }
+            const existing = await prisma.payslip.findUnique({ where: { id: data.id } });
+            if (existing) {
+                const result = await prisma.payslip.update({ where: { id: data.id }, data: payload });
+                res.json({ success: true, message: "Payslip updated", data: parsePayslip(result) });
+                return;
+            }
         }
 
         if (payload.createdAt === undefined) delete (payload as any).createdAt;
@@ -834,5 +842,5 @@ app.get('/api/seed', async (req: any, res: any) => {
 // --- BOOTSTRAP ---
 // Listen on 0.0.0.0 to be accessible from outside localhost (e.g. from frontend running on host)
 app.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`◈ Server menyala di http://localhost:${PORT}`);
+    console.log(`◈ Server menyala di http://localhost:${PORT}`);
 });

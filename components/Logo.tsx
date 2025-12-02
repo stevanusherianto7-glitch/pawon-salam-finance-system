@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface LogoProps {
@@ -8,31 +7,31 @@ interface LogoProps {
   showText?: boolean; // Opsi mau nampilin teks "Pawon Salam" atau ikon saja
 }
 
-export const Logo: React.FC<LogoProps> = ({ 
-  className = '', 
-  size = 'md', 
+export const Logo: React.FC<LogoProps> = ({
+  className = '',
+  size = 'md',
   variant = 'light',
-  showText = true 
+  showText = true
 }) => {
-  
-  // 1. Konfigurasi Ukuran Ikon (Disesuaikan untuk Mobile)
+
+  // 1. Konfigurasi Ukuran Ikon
   const sizeClasses = {
-    xs: 'w-5 h-5',
-    sm: 'w-7 h-7',
-    md: 'w-10 h-10',   // Standar header
-    lg: 'w-14 h-14',   // Login screen size (was w-16 h-16)
+    xs: 'w-6 h-6',
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
     xl: 'w-24 h-24',
     '2xl': 'w-32 h-32',
   };
 
-  // 2. Konfigurasi Ukuran Teks (Disesuaikan untuk Mobile)
+  // 2. Konfigurasi Ukuran Teks
   const textSizeClasses = {
     xs: 'text-xs',
     sm: 'text-sm',
-    md: 'text-xl',
-    lg: 'text-2xl',    // Login screen size (was text-3xl)
-    xl: 'text-4xl',
-    '2xl': 'text-5xl',
+    md: 'text-lg',
+    lg: 'text-2xl',
+    xl: 'text-3xl',
+    '2xl': 'text-4xl',
   };
 
   // 3. Konfigurasi Warna
@@ -46,30 +45,29 @@ export const Logo: React.FC<LogoProps> = ({
   };
 
   const colorClass = getColorClass();
-  // Sub-text color logic
-  const subTextColorClass = variant === 'light' ? 'text-orange-100 opacity-90' : 'text-orange-600 opacity-90';
+  // Menggunakan opacity class dari Tailwind untuk sub-text
+  const subTextColorClass = variant === 'light' ? 'text-orange-50 opacity-80' : 'text-orange-600 opacity-80';
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
-      
+
       {/* --- BAGIAN IKON (SVG VEKTOR) --- */}
-      {/* Langsung SVG tanpa border/background container */}
-      <div className={`${sizeClasses[size]} ${colorClass} drop-shadow-md relative flex items-center justify-center transition-transform hover:scale-105 duration-300`}>
-        <svg 
-          viewBox="0 0 100 100" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="5" 
-          strokeLinecap="round" 
+      <div className={`${sizeClasses[size]} ${colorClass} drop-shadow-sm relative flex items-center justify-center transition-transform hover:scale-105 duration-300`}>
+        <svg
+          viewBox="0 0 100 100"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="6"
+          strokeLinecap="round"
           strokeLinejoin="round"
           className="w-full h-full"
         >
           {/* Lingkaran Luar */}
-          <circle cx="50" cy="50" r="45" />
-          
+          <circle cx="50" cy="50" r="44" />
+
           {/* Daun Diagonal */}
           <path d="M28 72 Q 28 28 72 28 Q 72 72 28 72 Z" />
-          
+
           {/* Tulang Daun (Garis Tengah) */}
           <line x1="28" y1="72" x2="72" y2="28" />
 
@@ -81,22 +79,21 @@ export const Logo: React.FC<LogoProps> = ({
       {/* --- BAGIAN TEKS (OPSIONAL) --- */}
       {showText && (
         <div className={`text-center mt-2 ${colorClass}`}>
-          <h1 
-            className={`font-bold tracking-wide leading-none drop-shadow-sm ${textSizeClasses[size]}`}
-            style={{ fontFamily: '"Times New Roman", Times, serif' }} 
+          <h1
+            className={`font-bold tracking-tight drop-shadow-sm ${textSizeClasses[size]}`}
+            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             Pawon Salam
           </h1>
           {size !== 'xs' && size !== 'sm' && (
-            <div className="flex flex-col items-center mt-1">
-                <div className={`h-px w-8 my-0.5 ${variant === 'light' ? 'bg-white/40' : 'bg-gray-300'}`}></div>
-                <p className={`text-[10px] tracking-[0.25em] uppercase font-medium ${subTextColorClass}`}>
-                Resto & Catering
-                </p>
-            </div>
+            <p className={`text-[10px] tracking-widest uppercase font-medium ${subTextColorClass}`}>
+              Resto & Catering
+            </p>
           )}
         </div>
       )}
     </div>
   );
 };
+
+export default Logo;

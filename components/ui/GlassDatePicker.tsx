@@ -8,6 +8,7 @@ interface GlassDatePickerProps {
     placeholder?: string;
     className?: string;
     theme?: 'light' | 'dark';
+    mode?: 'date' | 'month-year' | 'year';
 }
 
 export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
@@ -16,6 +17,7 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
     placeholder = 'Pilih Tanggal',
     className = '',
     theme = 'dark',
+    mode = 'date',
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [viewDate, setViewDate] = useState(selectedDate || new Date());
@@ -59,7 +61,7 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
 
         // Empty cells for previous month
         for (let i = 0; i < startDay; i++) {
-            days.push(<div key={`empty-${i}`} className="h-8 w-8" />);
+            days.push(<div key={`empty-${i}`} className="h-11 w-11" />);
         }
 
         // Days of current month
@@ -77,7 +79,7 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
                     key={day}
                     onClick={() => handleDateClick(day)}
                     className={`
-            h-8 w-8 rounded-full flex items-center justify-center text-sm transition-all duration-200
+            h-11 w-11 rounded-full flex items-center justify-center text-sm transition-all duration-200 min-h-[44px] min-w-[44px]
             ${isSelected
                             ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 font-bold scale-110'
                             : theme === 'light'
@@ -95,6 +97,11 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
     };
 
     const formatDate = (date: Date) => {
+        if (mode === 'year') {
+            return date.toLocaleDateString('id-ID', { year: 'numeric' });
+        } else if (mode === 'month-year') {
+            return date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        }
         return date.toLocaleDateString('id-ID', {
             day: 'numeric',
             month: 'long',
@@ -126,7 +133,7 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
 
             {/* Dropdown Calendar */}
             {isOpen && (
-                <div className="absolute top-full right-0 mt-2 z-50 w-72 max-w-[90vw] animate-in fade-in zoom-in-95 duration-200">
+                <div className="absolute top-full right-0 mt-2 z-[60] w-72 max-w-[90vw] animate-in fade-in zoom-in-95 duration-200">
                     <div className={`
                         backdrop-blur-xl border rounded-2xl shadow-2xl p-4 overflow-hidden
                         ${isLight
@@ -167,22 +174,87 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
                             </button>
                         </div>
 
-                        {/* Weekday Headers */}
-                        <div className="grid grid-cols-7 mb-2 text-center">
-                            {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
-                                <div key={day} className={`
+                        {/* Weekday Headers (only for date mode) */}
+                        {mode === 'date' && (
+                            <div className="grid grid-cols-7 mb-2 text-center">
+                                {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
+                                    <div key={day} className={`
                                     text-[10px] font-bold uppercase tracking-wider
                                     ${isLight ? 'text-gray-400' : 'text-white/40'}
                                 `}>
-                                    {day}
-                                </div>
-                            ))}
-                        </div>
+                                        {day}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
-                        {/* Days Grid */}
-                        <div className="grid grid-cols-7 gap-1 place-items-center">
-                            {renderCalendarDays()}
-                        </div>
+                        {/* Content Grid - depends on mode */}
+                        {mode === 'date' && (
+                            <div className="grid grid-cols-7 gap-1 place-items-center">
+                                {renderCalendarDays()}
+                            </div>
+                        )}
+
+                        {mode === 'month-year' && (
+                            <div className="grid grid-cols-3 gap-2">
+                                {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'].map((monthName, idx) => {
+                                    const isSelected = selectedDate &&
+                                        selectedDate.getMonth() === idx &&
+                                        selectedDate.getFullYear() === viewDate.getFullYear();
+                                    return (
+                                        <button
+                                            key={idx}
+                                            onClick={() => {
+                                                const newDate = new Date(viewDate.getFullYear(), idx, 1);
+                                                onChange(newDate);
+                                                setIsOpen(false);
+                                            }}
+                                            className={`
+                                                py-3 px-4 rounded-xl text-sm font-medium transition-all min-h-[44px]
+                                                ${isSelected
+                                                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 font-bold'
+                                                    : isLight
+                                                        ? 'text-gray-700 hover:bg-gray-100'
+                                                        : 'text-white/80 hover:bg-white/10'
+                                                }
+                                            `}
+                                        >
+                                            {monthName}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {mode === 'year' && (
+                            <div className="grid grid-cols-3 gap-2">
+                                {Array.from({ length: 12 }, (_, i) => {
+                                    const year = viewDate.getFullYear() - 5 + i;
+                                    const isSelected = selectedDate && selectedDate.getFullYear() === year;
+                                    return (
+                                        <button
+                                            key={year}
+                                            onClick={() => {
+                                                const newDate = new Date(year, 0, 1);
+                                                onChange(newDate);
+                                                setIsOpen(false);
+                                            }}
+                                            className={`
+                                                py-3 px-4 rounded-xl text-sm font-medium transition-all min-h-[44px]
+                                                ${isSelected
+                                                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 font-bold'
+                                                    : isLight
+                                                        ? 'text-gray-700 hover:bg-gray-100'
+                                                        : 'text-white/80 hover:bg-white/10'
+                                                }
+                                            `}
+                                        >
+                                            {year}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
 
                         {/* Clear Button (Optional) */}
                         {selectedDate && (

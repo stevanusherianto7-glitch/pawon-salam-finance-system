@@ -84,7 +84,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
             />
 
             {/* Modal Content */}
-            <div className="fixed top-[12vh] h-[78vh] left-[4%] w-[92%] z-[9999] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 flex flex-col">
+            <div className="fixed inset-x-4 top-20 bottom-20 max-w-[480px] mx-auto z-[9999] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 flex flex-col">
 
                 {/* Header */}
                 <div className="p-5 border-b border-gray-100/50 flex items-center justify-between bg-gradient-to-r from-orange-50/50 to-amber-50/50 backdrop-blur-xl">

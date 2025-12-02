@@ -17,6 +17,9 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+        devOptions: {
+          enabled: true
+        },
         manifest: {
           name: 'Pawon Salam Resto Management',
           short_name: 'PawonSalam',
@@ -29,14 +32,20 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           icons: [
             {
-              src: '/logo.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
+              src: '/icon-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any maskable'
+            },
+            {
+              src: '/icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
               purpose: 'any maskable'
             },
             {
               src: '/logo.svg',
-              sizes: '512x512',
+              sizes: 'any',
               type: 'image/svg+xml',
               purpose: 'any maskable'
             }

@@ -47,6 +47,11 @@ import { BroadcastScreen } from './screens/employee/BroadcastScreen';
 import { HRDailyMonitorHubScreen } from './screens/admin/HRDailyMonitorHubScreen';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { CreatePayslip } from './screens/admin/CreatePayslip';
+import { OfflineBanner } from './components/OfflineBanner';
+
+// Initialize Axios Interceptor (must import to activate)
+import './services/axiosConfig';
 
 import { useNotificationStore } from './store/notificationStore';
 import { haptics } from './utils/haptics';
@@ -154,6 +159,10 @@ const App = () => {
         case 'hrDailyMonitorHub':
           return <HRDailyMonitorHubScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
 
+
+
+        // ... existing imports
+
         // Payroll - Admin/HR/Finance
         case 'payslipList':
           return <PayslipListScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
@@ -165,6 +174,8 @@ const App = () => {
             initialMonth={screenParams?.month}
             initialYear={screenParams?.year}
           />;
+        case 'createPayslip': // NEW ROUTE
+          return <CreatePayslip onBack={() => setCurrentScreen('adminDashboard')} />;
 
         // Super Admin Tools
         case 'systemSettings': return <SystemSettingsScreen onBack={() => setCurrentScreen('adminDashboard')} />;
@@ -224,6 +235,7 @@ const App = () => {
     'adminLeaveRequest',
     'jobdeskMonitor', // Add here
     'hrDailyMonitorHub', // Add new Hub here
+    'createPayslip', // Exclude from BottomTab
     // New report screens
     'reportFinancial', 'reportRevenueCost', 'reportOperational', 'reportHR', 'reportMarketing'
   ];
@@ -231,20 +243,23 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <div className="h-full w-full bg-gray-200 flex justify-center font-sans overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
-        <div className="w-full max-w-md bg-gray-50 h-full relative flex flex-col border-x border-gray-200 shadow-2xl overflow-hidden">
+      <OfflineBanner />
+      <div className="h-full w-full bg-gray-200 flex justify-center font-sans overflow-hidden print:overflow-visible print:bg-white print:h-auto print:block print:static" style={{ backgroundColor: '#e5e7eb' }}>
+        <div className="w-full max-w-md bg-gray-50 h-full relative flex flex-col border-x border-gray-200 shadow-2xl overflow-hidden print:max-w-none print:w-full print:h-auto print:overflow-visible print:border-none print:shadow-none print:block print:static">
           <ImpersonationBanner />
           <ToastContainer />
           <SpecialNotificationBanner />
           <PWAInstallPrompt />
 
-          <div className={`flex-1 overflow-y-auto overscroll-contain pb-[calc(8rem+env(safe-area-inset-bottom))] ${isImpersonating ? 'pt-16' : ''}`} id="main-content">
+          <div className={`flex-1 overflow-y-auto overscroll-contain pb-[calc(8rem+env(safe-area-inset-bottom))] ${isImpersonating ? 'pt-16' : ''} print:overflow-visible print:h-auto print:pb-0 print:static`} id="main-content">
             {renderScreen()}
           </div>
 
-          {isAuthenticated && user && !exclusionList.includes(currentScreen) && (
-            <BottomTab role={user.role} currentScreen={currentScreen} onNavigate={handleNavigate} />
-          )}
+          <div className="print:hidden">
+            {isAuthenticated && user && !exclusionList.includes(currentScreen) && (
+              <BottomTab role={user.role} currentScreen={currentScreen} onNavigate={handleNavigate} />
+            )}
+          </div>
         </div>
       </div>
     </ErrorBoundary>

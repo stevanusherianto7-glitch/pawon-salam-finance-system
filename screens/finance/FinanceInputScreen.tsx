@@ -138,29 +138,6 @@ export const FinanceInputScreen: React.FC<Props> = ({ onBack }) => {
                             />
                         </div>
 
-                        {/* Amount */}
-                        <div>
-                            <label className="text-xs font-bold text-gray-500 mb-1 block ml-1">Nominal (Rp)</label>
-                            <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Rp</span>
-                                <input
-                                    type="number"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    placeholder="0"
-                                    className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-lg font-bold text-gray-800 outline-none focus:border-orange-500 transition"
-                                />
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-95 transition-all flex items-center justify-center gap-2"
-                        >
-                            {isSubmitting ? 'Menyimpan...' : <><Save size={18} /> Simpan Transaksi</>}
-                        </button>
-                    </form>
                 </div>
 
                 {/* Recent Transactions List */}

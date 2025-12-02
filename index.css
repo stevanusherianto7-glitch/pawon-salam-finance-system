@@ -90,6 +90,39 @@
   .animate-shake {
     animation: shake 0.6s cubic-bezier(.36, .07, .19, .97) both;
   }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .animate-scale-up {
+    animation: scaleUp 0.2s ease-out;
+  }
+
+  /* Glassmorphism Tier System - PWA Native Feel */
+  .glass-overlay {
+    @apply bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/50 shadow-lg;
+  }
+
+  .glass-button {
+    @apply bg-white/60 backdrop-blur-md border border-white/40 shadow-md;
+  }
+
+  .glass-badge {
+    @apply bg-white/20 backdrop-blur-sm border border-white/10;
+  }
+
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-xl border border-white/10;
+  }
 }
 
 /* Keyframes */
@@ -133,5 +166,51 @@
   40%,
   60% {
     transform: translate3d(4px, 0, 0);
+  }
+}
+
+/* ========================================
+   ENHANCED PRINT STYLES FOR PDF GENERATION
+   ======================================== */
+
+@media print {
+
+  /* Force A4 Portrait with zero margins */
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  /* Force exact color printing (critical for orange motifs) */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Remove body margins and ensure white background */
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    overflow: visible;
+    position: static;
+    height: auto;
+  }
+
+  /* Ensure SVGs render with high quality */
+  svg {
+    shape-rendering: geometricPrecision;
+  }
+
+  /* Prevent page breaks inside important elements */
+  .print\:break-inside-avoid,
+  section,
+  header {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }

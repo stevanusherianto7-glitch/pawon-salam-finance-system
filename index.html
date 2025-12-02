@@ -138,6 +138,38 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0 !important;
+        /* CRITICAL: Removes browser header/footer (Date, Title, URL) */
+      }
+
+      html,
+      body {
+        width: 210mm;
+        height: 297mm;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        overflow: hidden;
+        /* Prevents scrollbars in print preview */
+      }
+
+      /* Hide everything by default, we will expose the print container explicitly */
+      body>*:not(#root) {
+        display: none;
+      }
+
+      /* Force background graphics to show */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
   </style>
   <link rel="stylesheet" href="/index.css">
 </head>

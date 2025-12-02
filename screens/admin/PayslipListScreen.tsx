@@ -7,6 +7,8 @@ import { useAuthStore } from '../../store/authStore';
 import { colors } from '../../theme/colors';
 import { ArrowLeft, Plus, Filter, Search, DollarSign, CheckCircle2, Clock, FileText, User, Banknote } from 'lucide-react';
 import { UserRole, PayslipStatus } from '../../types';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { SkeletonLoader } from '../../components/ui/SkeletonLoader';
 
 interface Props {
     onBack: () => void;
@@ -107,12 +109,15 @@ export const PayslipListScreen: React.FC<Props> = ({ onBack, onNavigate }) => {
                 {/* List */}
                 <div className="space-y-2.5">
                     {isLoading && payslips.length === 0 ? (
-                        <div className="text-center py-8 text-gray-400 text-xs">Memuat data...</div>
+                        <SkeletonLoader variant="list" count={5} />
                     ) : filteredPayslips.length === 0 ? (
-                        <div className="text-center py-8 text-gray-400 bg-white rounded-xl border border-dashed border-gray-200">
-                            <FileText size={24} className="mx-auto mb-1.5 opacity-20" />
-                            <p className="text-xs">Belum ada data slip gaji untuk periode ini.</p>
-                        </div>
+                        <EmptyState
+                            icon={Banknote}
+                            title="Belum Ada Slip Gaji"
+                            description="Slip gaji untuk periode ini belum dibuat. Silakan buat slip gaji baru."
+                            actionLabel={user?.role === UserRole.HR_MANAGER ? "Buat Slip Gaji" : undefined}
+                            onAction={user?.role === UserRole.HR_MANAGER ? handleCreate : undefined}
+                        />
                     ) : (
                         filteredPayslips.map(slip => {
                             const emp = employees.find(e => e.id === slip.employeeId);

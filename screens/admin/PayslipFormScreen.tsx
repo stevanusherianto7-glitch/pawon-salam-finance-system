@@ -145,6 +145,7 @@ export const PayslipFormScreen: React.FC<Props> = ({ onBack, payslipId, isNew, i
                 <span className="absolute left-3 top-2.5 text-gray-400 font-bold text-[10px]">Rp</span>
                 <input
                     type="number"
+                    inputMode="numeric"
                     disabled={!canEdit}
                     value={formData[field] as number}
                     onChange={e => setFormData({ ...formData, [field]: parseFloat(e.target.value) || 0 })}
@@ -211,6 +212,7 @@ export const PayslipFormScreen: React.FC<Props> = ({ onBack, payslipId, isNew, i
                             <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Tahun</label>
                             <input
                                 type="number"
+                                inputMode="numeric"
                                 disabled={!canEdit}
                                 value={formData.periodYear}
                                 onChange={e => setFormData({ ...formData, periodYear: Number(e.target.value) })}
