@@ -13,22 +13,34 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState<Tab>('utilities');
     const { utilities, logs, setUtility, addLog, removeLog, getTotalExpense } = useOpexStore();
 
-    // Temporary state for new log input
-    const [isAddingLog, setIsAddingLog] = useState(false);
-    const [newLog, setNewLog] = useState({ name: '', price: '', reason: '' });
+    // Form States
+    const [pettyForm, setPettyForm] = useState({ name: '', price: '', category: 'Dapur' });
+    const [wasteForm, setWasteForm] = useState({ name: '', qty: '', reason: 'Basi', price: '' });
 
     if (!isOpen) return null;
 
-    const handleAddLog = () => {
-        if (!newLog.name || !newLog.price) return;
+    const handleAddPetty = () => {
+        if (!pettyForm.name || !pettyForm.price) return;
         addLog({
-            type: activeTab === 'petty' ? 'petty' : 'waste',
-            name: newLog.name,
-            price: parseFloat(newLog.price),
-            reason: newLog.reason
+            type: 'petty',
+            name: pettyForm.name,
+            price: parseFloat(pettyForm.price),
+            category: pettyForm.category,
+            reason: '-' // Not used for petty
         });
-        setNewLog({ name: '', price: '', reason: '' });
-        setIsAddingLog(false);
+        setPettyForm({ name: '', price: '', category: 'Dapur' });
+    };
+
+    const handleAddWaste = () => {
+        if (!wasteForm.name || !wasteForm.qty) return;
+        addLog({
+            type: 'waste',
+            name: wasteForm.name,
+            price: wasteForm.price ? parseFloat(wasteForm.price) : 0,
+            qty: parseFloat(wasteForm.qty),
+            reason: wasteForm.reason
+        });
+        setWasteForm({ name: '', qty: '', reason: 'Basi', price: '' });
     };
 
     const renderUtilities = () => (
@@ -61,44 +73,160 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
     );
 
-    const renderLogList = (type: 'petty' | 'waste') => {
-        const filteredLogs = logs.filter(l => l.type === type);
-        return (
-            <div className="space-y-3 p-4 pb-[200px]">
-                {filteredLogs.map(log => (
+    const renderPettyCash = () => (
+        <div className="p-4 pb-[200px] space-y-6">
+            {/* Quick Add Form */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                    <Plus size={16} className="text-orange-500" />
+                    Catat Pengeluaran
+                </h3>
+                <input
+                    type="text"
+                    placeholder="Nama Barang (Contoh: Es Batu)"
+                    value={pettyForm.name}
+                    onChange={(e) => setPettyForm({ ...pettyForm, name: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-orange-500 transition-all"
+                />
+                <div className="flex gap-2">
+                    <div className="relative flex-1">
+                        <span className="absolute left-3 top-3 text-gray-400 text-xs font-bold">Rp</span>
+                        <input
+                            type="number"
+                            placeholder="Nominal"
+                            value={pettyForm.price}
+                            onChange={(e) => setPettyForm({ ...pettyForm, price: e.target.value })}
+                            className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-orange-500 transition-all"
+                        />
+                    </div>
+                    <select
+                        value={pettyForm.category}
+                        onChange={(e) => setPettyForm({ ...pettyForm, category: e.target.value })}
+                        className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-orange-500 transition-all appearance-none"
+                    >
+                        <option value="Dapur">Dapur</option>
+                        <option value="Kebersihan">Kebersihan</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <button
+                    onClick={handleAddPetty}
+                    className="w-full py-3 bg-gradient-to-r from-[#E87722] to-[#F9A055] text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all"
+                >
+                    + Tambah
+                </button>
+            </div>
+
+            {/* List */}
+            <div className="space-y-3">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Hari Ini</h3>
+                {logs.filter(l => l.type === 'petty').map(log => (
                     <div key={log.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center group">
                         <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-xl ${type === 'petty' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                {type === 'petty' ? <Wallet size={20} /> : <Trash2 size={20} />}
+                            <div className="p-2 rounded-xl bg-orange-50 text-orange-600">
+                                <Wallet size={20} />
                             </div>
                             <div>
                                 <p className="font-bold text-gray-800 text-sm">{log.name}</p>
-                                <p className="text-xs text-gray-400">{log.reason || '-'}</p>
+                                <p className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full w-fit mt-1">{log.category || 'Umum'}</p>
                             </div>
                         </div>
                         <div className="text-right">
-                            <p className="font-black text-orange-600">Rp {log.price.toLocaleString()}</p>
-                            <button onClick={() => removeLog(log.id)} className="text-gray-300 hover:text-red-500 text-xs mt-1">Hapus</button>
+                            <p className="font-black text-gray-800 text-sm">Rp {log.price.toLocaleString()}</p>
+                            <button onClick={() => removeLog(log.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={14} /></button>
                         </div>
                     </div>
                 ))}
-
-                {filteredLogs.length === 0 && (
-                    <div className="text-center py-10 text-gray-400 text-sm italic">
-                        Belum ada data {type === 'petty' ? 'Petty Cash' : 'Waste'}
-                    </div>
+                {logs.filter(l => l.type === 'petty').length === 0 && (
+                    <div className="text-center py-8 text-gray-400 text-xs italic">Belum ada pengeluaran hari ini</div>
                 )}
+            </div>
+        </div>
+    );
 
-                {/* FAB */}
+    const renderWaste = () => (
+        <div className="p-4 pb-[200px] space-y-6">
+            {/* Quick Add Form */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                    <AlertTriangle size={16} className="text-red-500" />
+                    Catat Waste (Terbuang)
+                </h3>
+                <input
+                    type="text"
+                    placeholder="Nama Bahan (Contoh: Ayam Potong)"
+                    value={wasteForm.name}
+                    onChange={(e) => setWasteForm({ ...wasteForm, name: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-red-500 transition-all"
+                />
+                <div className="flex gap-2">
+                    <div className="relative flex-1">
+                        <input
+                            type="number"
+                            placeholder="Qty"
+                            value={wasteForm.qty}
+                            onChange={(e) => setWasteForm({ ...wasteForm, qty: e.target.value })}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-red-500 transition-all"
+                        />
+                    </div>
+                    <select
+                        value={wasteForm.reason}
+                        onChange={(e) => setWasteForm({ ...wasteForm, reason: e.target.value })}
+                        className="flex-[1.5] px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-red-500 transition-all appearance-none"
+                    >
+                        <option value="Basi">Basi</option>
+                        <option value="Jatuh">Jatuh</option>
+                        <option value="Salah Masak">Salah Masak</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+                <div className="relative">
+                    <span className="absolute left-3 top-3 text-gray-400 text-xs font-bold">Rp</span>
+                    <input
+                        type="number"
+                        placeholder="Estimasi Kerugian (Opsional)"
+                        value={wasteForm.price}
+                        onChange={(e) => setWasteForm({ ...wasteForm, price: e.target.value })}
+                        className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-red-500 transition-all"
+                    />
+                </div>
                 <button
-                    onClick={() => setIsAddingLog(true)}
-                    className="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-lg shadow-orange-500/30 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50"
+                    onClick={handleAddWaste}
+                    className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-500/20 active:scale-[0.98] transition-all"
                 >
-                    <Plus size={28} />
+                    + Catat Waste
                 </button>
             </div>
-        );
-    };
+
+            {/* List */}
+            <div className="space-y-3">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Log Waste</h3>
+                {logs.filter(l => l.type === 'waste').map(log => (
+                    <div key={log.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center group">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-xl bg-red-50 text-red-600">
+                                <Trash2 size={20} />
+                            </div>
+                            <div>
+                                <p className="font-bold text-gray-800 text-sm">{log.name}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[10px] font-bold text-white bg-red-500 px-2 py-0.5 rounded-full">{log.qty} Items</span>
+                                    <span className="text-[10px] text-gray-400">{log.reason}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="font-black text-gray-800 text-sm">Rp {log.price.toLocaleString()}</p>
+                            <button onClick={() => removeLog(log.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={14} /></button>
+                        </div>
+                    </div>
+                ))}
+                {logs.filter(l => l.type === 'waste').length === 0 && (
+                    <div className="text-center py-8 text-gray-400 text-xs italic">Belum ada data waste</div>
+                )}
+            </div>
+        </div>
+    );
 
     return (
         <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4">
@@ -138,8 +266,8 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto bg-gray-50">
                     {activeTab === 'utilities' && renderUtilities()}
-                    {activeTab === 'petty' && renderLogList('petty')}
-                    {activeTab === 'waste' && renderLogList('waste')}
+                    {activeTab === 'petty' && renderPettyCash()}
+                    {activeTab === 'waste' && renderWaste()}
                 </div>
 
                 {/* Sticky Footer */}
@@ -151,44 +279,6 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 </div>
 
             </div>
-
-            {/* Add Log Modal (Overlay) - Moved outside to avoid overflow clipping */}
-            {isAddingLog && (
-                <div className="absolute inset-0 z-[10001] flex items-end sm:items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsAddingLog(false)} />
-                    <div className="bg-white w-full sm:max-w-md rounded-2xl p-5 animate-scale-up shadow-2xl relative z-10 mb-4 sm:mb-0">
-                        <h3 className="font-bold text-gray-800 mb-4">Tambah {activeTab === 'petty' ? 'Petty Cash' : 'Waste'}</h3>
-                        <div className="space-y-3">
-                            <input
-                                autoFocus
-                                type="text"
-                                placeholder="Nama Item"
-                                value={newLog.name}
-                                onChange={e => setNewLog({ ...newLog, name: e.target.value })}
-                                className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:border-orange-500 font-bold text-sm"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Harga (Rp)"
-                                value={newLog.price}
-                                onChange={e => setNewLog({ ...newLog, price: e.target.value })}
-                                className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:border-orange-500 font-bold text-sm"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Keterangan (Opsional)"
-                                value={newLog.reason}
-                                onChange={e => setNewLog({ ...newLog, reason: e.target.value })}
-                                className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:border-orange-500 text-sm"
-                            />
-                            <div className="flex gap-2 pt-2">
-                                <button onClick={() => setIsAddingLog(false)} className="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm">Batal</button>
-                                <button onClick={handleAddLog} className="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-orange-500/20">Simpan</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

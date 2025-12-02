@@ -7,6 +7,8 @@ export interface OpexLog {
     name: string;
     reason: string;
     price: number;
+    qty?: number;
+    category?: string;
     date: string;
 }
 
