@@ -126,7 +126,7 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
 
             {/* Dropdown Calendar */}
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 z-50 w-72 animate-in fade-in zoom-in-95 duration-200">
+                <div className="absolute top-full right-0 mt-2 z-50 w-72 max-w-[90vw] animate-in fade-in zoom-in-95 duration-200">
                     <div className={`
                         backdrop-blur-xl border rounded-2xl shadow-2xl p-4 overflow-hidden
                         ${isLight

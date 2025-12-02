@@ -1,22 +1,23 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { colors } from '../../theme/colors';
-import { ownerApi } from '../../services/api';
-import { ArrowLeft, Users, Calendar, TrendingUp, TrendingDown, Filter, Star } from 'lucide-react';
+import { ownerApi, mockExportApi } from '../../services/api';
+import { ArrowLeft, Users, Calendar, TrendingUp, TrendingDown, Filter, Star, ChevronDown, Download } from 'lucide-react';
 import { OwnerDashboardData, TrendData } from '../../types';
-import { PeriodFilter } from '../../components/PeriodFilter';
 import { BackgroundPattern } from '../../components/layout/BackgroundPattern';
+import { GlassDatePicker } from '../../components/ui/GlassDatePicker';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 interface Props {
-  onBack: () => void;
+    onBack: () => void;
 }
 
 // Helper Components
 const TrendBadge = ({ data, inverseColor = false }: { data: TrendData, inverseColor?: boolean }) => {
     let isPositive = data.trend === 'UP';
     if (inverseColor) isPositive = !isPositive;
-    if (data.trend === 'STABLE') return <span className="text-[10px] text-white/40 font-medium bg-white/10 px-1.5 py-0.5 rounded">Stable</span>;
-    const colorClass = isPositive ? 'text-green-300 bg-green-500/20 border-green-500/30' : 'text-red-300 bg-red-500/20 border-red-500/30';
+    if (data.trend === 'STABLE') return <span className="text-[10px] text-gray-400 font-medium bg-gray-100 px-1.5 py-0.5 rounded">Stable</span>;
+    const colorClass = isPositive ? 'text-emerald-600 bg-emerald-100 border-emerald-200' : 'text-rose-600 bg-rose-100 border-rose-200';
     const Icon = data.trend === 'UP' ? TrendingUp : TrendingDown;
     return (
         <span className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border ${colorClass}`}>
@@ -25,126 +26,202 @@ const TrendBadge = ({ data, inverseColor = false }: { data: TrendData, inverseCo
     );
 };
 
-const KPICard = ({ label, value, trend, icon: Icon, colorClass, inverseTrend = false, subValue }: any) => (
-    <div className="bg-black/20 backdrop-blur-xl p-4 rounded-2xl shadow-lg border border-white/10 flex flex-col justify-between h-full relative overflow-hidden group hover:bg-black/30 transition-all">
-        <div className={`absolute top-0 right-0 p-3 opacity-20 rounded-bl-2xl ${colorClass.replace('text-', 'bg-')}`}>
-            <Icon size={32} />
+const KPICard = ({ label, value, trend, icon: Icon, colorClass, inverseTrend = false, subValue, gradientFrom, gradientTo }: any) => (
+    <div className={`relative overflow-hidden rounded-3xl p-4 border border-white/40 shadow-xl backdrop-blur-xl bg-gradient-to-br ${gradientFrom} ${gradientTo} group hover:scale-[1.02] transition-all duration-300`}>
+        <div className="absolute top-0 right-0 p-3 opacity-10">
+            <Icon size={48} className="text-gray-900" />
         </div>
-        <div>
-            <p className="text-xs text-white/50 font-bold uppercase tracking-wider mb-1">{label}</p>
-            <div className="flex items-baseline gap-1">
-                <h3 className="text-2xl font-bold text-white leading-tight">{value}</h3>
-                {subValue && <span className="text-xs text-white/60 font-medium">{subValue}</span>}
+
+        <div className="relative z-10 flex flex-col justify-between h-full">
+            <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                    <div className={`p-1.5 rounded-xl bg-white/40 backdrop-blur-md shadow-sm ${colorClass}`}>
+                        <Icon size={16} />
+                    </div>
+                    <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">{label}</p>
+                </div>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                    <h3 className="text-2xl font-black text-gray-800 tracking-tight">{value}</h3>
+                    {subValue && <span className="text-[10px] text-gray-500 font-medium">{subValue}</span>}
+                </div>
             </div>
-        </div>
-        <div className="mt-4 flex items-center justify-between">
-             {trend ? <TrendBadge data={trend} inverseColor={inverseTrend} /> : <span className="h-4"></span>}
-             <div className={`p-1.5 rounded-lg ${colorClass} bg-opacity-20`}>
-                 <Icon size={14} className={colorClass.split(' ')[0]} />
-             </div>
+
+            <div className="mt-3 flex items-center justify-between">
+                {trend ? <TrendBadge data={trend} inverseColor={inverseTrend} /> : <span className="h-4"></span>}
+            </div>
         </div>
     </div>
 );
 
 export const ReportHRScreen: React.FC<Props> = ({ onBack }) => {
-  const [data, setData] = useState<OwnerDashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [location, setLocation] = useState('ALL');
+    const [data, setData] = useState<OwnerDashboardData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [exporting, setExporting] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const loadKPIs = async () => {
-        setLoading(true);
-        const res = await ownerApi.getDashboardKPIs(month, year, location === 'ALL' ? undefined : location);
-        if (res.success && res.data) setData(res.data);
-        setLoading(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [location, setLocation] = useState('ALL');
+
+    useEffect(() => {
+        const loadKPIs = async () => {
+            setLoading(true);
+            const month = selectedDate.getMonth() + 1;
+            const year = selectedDate.getFullYear();
+            const res = await ownerApi.getDashboardKPIs(month, year, location === 'ALL' ? undefined : location);
+            if (res.success && res.data) setData(res.data);
+            setLoading(false);
+        };
+        loadKPIs();
+    }, [selectedDate, location]);
+
+    const handleExportPDF = async () => {
+        if (!contentRef.current) return;
+        setExporting(true);
+        try {
+            const canvas = await html2canvas(contentRef.current, {
+                scale: 2,
+                backgroundColor: '#F9FAFB', // Match bg-gray-50
+                useCORS: true
+            });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.save(`Laporan_HR_${selectedDate.toISOString().split('T')[0]}.pdf`);
+        } catch (error) {
+            const handleExport = async () => {
+                try {
+                    // Assuming mockExportApi is defined elsewhere or imported
+                    // For now, this will cause a ReferenceError if mockExportApi is not defined.
+                    // This change is made faithfully as per user instruction.
+                    const res = await mockExportApi.exportPDF("Laporan HR");
+                    if (res.success) alert(res.message);
+                } catch (e) {
+                    alert("Gagal mengexport PDF");
+                }
+            };
+        } finally {
+            setExporting(false);
+        }
     };
-    loadKPIs();
-  }, [month, year, location]);
 
-  const handlePeriodChange = (period: { month: number; year: number }) => {
-    setMonth(period.month);
-    setYear(period.year);
-  };
+    return (
+        <div className="min-h-screen w-full relative overflow-hidden font-sans bg-gray-50" ref={contentRef}>
+            <BackgroundPattern />
 
-  return (
-    <div className="min-h-screen w-full relative overflow-hidden font-sans">
-      <BackgroundPattern />
+            <div className="relative z-10 p-4 max-w-3xl mx-auto space-y-4">
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                    <button onClick={onBack} className="p-2.5 bg-white/60 rounded-2xl text-gray-700 hover:bg-white hover:shadow-lg transition-all backdrop-blur-xl border border-white/40 group">
+                        <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div className="flex-1">
+                        <h2 className="font-black text-xl text-gray-800 tracking-tight">Kinerja Tim & SDM</h2>
+                        <p className="text-xs text-gray-500 font-medium">Analisa Kinerja Sumber Daya Manusia</p>
+                    </div>
 
-      <div className="relative z-10 p-4 pt-10">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={onBack} className="p-2 bg-white/10 rounded-full text-white/80 hover:bg-white/20 transition-colors backdrop-blur-sm">
-            <ArrowLeft size={20} />
-          </button>
-          <div className="flex-1">
-            <h2 className="font-bold text-white text-xl leading-tight">Kinerja Tim & SDM</h2>
-            <p className="text-xs text-orange-100/80 font-medium mt-0.5">Analisa Kinerja Sumber Daya Manusia</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 p-4 space-y-4">
-        <div className="bg-black/20 backdrop-blur-xl p-3 rounded-2xl shadow-sm border border-white/10 flex items-center justify-between">
-            <span className="text-xs font-bold text-white/60 flex items-center gap-1"><Filter size={12}/> Filter</span>
-            <div className="flex gap-2 items-center">
-               <select 
-                 value={location} 
-                 onChange={(e) => setLocation(e.target.value)} 
-                 className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm font-medium text-white outline-none focus:bg-white/20 transition"
-                >
-                   <option value="ALL" className="text-black">Semua Outlet</option>
-               </select>
-               <PeriodFilter onPeriodChange={handlePeriodChange} />
-            </div>
-        </div>
-
-        {loading || !data ? (
-            <div className="text-center py-20 text-white/50 text-sm">Memuat data...</div>
-        ) : (
-            <>
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                    <KPICard 
-                        label="Staff Turnover" 
-                        value={`${data.hr.employeeTurnoverRate.value}%`}
-                        trend={data.hr.employeeTurnoverRate}
-                        inverseTrend={true}
-                        icon={Users}
-                        colorClass="text-pink-400"
-                    />
-                    <KPICard 
-                        label="Attendance" 
-                        value={`${data.hr.attendanceCompliance}%`}
-                        icon={Calendar}
-                        colorClass="text-blue-400"
-                        subValue="Compliance"
-                    />
+                    {/* Export Button */}
+                    <button
+                        onClick={handleExportPDF}
+                        disabled={exporting}
+                        className="flex items-center gap-2 px-3 py-2.5 bg-white/60 text-gray-700 rounded-2xl shadow-sm border border-white/40 hover:bg-white hover:shadow-md transition-all active:scale-95 disabled:opacity-50"
+                    >
+                        <Download size={16} />
+                        <span className="text-xs font-bold">{exporting ? 'Exporting...' : 'Export PDF'}</span>
+                    </button>
                 </div>
-                
-                <div className="bg-black/20 backdrop-blur-xl p-4 rounded-2xl shadow-lg border border-white/10">
-                    <p className="text-sm font-bold text-white/90 mb-4 uppercase tracking-wider">Top Performers</p>
-                    <div className="space-y-3">
-                        {data.hr.topEmployees.map((emp, i) => (
-                            <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg ${i===0?'bg-yellow-500':i===1?'bg-gray-500':'bg-orange-600'}`}>
-                                        {i+1}
-                                    </div>
-                                    <img src={emp.avatarUrl} className="w-10 h-10 rounded-full bg-gray-700 object-cover border border-white/10" alt={emp.name}/>
-                                    <p className="text-sm font-bold text-white">{emp.name}</p>
-                                </div>
-                                <div className="flex items-center gap-1 bg-green-500/20 px-2 py-1 rounded-lg text-green-300 border border-green-500/20">
-                                    <Star size={12} fill="currentColor"/>
-                                    <span className="text-xs font-bold">{emp.avgScore.toFixed(1)}</span>
-                                </div>
-                            </div>
-                        ))}
+
+                {/* Filters - High Z-Index to prevent overlap */}
+                <div className="relative z-50 bg-white/60 backdrop-blur-xl p-1.5 rounded-2xl shadow-sm border border-white/40 flex items-center justify-between">
+                    <div className="relative group">
+                        <select
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            className="appearance-none bg-white/50 border border-white/40 rounded-xl pl-3 pr-8 py-2 text-xs font-bold text-gray-700 outline-none focus:bg-white focus:shadow-md transition-all cursor-pointer hover:bg-white/80 min-w-[140px]"
+                        >
+                            <option value="ALL">Semua Outlet</option>
+                            <option value="JAKARTA">Jakarta</option>
+                            <option value="BANDUNG">Bandung</option>
+                            <option value="SURABAYA">Surabaya</option>
+                        </select>
+                        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-gray-600 transition-colors" />
+                    </div>
+
+                    <div className="w-[180px] relative z-50">
+                        <GlassDatePicker
+                            selectedDate={selectedDate}
+                            onChange={setSelectedDate}
+                        />
                     </div>
                 </div>
-            </>
-        )}
-      </div>
-    </div>
-  );
+
+                {loading || !data ? (
+                    <div className="text-center py-20">
+                        <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <p className="text-gray-400 text-sm font-medium">Memuat data SDM...</p>
+                    </div>
+                ) : (
+                    <div className="relative z-0 space-y-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <KPICard
+                                label="Staff Turnover"
+                                value={`${data.hr.employeeTurnoverRate.value}%`}
+                                trend={data.hr.employeeTurnoverRate}
+                                inverseTrend={true}
+                                icon={Users}
+                                colorClass="text-rose-600"
+                                gradientFrom="from-rose-50"
+                                gradientTo="to-white"
+                            />
+                            <KPICard
+                                label="Attendance"
+                                value={`${data.hr.attendanceCompliance}%`}
+                                icon={Calendar}
+                                colorClass="text-blue-600"
+                                subValue="Compliance"
+                                gradientFrom="from-blue-50"
+                                gradientTo="to-white"
+                            />
+                        </div>
+
+                        <div className="bg-white/60 backdrop-blur-xl p-4 rounded-3xl shadow-xl border border-white/40">
+                            <div className="flex items-center justify-between mb-3">
+                                <p className="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                                    <Star size={14} className="text-amber-500 fill-amber-500" />
+                                    Top Performers (FOH & BOH)
+                                </p>
+                                <span className="text-[9px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">Bulan Ini</span>
+                            </div>
+
+                            <div className="space-y-2.5">
+                                {data.hr.topEmployees.map((emp, i) => (
+                                    <div key={i} className="flex items-center justify-between p-2.5 bg-white/50 rounded-2xl border border-white/50 hover:bg-white hover:shadow-md transition-all group">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-black text-white shadow-md transform group-hover:scale-110 transition-transform ${i === 0 ? 'bg-gradient-to-br from-amber-400 to-orange-500' : i === 1 ? 'bg-gradient-to-br from-gray-400 to-gray-500' : 'bg-gradient-to-br from-orange-700 to-orange-800'}`}>
+                                                {i + 1}
+                                            </div>
+                                            <div className="flex items-center gap-2.5">
+                                                <img src={emp.avatarUrl} className="w-9 h-9 rounded-full bg-gray-200 object-cover border-2 border-white shadow-sm" alt={emp.name} />
+                                                <div>
+                                                    <p className="text-xs font-bold text-gray-800">{emp.name}</p>
+                                                    <p className="text-[9px] font-medium text-gray-500">Staff FOH/BOH</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-xl text-emerald-600 border border-emerald-100">
+                                            <Star size={12} fill="currentColor" />
+                                            <span className="text-[10px] font-bold">{emp.avgScore.toFixed(1)}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };

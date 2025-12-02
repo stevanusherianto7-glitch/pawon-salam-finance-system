@@ -7,6 +7,7 @@ interface GlassDatePickerProps {
     onChange: (date: Date) => void;
     placeholder?: string;
     className?: string;
+    theme?: 'light' | 'dark';
 }
 
 export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
@@ -14,6 +15,7 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
     onChange,
     placeholder = 'Pilih Tanggal',
     className = '',
+    theme = 'dark',
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [viewDate, setViewDate] = useState(selectedDate || new Date());
@@ -78,9 +80,11 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
             h-8 w-8 rounded-full flex items-center justify-center text-sm transition-all duration-200
             ${isSelected
                             ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 font-bold scale-110'
-                            : 'text-white/80 hover:bg-white/10 hover:text-white'
+                            : theme === 'light'
+                                ? 'text-gray-700 hover:bg-gray-100'
+                                : 'text-white/80 hover:bg-white/10 hover:text-white'
                         }
-            ${isToday && !isSelected ? 'border border-orange-400/50 text-orange-300' : ''}
+            ${isToday && !isSelected ? 'border border-orange-400/50 text-orange-500' : ''}
           `}
                 >
                     {day}
@@ -98,6 +102,8 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
         });
     };
 
+    const isLight = theme === 'light';
+
     return (
         <div className={`relative ${className}`} ref={containerRef}>
             {/* Trigger Button */}
@@ -106,12 +112,14 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
                 onClick={() => setIsOpen(!isOpen)}
                 className={`
           flex items-center gap-2 px-4 py-2.5 rounded-xl w-full transition-all duration-300
-          bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20
+          ${isLight
+                        ? 'bg-white border border-gray-200 hover:border-orange-300 shadow-sm'
+                        : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20'}
           ${isOpen ? 'ring-2 ring-orange-500/20 border-orange-500/50' : ''}
         `}
             >
-                <CalendarIcon size={18} className="text-orange-400" />
-                <span className={`text-sm font-medium ${selectedDate ? 'text-white' : 'text-white/40'}`}>
+                <CalendarIcon size={18} className="text-orange-500" />
+                <span className={`text-sm font-medium ${isLight ? 'text-gray-700' : (selectedDate ? 'text-white' : 'text-white/40')}`}>
                     {selectedDate ? formatDate(selectedDate) : placeholder}
                 </span>
             </button>
@@ -119,23 +127,41 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
             {/* Dropdown Calendar */}
             {isOpen && (
                 <div className="absolute top-full left-0 mt-2 z-50 w-72 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="bg-[#1a1a1a]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 overflow-hidden">
+                    <div className={`
+                        backdrop-blur-xl border rounded-2xl shadow-2xl p-4 overflow-hidden
+                        ${isLight
+                            ? 'bg-white/95 border-gray-200'
+                            : 'bg-[#1a1a1a]/90 border-white/10'
+                        }
+                    `}>
                         {/* Header */}
                         <div className="flex items-center justify-between mb-4">
                             <button
                                 onClick={handlePrevMonth}
-                                className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                className={`
+                                    p-1 rounded-lg transition-colors
+                                    ${isLight
+                                        ? 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+                                        : 'hover:bg-white/10 text-white/60 hover:text-white'
+                                    }
+                                `}
                             >
                                 <ChevronLeft size={20} />
                             </button>
 
-                            <span className="text-white font-bold text-sm">
+                            <span className={`font-bold text-sm ${isLight ? 'text-gray-800' : 'text-white'}`}>
                                 {viewDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
                             </span>
 
                             <button
                                 onClick={handleNextMonth}
-                                className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                className={`
+                                    p-1 rounded-lg transition-colors
+                                    ${isLight
+                                        ? 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+                                        : 'hover:bg-white/10 text-white/60 hover:text-white'
+                                    }
+                                `}
                             >
                                 <ChevronRight size={20} />
                             </button>
@@ -144,7 +170,10 @@ export const GlassDatePicker: React.FC<GlassDatePickerProps> = ({
                         {/* Weekday Headers */}
                         <div className="grid grid-cols-7 mb-2 text-center">
                             {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
-                                <div key={day} className="text-[10px] font-bold text-white/40 uppercase tracking-wider">
+                                <div key={day} className={`
+                                    text-[10px] font-bold uppercase tracking-wider
+                                    ${isLight ? 'text-gray-400' : 'text-white/40'}
+                                `}>
                                     {day}
                                 </div>
                             ))}

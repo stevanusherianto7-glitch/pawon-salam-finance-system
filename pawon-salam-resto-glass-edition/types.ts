@@ -291,6 +291,15 @@ export interface PerformanceRecord {
   description: string;
 }
 
+export interface Transaction {
+  id: string;
+  date: string;
+  desc: string;
+  amount: number;
+  type: 'IN' | 'OUT';
+  outlet: string;
+}
+
 export interface OperationalReport {
   id: string;
   date: string;
@@ -421,6 +430,8 @@ export enum MessageAudience {
   ALL_STAFF = 'ALL_STAFF',
   ALL_MANAGERS = 'ALL_MANAGERS',
   BUSINESS_OWNER = 'BUSINESS_OWNER',
+  FOH_ONLY = 'FOH_ONLY',
+  BOH_ONLY = 'BOH_ONLY',
 }
 
 export interface Message {
@@ -433,6 +444,7 @@ export interface Message {
   timestamp: string; // ISO String
   audience: MessageAudience;
   readBy: string[]; // Array of employee IDs who have read it
+  senderArea: EmployeeArea;
 }
 
 

@@ -41,43 +41,43 @@ const Icons = {
 export const BackgroundPattern = () => {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50">
-      
+
       {/* --- WATERMARK MOTIF MAKANAN (Pastel/White) --- */}
-      
+
       {/* 1. Pojok Kanan Atas (Besar) */}
-      <div className="absolute -top-12 -right-12 w-72 h-72 text-orange-200/40 opacity-50 transform rotate-12">
+      <div className="absolute -top-12 -right-12 w-72 h-72 text-orange-300/60 opacity-80 transform rotate-12">
         {Icons.UtensilsCrossed}
       </div>
-      
+
       {/* 2. Pojok Kiri Bawah (Besar) */}
-      <div className="absolute -bottom-8 -left-8 w-64 h-64 text-orange-200/40 opacity-50 transform -rotate-12">
+      <div className="absolute -bottom-8 -left-8 w-64 h-64 text-orange-300/60 opacity-80 transform -rotate-12">
         {Icons.ChefHat}
       </div>
-      
+
       {/* 3. Kopi (Kiri Atas) */}
-      <div className="absolute top-[10%] left-[8%] w-14 h-14 text-orange-300/30 opacity-40 transform -rotate-12">
+      <div className="absolute top-[10%] left-[8%] w-14 h-14 text-orange-400/50 opacity-70 transform -rotate-12">
         {Icons.Coffee}
       </div>
-      
+
       {/* 4. Sup (Kanan Tengah) */}
-      <div className="absolute top-[45%] right-[5%] w-16 h-16 text-orange-300/30 opacity-40 transform rotate-6">
+      <div className="absolute top-[45%] right-[5%] w-16 h-16 text-orange-400/50 opacity-70 transform rotate-6">
         {Icons.Soup}
       </div>
-      
+
       {/* 5. Garpu Sendok (Kiri Tengah) */}
-      <div className="absolute bottom-[40%] left-[5%] w-20 h-20 text-orange-300/30 opacity-40 transform -rotate-45">
+      <div className="absolute bottom-[40%] left-[5%] w-20 h-20 text-orange-400/50 opacity-70 transform -rotate-45">
         {Icons.Utensils}
       </div>
-      
+
       {/* 6. Pojok Kanan Bawah (Kecil) */}
-      <div className="absolute bottom-[10%] right-[10%] w-16 h-16 text-orange-300/30 opacity-40 transform rotate-45">
+      <div className="absolute bottom-[10%] right-[10%] w-16 h-16 text-orange-400/50 opacity-70 transform rotate-45">
         {Icons.UtensilsCrossed}
       </div>
-      
+
       {/* --- EFEK CAHAYA/GLOW (BLUR) --- */}
       <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-white rounded-full mix-blend-soft-light filter blur-3xl opacity-60"></div>
       <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
-      
+
     </div>
   );
 };

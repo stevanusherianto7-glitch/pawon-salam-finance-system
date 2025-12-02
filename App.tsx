@@ -36,6 +36,7 @@ import { UserRole } from './types';
 import { colors } from './theme/colors';
 
 import { FinanceInputScreen } from './screens/finance/FinanceInputScreen';
+import { FinanceDashboardScreen } from './screens/admin/FinanceDashboardScreen'; // NEW IMPORT
 import { ReportFinancialScreen } from './screens/admin/ReportFinancialScreen';
 import { ReportRevenueCostScreen } from './screens/admin/ReportRevenueCostScreen';
 import { ReportOperationalScreen } from './screens/admin/ReportOperationalScreen';
@@ -62,7 +63,9 @@ const App = () => {
       // Determine default screen based on EFFECTIVE role (impersonated or real)
       const role = user?.role || UserRole.EMPLOYEE;
 
-      if ([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.RESTAURANT_MANAGER, UserRole.HR_MANAGER, UserRole.BUSINESS_OWNER, UserRole.FINANCE_MANAGER, UserRole.MARKETING_MANAGER].includes(role)) {
+      if (role === UserRole.FINANCE_MANAGER) {
+        setCurrentScreen('financeDashboard');
+      } else if ([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.RESTAURANT_MANAGER, UserRole.HR_MANAGER, UserRole.BUSINESS_OWNER, UserRole.MARKETING_MANAGER].includes(role)) {
         setCurrentScreen('adminDashboard');
       } else {
         setCurrentScreen('dashboard');
@@ -83,6 +86,7 @@ const App = () => {
 
         // Specialized Panels (Legacy, kept for Finance & Marketing)
         case 'financePanel': return <FinancePanel onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'financeDashboard': return <FinanceDashboardScreen onNavigate={handleNavigate} />; // NEW ROUTE
         case 'financeInput': return <FinanceInputScreen onBack={() => setCurrentScreen('adminDashboard')} />; // NEW ROUTE
         case 'marketingPanel': return <MarketingPanel onBack={() => setCurrentScreen('adminDashboard')} />;
 

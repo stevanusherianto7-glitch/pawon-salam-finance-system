@@ -25,5 +25,11 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "pawon-salam-resto-glass-edition",
+    "dist",
+    "src"
+  ]
 }

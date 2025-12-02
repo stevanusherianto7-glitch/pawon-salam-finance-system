@@ -39,12 +39,13 @@ export const SpecialNotificationBanner: React.FC = () => {
           </p>
         </div>
 
-        {/* Close Button - Glass Style */}
+        {/* Close Button - Glass Style - Improved Responsiveness */}
         <button
           onClick={hideSpecialNotification}
-          className="absolute top-3 right-3 p-1.5 rounded-full bg-white/40 hover:bg-white border border-white/30 text-gray-500 hover:text-orange-600 transition-all shadow-sm"
+          className="absolute top-2 right-2 p-3 rounded-full bg-white/40 hover:bg-white border border-white/30 text-gray-500 hover:text-orange-600 transition-all shadow-sm z-50 active:scale-95 cursor-pointer"
+          aria-label="Close notification"
         >
-          <X size={14} />
+          <X size={18} />
         </button>
       </div>
     </div>

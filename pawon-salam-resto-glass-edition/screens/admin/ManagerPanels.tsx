@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, Users, Utensils, Megaphone, FileText, Calendar, Clock, ChevronRight, ClipboardList, Banknote, CheckSquare, AlertCircle } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, Utensils, Megaphone, FileText, Calendar, Clock, ChevronRight, ClipboardList, Banknote, CheckSquare, AlertCircle, Package } from 'lucide-react';
 import { colors } from '../../theme/colors';
-import { performanceApi, jobdeskApi } from '../../services/api';
-import { SalarySlip } from '../../types';
+import { performanceApi, jobdeskApi, employeeApi, payrollApi } from '../../services/api';
+import { Payslip, Employee } from '../../types';
+import { StockOpnameModal } from '../../components/features/StockOpnameModal';
 
 interface PanelProps {
     onBack: () => void;
@@ -11,13 +12,13 @@ interface PanelProps {
 }
 
 const PanelHeader = ({ title, icon: Icon, onBack }: { title: string, icon: any, onBack: () => void }) => (
-    <div className="pt-12 pb-10 px-6 rounded-b-[2.5rem] shadow-sm relative z-0 mb-6 overflow-hidden" style={{ background: colors.gradientMain }}>
+    <div className="pt-10 pb-8 px-4 rounded-b-[2rem] shadow-sm relative z-0 mb-4 overflow-hidden" style={{ background: colors.gradientMain }}>
         <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/food.png")' }}></div>
         <div className="flex items-center gap-3 text-white relative z-10">
-            <button onClick={onBack} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors backdrop-blur-sm"><ArrowLeft size={20} /></button>
+            <button onClick={onBack} className="p-1.5 bg-white/20 rounded-full hover:bg-white/30 transition-colors backdrop-blur-sm"><ArrowLeft size={18} /></button>
             <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm"><Icon size={18} /></div>
-                <h2 className="text-lg font-bold">{title}</h2>
+                <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm"><Icon size={16} /></div>
+                <h2 className="text-base font-bold">{title}</h2>
             </div>
         </div>
     </div>
@@ -25,13 +26,13 @@ const PanelHeader = ({ title, icon: Icon, onBack }: { title: string, icon: any, 
 
 // Reusable Action Card for Bento Grid
 const ActionCard = ({ onClick, icon: Icon, title, subtitle, colorClass }: any) => (
-    <button onClick={onClick} className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-start gap-2 active:scale-95 transition-all hover:shadow-md h-full">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorClass} bg-opacity-10`}>
-            <Icon size={20} className={colorClass.replace('bg-', 'text-')} />
+    <button onClick={onClick} className="bg-white p-2.5 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-start gap-2 active:scale-95 transition-all hover:shadow-md h-full">
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${colorClass} bg-opacity-10`}>
+            <Icon size={18} className={colorClass.replace('bg-', 'text-')} />
         </div>
         <div className="text-left">
-            <h4 className="font-bold text-sm text-gray-800 leading-tight">{title}</h4>
-            <p className="text-[10px] text-gray-400 mt-0.5">{subtitle}</p>
+            <h4 className="font-bold text-xs text-gray-800 leading-tight">{title}</h4>
+            <p className="text-[9px] text-gray-400 mt-0.5">{subtitle}</p>
         </div>
     </button>
 );
@@ -40,35 +41,83 @@ export const HRPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     const [activeTab, setActiveTab] = useState<'SP' | 'SALARY'>('SP');
     const [type, setType] = useState('SP1');
     const [desc, setDesc] = useState('');
-    const [empName, setEmpName] = useState('');
-    const [salaryForm, setSalaryForm] = useState<Partial<SalarySlip>>({
-        employeeName: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(),
-        basicSalary: 0, allowances: 0, deductions: 0, totalSalary: 0
+    const [selectedEmpId, setSelectedEmpId] = useState('');
+    const [employees, setEmployees] = useState<Employee[]>([]);
+    const [salaryForm, setSalaryForm] = useState<Partial<Payslip>>({
+        employeeId: '', periodMonth: new Date().getMonth() + 1, periodYear: new Date().getFullYear(),
+        basicSalary: 0, allowanceOther: 0, otherDeductions: 0, totalEarnings: 0
     });
 
     useEffect(() => {
+        const loadEmployees = async () => {
+            const res = await employeeApi.getAll();
+            if (res.success && res.data) setEmployees(res.data);
+        };
+        loadEmployees();
+    }, []);
+
+    useEffect(() => {
         const basic = Number(salaryForm.basicSalary) || 0;
-        const allow = Number(salaryForm.allowances) || 0;
-        const deduct = Number(salaryForm.deductions) || 0;
-        setSalaryForm(prev => ({ ...prev, totalSalary: basic + allow - deduct }));
-    }, [salaryForm.basicSalary, salaryForm.allowances, salaryForm.deductions]);
+        const allow = Number(salaryForm.allowanceOther) || 0;
+        const deduct = Number(salaryForm.otherDeductions) || 0;
+        setSalaryForm(prev => ({ ...prev, totalEarnings: basic + allow - deduct }));
+    }, [salaryForm.basicSalary, salaryForm.allowanceOther, salaryForm.otherDeductions]);
 
     const handleSaveSP = async () => {
-        await performanceApi.saveHRRecord({ type, desc, empName });
-        alert('Catatan HR Tersimpan'); setEmpName(''); setDesc('');
+        if (!selectedEmpId) return alert("Pilih karyawan dulu");
+        const res = await performanceApi.saveHRRecord({ type, desc, empId: selectedEmpId });
+        if (res.success) {
+            alert(res.message);
+            setDesc('');
+            setSelectedEmpId('');
+        }
+    };
+
+    const handleSaveSalary = async () => {
+        if (!salaryForm.employeeId) return alert("Pilih karyawan dulu");
+        const emp = employees.find(e => e.id === salaryForm.employeeId);
+
+        // Construct full Payslip object
+        const newPayslip: Payslip = {
+            id: `slip-${Date.now()}`,
+            employeeId: salaryForm.employeeId,
+            periodMonth: salaryForm.periodMonth || 1,
+            periodYear: salaryForm.periodYear || 2025,
+            payDate: new Date().toISOString(),
+            basicSalary: salaryForm.basicSalary || 0,
+            allowanceMeal: 0, allowanceTransport: 0,
+            allowanceOther: salaryForm.allowanceOther || 0,
+            overtimeHours: 0, overtimeAmount: 0, bonus: 0, commission: 0,
+            bpjsKesehatan: 0, bpjsKetenagakerjaan: 0, taxPPh21: 0,
+            otherDeductions: salaryForm.otherDeductions || 0,
+            totalEarnings: (salaryForm.basicSalary || 0) + (salaryForm.allowanceOther || 0),
+            totalDeductions: salaryForm.otherDeductions || 0,
+            netSalary: (salaryForm.basicSalary || 0) + (salaryForm.allowanceOther || 0) - (salaryForm.otherDeductions || 0),
+            status: 'SENT',
+            isVisibleToEmployee: true,
+            createdByHrId: 'hr-admin',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        const res = await payrollApi.savePayslip(newPayslip);
+        if (res.success) {
+            alert(res.message);
+            setSalaryForm({ ...salaryForm, basicSalary: 0, allowanceOther: 0, otherDeductions: 0, employeeId: '' });
+        }
     };
 
     return (
         <div className="bg-gray-50 pb-24 min-h-screen">
             <PanelHeader title="HR Manager" icon={Users} onBack={onBack} />
-            <div className="px-4 space-y-4 -mt-8 relative z-10">
+            <div className="px-4 space-y-3 -mt-6 relative z-10">
                 {/* Shift Shortcut */}
-                <div className="bg-white p-3 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between cursor-pointer active:scale-98" onClick={() => onNavigate && onNavigate('shiftScheduler')}>
+                <div className="bg-white p-2.5 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between cursor-pointer active:scale-98" onClick={() => onNavigate && onNavigate('shiftScheduler')}>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><Calendar size={20} /></div>
-                        <div><h3 className="font-bold text-sm text-gray-800">Jadwal Shift</h3><p className="text-[10px] text-gray-500">Monitoring Staff</p></div>
+                        <div className="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><Calendar size={18} /></div>
+                        <div><h3 className="font-bold text-xs text-gray-800">Jadwal Shift</h3><p className="text-[9px] text-gray-500">Monitoring Staff</p></div>
                     </div>
-                    <ChevronRight size={16} className="text-gray-300" />
+                    <ChevronRight size={14} className="text-gray-300" />
                 </div>
 
                 {/* Tabs */}
@@ -78,24 +127,44 @@ export const HRPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
                 </div>
 
                 {activeTab === 'SP' ? (
-                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
-                        <input type="text" placeholder="Nama Karyawan" className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-200" value={empName} onChange={e => setEmpName(e.target.value)} />
-                        <select className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none" value={type} onChange={e => setType(e.target.value)}>
+                    <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 space-y-2.5">
+                        <select
+                            className="w-full p-2.5 bg-gray-50 border-none rounded-xl text-xs outline-none focus:ring-1 focus:ring-orange-200"
+                            value={selectedEmpId}
+                            onChange={e => setSelectedEmpId(e.target.value)}
+                        >
+                            <option value="">Pilih Karyawan...</option>
+                            {employees.map(e => (
+                                <option key={e.id} value={e.id}>{e.name} - {e.role}</option>
+                            ))}
+                        </select>
+                        <select className="w-full p-2.5 bg-gray-50 border-none rounded-xl text-xs outline-none" value={type} onChange={e => setType(e.target.value)}>
                             <option value="SP1">Surat Peringatan 1</option>
                             <option value="SP2">Surat Peringatan 2</option>
                             <option value="COACHING">Coaching</option>
                         </select>
-                        <textarea rows={3} placeholder="Keterangan..." className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none resize-none" value={desc} onChange={e => setDesc(e.target.value)} />
-                        <button onClick={handleSaveSP} className="w-full py-3 bg-red-500 text-white font-bold rounded-xl shadow-lg active:scale-95">Simpan</button>
+                        <textarea rows={3} placeholder="Keterangan..." className="w-full p-2.5 bg-gray-50 border-none rounded-xl text-xs outline-none resize-none" value={desc} onChange={e => setDesc(e.target.value)} />
+                        <button onClick={handleSaveSP} className="w-full py-2.5 bg-red-500 text-white font-bold rounded-xl shadow-lg active:scale-95 text-xs">Simpan</button>
                     </div>
                 ) : (
-                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
-                        <input type="text" placeholder="Nama Karyawan" className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm" value={salaryForm.employeeName} onChange={e => setSalaryForm({ ...salaryForm, employeeName: e.target.value })} />
+                    <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 space-y-2.5">
+                        <select
+                            className="w-full p-2.5 bg-gray-50 border-none rounded-xl text-xs outline-none focus:ring-1 focus:ring-orange-200"
+                            value={salaryForm.employeeId}
+                            onChange={e => setSalaryForm({ ...salaryForm, employeeId: e.target.value })}
+                        >
+                            <option value="">Pilih Karyawan...</option>
+                            {employees.map(e => (
+                                <option key={e.id} value={e.id}>{e.name} - {e.role}</option>
+                            ))}
+                        </select>
                         <div className="grid grid-cols-2 gap-2">
-                            <input type="number" placeholder="Gaji Pokok" className="p-3 bg-gray-50 border-none rounded-xl text-sm" onChange={e => setSalaryForm({ ...salaryForm, basicSalary: parseFloat(e.target.value) })} />
-                            <input type="number" placeholder="Tunjangan" className="p-3 bg-gray-50 border-none rounded-xl text-sm" onChange={e => setSalaryForm({ ...salaryForm, allowances: parseFloat(e.target.value) })} />
+                            <input type="number" placeholder="Gaji Pokok" className="p-2.5 bg-gray-50 border-none rounded-xl text-xs" onChange={e => setSalaryForm({ ...salaryForm, basicSalary: parseFloat(e.target.value) })} />
+                            <input type="number" placeholder="Tunjangan" className="p-2.5 bg-gray-50 border-none rounded-xl text-xs" onChange={e => setSalaryForm({ ...salaryForm, allowanceOther: parseFloat(e.target.value) })} />
+                            <input type="number" placeholder="Potongan" className="p-2.5 bg-gray-50 border-none rounded-xl text-xs" onChange={e => setSalaryForm({ ...salaryForm, otherDeductions: parseFloat(e.target.value) })} />
                         </div>
-                        <div className="bg-green-50 p-3 rounded-xl flex justify-between items-center"><span className="text-xs font-bold text-green-700">Total</span><span className="font-bold text-green-700">Rp {salaryForm.totalSalary?.toLocaleString('id-ID')}</span></div>
+                        <div className="bg-green-50 p-2.5 rounded-xl flex justify-between items-center"><span className="text-[10px] font-bold text-green-700">Total</span><span className="font-bold text-green-700 text-sm">Rp {salaryForm.totalEarnings?.toLocaleString('id-ID')}</span></div>
+                        <button onClick={handleSaveSalary} className="w-full py-2.5 bg-green-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-xs">Kirim Slip Gaji</button>
                     </div>
                 )}
             </div>
@@ -107,6 +176,7 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     const [sales, setSales] = useState('');
     const [notes, setNotes] = useState('');
     const [jobdeskStats, setJobdeskStats] = useState({ fohCount: 0, bohCount: 0 });
+    const [showStockOpname, setShowStockOpname] = useState(false);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -123,29 +193,37 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     }, []);
 
     const handleSave = async () => {
-        await performanceApi.saveOperationalReport({ sales, notes });
-        alert('Laporan Tersimpan'); onBack();
+        const salesValue = parseFloat(sales);
+        if (!salesValue) return alert("Masukkan nominal omzet");
+
+        const res = await performanceApi.saveOperationalReport({ sales: salesValue, notes });
+        if (res.success) {
+            alert(res.message);
+            setSales('');
+            setNotes('');
+            onBack();
+        }
     };
 
     return (
         <div className="bg-gray-50 pb-24 min-h-screen">
             <PanelHeader title="Restaurant Manager" icon={Utensils} onBack={onBack} />
-            <div className="px-4 space-y-4 -mt-8 relative z-10">
+            <div className="px-4 space-y-3 -mt-6 relative z-10">
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center">
-                        <span className="text-[10px] font-bold text-blue-500 uppercase mb-1">Jobdesk FOH</span>
-                        <span className="text-2xl font-bold text-gray-800">{jobdeskStats.fohCount}</span>
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-white p-2.5 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-[9px] font-bold text-blue-500 uppercase mb-1">Jobdesk FOH</span>
+                        <span className="text-xl font-bold text-gray-800">{jobdeskStats.fohCount}</span>
                     </div>
-                    <div className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center">
-                        <span className="text-[10px] font-bold text-orange-500 uppercase mb-1">Jobdesk BOH</span>
-                        <span className="text-2xl font-bold text-gray-800">{jobdeskStats.bohCount}</span>
+                    <div className="bg-white p-2.5 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-[9px] font-bold text-orange-500 uppercase mb-1">Jobdesk BOH</span>
+                        <span className="text-xl font-bold text-gray-800">{jobdeskStats.bohCount}</span>
                     </div>
                 </div>
 
                 {/* Actions Grid */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                     <ActionCard
                         onClick={() => onNavigate && onNavigate('dailyChecklistList')}
                         icon={ClipboardList} title="Checklist" subtitle="Daily Performance" colorClass="bg-orange-500 text-white"
@@ -157,18 +235,38 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
                 </div>
 
                 {/* Report Form */}
-                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="font-bold text-sm text-gray-800 mb-3">Laporan Omzet Harian</h3>
-                    <div className="space-y-3">
+                <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 className="font-bold text-xs text-gray-800 mb-2.5">Laporan Omzet Harian</h3>
+                    <div className="space-y-2.5">
                         <div className="relative">
-                            <span className="absolute left-3 top-2.5 text-gray-400 text-xs font-bold">Rp</span>
-                            <input type="number" placeholder="0" className="w-full pl-8 p-2.5 bg-gray-50 border-none rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-200" value={sales} onChange={e => setSales(e.target.value)} />
+                            <span className="absolute left-3 top-2.5 text-gray-400 text-[10px] font-bold">Rp</span>
+                            <input type="number" placeholder="0" className="w-full pl-8 p-2.5 bg-gray-50 border-none rounded-xl text-xs outline-none focus:ring-1 focus:ring-orange-200" value={sales} onChange={e => setSales(e.target.value)} />
                         </div>
-                        <textarea rows={2} placeholder="Catatan operasional..." className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-none resize-none" value={notes} onChange={e => setNotes(e.target.value)} />
-                        <button onClick={handleSave} className="w-full py-3 bg-orange-500 text-white font-bold rounded-xl shadow-lg active:scale-95 text-xs">Kirim Laporan</button>
+                        <textarea rows={2} placeholder="Catatan operasional..." className="w-full p-2.5 bg-gray-50 border-none rounded-xl text-xs outline-none resize-none" value={notes} onChange={e => setNotes(e.target.value)} />
+                        <button onClick={handleSave} className="w-full py-2.5 bg-orange-500 text-white font-bold rounded-xl shadow-lg active:scale-95 text-xs">Kirim Laporan</button>
                     </div>
                 </div>
             </div>
+
+            {/* Floating Action Button for Stock Opname */}
+            <div className="fixed bottom-6 left-0 right-0 z-[60] flex justify-center pointer-events-none">
+                <div className="w-full max-w-md px-4 flex justify-end">
+                    <button
+                        onClick={() => setShowStockOpname(true)}
+                        className="pointer-events-auto flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full shadow-2xl shadow-orange-500/40 hover:shadow-orange-500/60 hover:scale-105 transition-all active:scale-95 group"
+                    >
+                        <Package size={20} className="group-hover:rotate-12 transition-transform" />
+                        <span className="font-bold text-base">Stock Opname</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Stock Opname Modal */}
+            <StockOpnameModal
+                isOpen={showStockOpname}
+                onClose={() => setShowStockOpname(false)}
+                isReadOnly={false}
+            />
         </div>
     );
 };
@@ -177,19 +275,32 @@ export const FinancePanel: React.FC<PanelProps> = ({ onBack }) => {
     const [bonus, setBonus] = useState('');
     const [empName, setEmpName] = useState('');
 
+    const handleSave = async () => {
+        const amount = parseFloat(bonus);
+        if (!amount || !empName) return alert("Lengkapi data");
+
+        const res = await performanceApi.saveIncentive({ empName, amount });
+        if (res.success) {
+            alert(res.message);
+            setBonus('');
+            setEmpName('');
+            onBack();
+        }
+    };
+
     return (
         <div className="bg-gray-50 pb-24 min-h-screen">
             <PanelHeader title="Finance" icon={Banknote} onBack={onBack} />
-            <div className="px-4 space-y-4 -mt-8 relative z-10">
-                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="font-bold text-gray-800 mb-4 text-sm">Input Insentif / Lembur</h3>
-                    <div className="space-y-3">
-                        <input type="text" placeholder="Nama Karyawan" className="w-full p-3 bg-gray-50 rounded-xl text-sm border-none outline-none" value={empName} onChange={e => setEmpName(e.target.value)} />
+            <div className="px-4 space-y-3 -mt-6 relative z-10">
+                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 className="font-bold text-gray-800 mb-3 text-xs">Input Insentif / Lembur</h3>
+                    <div className="space-y-2.5">
+                        <input type="text" placeholder="Nama Karyawan" className="w-full p-2.5 bg-gray-50 rounded-xl text-xs border-none outline-none" value={empName} onChange={e => setEmpName(e.target.value)} />
                         <div className="relative">
-                            <span className="absolute left-3 top-3 text-gray-400 text-xs">Rp</span>
-                            <input type="number" placeholder="Nominal" className="w-full p-3 pl-8 bg-gray-50 rounded-xl text-sm border-none outline-none" value={bonus} onChange={e => setBonus(e.target.value)} />
+                            <span className="absolute left-3 top-2.5 text-gray-400 text-[10px]">Rp</span>
+                            <input type="number" placeholder="Nominal" className="w-full p-2.5 pl-8 bg-gray-50 rounded-xl text-xs border-none outline-none" value={bonus} onChange={e => setBonus(e.target.value)} />
                         </div>
-                        <button onClick={() => { alert('Saved'); onBack(); }} className="w-full py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-sm">Simpan Data</button>
+                        <button onClick={handleSave} className="w-full py-2.5 bg-green-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-xs">Simpan Data</button>
                     </div>
                 </div>
             </div>
@@ -198,18 +309,30 @@ export const FinancePanel: React.FC<PanelProps> = ({ onBack }) => {
 };
 
 export const MarketingPanel: React.FC<PanelProps> = ({ onBack }) => {
+    const [campaign, setCampaign] = useState('');
+
+    const handleSave = async () => {
+        if (!campaign) return alert("Isi nama campaign");
+        const res = await performanceApi.saveCampaign({ name: campaign });
+        if (res.success) {
+            alert(res.message);
+            setCampaign('');
+            onBack();
+        }
+    };
+
     return (
         <div className="bg-gray-50 pb-24 min-h-screen">
             <PanelHeader title="Marketing" icon={Megaphone} onBack={onBack} />
-            <div className="px-4 space-y-4 -mt-8 relative z-10">
-                <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100 flex items-center justify-between">
-                    <div><p className="text-xs text-purple-600 font-bold uppercase">Engagement</p><h3 className="text-2xl font-bold text-purple-800">4.2%</h3></div>
-                    <div><p className="text-xs text-purple-600 font-bold uppercase">Reach</p><h3 className="text-2xl font-bold text-purple-800">45K</h3></div>
+            <div className="px-4 space-y-3 -mt-6 relative z-10">
+                <div className="bg-purple-50 p-3.5 rounded-2xl border border-purple-100 flex items-center justify-between">
+                    <div><p className="text-[10px] text-purple-600 font-bold uppercase">Engagement</p><h3 className="text-xl font-bold text-purple-800">4.2%</h3></div>
+                    <div><p className="text-[10px] text-purple-600 font-bold uppercase">Reach</p><h3 className="text-xl font-bold text-purple-800">45K</h3></div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="font-bold text-gray-800 mb-4 text-sm">New Campaign</h3>
-                    <input type="text" placeholder="Nama Campaign" className="w-full p-3 bg-gray-50 rounded-xl text-sm border-none outline-none mb-3" />
-                    <button onClick={() => { alert('Saved'); onBack(); }} className="w-full py-3 bg-purple-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-sm">Simpan</button>
+                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 className="font-bold text-gray-800 mb-3 text-xs">New Campaign</h3>
+                    <input type="text" placeholder="Nama Campaign" className="w-full p-2.5 bg-gray-50 rounded-xl text-xs border-none outline-none mb-2.5" value={campaign} onChange={e => setCampaign(e.target.value)} />
+                    <button onClick={handleSave} className="w-full py-2.5 bg-purple-600 text-white font-bold rounded-xl shadow-lg active:scale-95 text-xs">Simpan</button>
                 </div>
             </div>
         </div>

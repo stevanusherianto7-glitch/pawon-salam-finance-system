@@ -6,6 +6,7 @@ import { colors } from '../../theme/colors';
 import { LeaveType, LeaveStatus } from '../../types';
 import { useLeaveStore } from '../../store/leaveStore';
 import { useAuthStore } from '../../store/authStore';
+import { GlassDatePicker } from '../../components/ui/GlassDatePicker';
 
 interface LeaveRequestScreenProps {
   onBack: () => void;
@@ -90,7 +91,7 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
     <div className="bg-gray-50 pb-24 relative">
       {/* Header */}
       <div
-        className="px-6 pt-12 pb-12 rounded-b-[3rem] shadow-md relative z-0 overflow-hidden"
+        className="px-6 pt-10 pb-10 rounded-b-[2.5rem] shadow-md relative z-0 overflow-hidden"
         style={{ background: colors.gradientMain }}
       >
         {/* Watermark */}
@@ -99,43 +100,43 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
         <div className="relative z-10">
           <div className="flex items-center gap-3 text-white mb-2">
             <button onClick={onBack} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors backdrop-blur-sm">
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} />
             </button>
-            <h2 className="text-xl font-bold">Pengajuan Izin</h2>
+            <h2 className="text-lg font-bold">Pengajuan Izin</h2>
           </div>
-          <p className="text-orange-100 text-sm pl-12 opacity-90">Isi formulir untuk mengajukan cuti atau izin.</p>
+          <p className="text-orange-100 text-xs pl-11 opacity-90">Isi formulir untuk mengajukan cuti atau izin.</p>
         </div>
       </div>
 
       <div className="px-4 -mt-8 relative z-10 space-y-6">
 
         {/* FORM CARD */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-50">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="bg-white rounded-2xl shadow-lg p-4 border border-orange-50">
+          <form onSubmit={handleSubmit} className="space-y-3">
 
             {/* Leave Type */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Jenis Izin</label>
+              <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Jenis Izin</label>
               <div className="relative">
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as LeaveType })}
-                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors font-medium text-sm"
+                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors font-medium text-xs"
                 >
                   <option value={LeaveType.SICK}>🤒 Sakit</option>
                   <option value={LeaveType.ANNUAL}>🌴 Cuti Tahunan</option>
                   <option value={LeaveType.OTHER}>⚡ Lainnya</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                  <ChevronDown size={16} />
+                  <ChevronDown size={14} />
                 </div>
               </div>
             </div>
 
             {/* Date Range */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Dari Tanggal</label>
+                <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Dari Tanggal</label>
                 <div className="relative">
                   <GlassDatePicker
                     selectedDate={formData.startDate ? new Date(formData.startDate) : null}
@@ -150,7 +151,7 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Sampai</label>
+                <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Sampai</label>
                 <div className="relative">
                   <GlassDatePicker
                     selectedDate={formData.endDate ? new Date(formData.endDate) : null}
@@ -168,14 +169,14 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
 
             {/* Reason */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Alasan / Keterangan</label>
+              <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Alasan / Keterangan</label>
               <textarea
                 required
                 rows={3}
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 placeholder="Jelaskan alasan pengajuan anda secara detail..."
-                className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors text-sm resize-none"
+                className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors text-xs resize-none"
               />
             </div>
 
@@ -183,14 +184,14 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 mt-2"
+              className="w-full py-3 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 mt-1"
               style={{ background: colors.gradientMain, boxShadow: colors.shadowOrange }}
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <Send size={18} /> Kirim Pengajuan
+                  <Send size={16} /> <span className="text-xs">Kirim Pengajuan</span>
                 </>
               )}
             </button>
@@ -203,34 +204,34 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
             <FileText size={18} className="text-orange-500" /> Riwayat Pengajuan
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {isLoading && requests.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-sm">Memuat riwayat...</div>
+              <div className="text-center py-8 text-gray-400 text-xs">Memuat riwayat...</div>
             ) : requests.length === 0 ? (
               <div className="text-center py-8 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
-                <p className="text-xs">Belum ada riwayat pengajuan.</p>
+                <p className="text-[10px]">Belum ada riwayat pengajuan.</p>
               </div>
             ) : (
               requests.map((item) => (
-                <div key={item.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2 active:scale-98 transition-transform">
+                <div key={item.id} className="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2 active:scale-98 transition-transform">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
-                      <span className={`text-sm font-bold ${item.type === LeaveType.SICK ? 'text-red-600' : item.type === LeaveType.ANNUAL ? 'text-blue-600' : 'text-gray-700'}`}>
+                      <span className={`text-xs font-bold ${item.type === LeaveType.SICK ? 'text-red-600' : item.type === LeaveType.ANNUAL ? 'text-blue-600' : 'text-gray-700'}`}>
                         {getTypeLabel(item.type)}
                       </span>
                     </div>
                     {getStatusBadge(item.status)}
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Calendar size={12} />
+                  <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                    <Calendar size={10} />
                     <span>
                       {new Date(item.startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} - {new Date(item.endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
 
-                  <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100 mt-1">
-                    <p className="text-xs text-gray-600 italic line-clamp-2">"{item.reason}"</p>
+                  <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 mt-0.5">
+                    <p className="text-[10px] text-gray-600 italic line-clamp-2">"{item.reason}"</p>
                   </div>
                 </div>
               ))

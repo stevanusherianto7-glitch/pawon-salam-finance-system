@@ -76,14 +76,14 @@ export const AdminLeaveRequestScreen: React.FC<Props> = ({ onBack }) => {
   return (
     <div className="bg-gray-50 min-h-screen pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm px-4 py-4">
+      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <ArrowLeft size={20} className="text-gray-600" />
+          <button onClick={onBack} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <ArrowLeft size={18} className="text-gray-600" />
           </button>
           <div className="flex-1">
-            <h2 className="font-bold text-gray-800 text-lg leading-tight">Input Cuti Karyawan</h2>
-            <p className="text-xs text-gray-500 font-medium mt-0.5">Pengajuan izin atas nama staff</p>
+            <h2 className="font-bold text-gray-800 text-base leading-tight">Input Cuti Karyawan</h2>
+            <p className="text-[10px] text-gray-500 font-medium mt-0.5">Pengajuan izin atas nama staff</p>
           </div>
         </div>
       </div>
@@ -94,9 +94,9 @@ export const AdminLeaveRequestScreen: React.FC<Props> = ({ onBack }) => {
           <form onSubmit={handleSubmit} className="space-y-5">
 
             {/* Employee Selector */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase text-gray-500 tracking-wider flex items-center gap-1">
-                <User size={12} /> Pilih Karyawan
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider flex items-center gap-1">
+                <User size={10} /> Pilih Karyawan
               </label>
 
               {/* Simple Search inside Select simulation */}
@@ -104,47 +104,47 @@ export const AdminLeaveRequestScreen: React.FC<Props> = ({ onBack }) => {
                 {selectedEmployeeId ? (
                   <div
                     onClick={() => setSelectedEmployeeId('')}
-                    className="flex items-center justify-between w-full p-3 bg-blue-50 border border-blue-200 rounded-xl cursor-pointer"
+                    className="flex items-center justify-between w-full p-2.5 bg-blue-50 border border-blue-200 rounded-xl cursor-pointer"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold text-[10px]">
                         {employees.find(e => e.id === selectedEmployeeId)?.name.charAt(0)}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-800">{employees.find(e => e.id === selectedEmployeeId)?.name}</p>
-                        <p className="text-[10px] text-gray-500">{employees.find(e => e.id === selectedEmployeeId)?.department}</p>
+                        <p className="text-xs font-bold text-gray-800">{employees.find(e => e.id === selectedEmployeeId)?.name}</p>
+                        <p className="text-[9px] text-gray-500">{employees.find(e => e.id === selectedEmployeeId)?.department}</p>
                       </div>
                     </div>
-                    <span className="text-xs text-blue-600 font-bold">Ubah</span>
+                    <span className="text-[10px] text-blue-600 font-bold">Ubah</span>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <div className="relative">
-                      <Search size={16} className="absolute left-3 top-3 text-gray-400" />
+                      <Search size={14} className="absolute left-3 top-3 text-gray-400" />
                       <input
                         type="text"
                         placeholder="Cari nama..."
-                        className="w-full pl-10 p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:border-orange-500 outline-none"
+                        className="w-full pl-9 p-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:border-orange-500 outline-none"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                       />
                     </div>
-                    <div className="max-h-40 overflow-y-auto border border-gray-100 rounded-xl bg-white shadow-inner">
+                    <div className="max-h-32 overflow-y-auto border border-gray-100 rounded-xl bg-white shadow-inner">
                       {isLoadingEmps ? (
-                        <p className="text-center text-xs text-gray-400 py-4">Memuat...</p>
+                        <p className="text-center text-[10px] text-gray-400 py-3">Memuat...</p>
                       ) : filteredEmployees.length === 0 ? (
-                        <p className="text-center text-xs text-gray-400 py-4">Tidak ditemukan</p>
+                        <p className="text-center text-[10px] text-gray-400 py-3">Tidak ditemukan</p>
                       ) : (
                         filteredEmployees.map(emp => (
                           <div
                             key={emp.id}
                             onClick={() => setSelectedEmployeeId(emp.id)}
-                            className="p-3 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-0 flex items-center gap-3"
+                            className="p-2 hover:bg-orange-50 cursor-pointer border-b border-gray-50 last:border-0 flex items-center gap-2"
                           >
-                            <img src={emp.avatarUrl} className="w-6 h-6 rounded-full bg-gray-200 object-cover" />
+                            <img src={emp.avatarUrl} className="w-5 h-5 rounded-full bg-gray-200 object-cover" />
                             <div className="flex-1">
-                              <p className="text-xs font-bold text-gray-700">{emp.name}</p>
-                              <p className="text-[9px] text-gray-400">{emp.department}</p>
+                              <p className="text-[10px] font-bold text-gray-700">{emp.name}</p>
+                              <p className="text-[8px] text-gray-400">{emp.department}</p>
                             </div>
                           </div>
                         ))
@@ -159,27 +159,27 @@ export const AdminLeaveRequestScreen: React.FC<Props> = ({ onBack }) => {
 
             {/* Leave Type */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Jenis Izin</label>
+              <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Jenis Izin</label>
               <div className="relative">
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as LeaveType })}
-                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors font-medium text-sm"
+                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors font-medium text-xs"
                 >
                   <option value={LeaveType.SICK}>🤒 Sakit</option>
                   <option value={LeaveType.ANNUAL}>🌴 Cuti Tahunan</option>
                   <option value={LeaveType.OTHER}>⚡ Lainnya</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                  <ChevronDown size={16} />
+                  <ChevronDown size={14} />
                 </div>
               </div>
             </div>
 
             {/* Date Range */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Dari</label>
+                <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Dari</label>
                 <div className="relative">
                   <GlassDatePicker
                     selectedDate={formData.startDate ? new Date(formData.startDate) : null}
@@ -194,7 +194,7 @@ export const AdminLeaveRequestScreen: React.FC<Props> = ({ onBack }) => {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Sampai</label>
+                <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Sampai</label>
                 <div className="relative">
                   <GlassDatePicker
                     selectedDate={formData.endDate ? new Date(formData.endDate) : null}
@@ -212,14 +212,14 @@ export const AdminLeaveRequestScreen: React.FC<Props> = ({ onBack }) => {
 
             {/* Reason */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-gray-500 tracking-wider">Alasan</label>
+              <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Alasan</label>
               <textarea
                 required
                 rows={3}
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 placeholder="Keterangan sakit / keperluan..."
-                className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors text-sm resize-none"
+                className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors text-xs resize-none"
               />
             </div>
 
@@ -227,25 +227,25 @@ export const AdminLeaveRequestScreen: React.FC<Props> = ({ onBack }) => {
             <button
               type="submit"
               disabled={isSubmitting || !selectedEmployeeId}
-              className="w-full py-3.5 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 mt-3 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
               style={{ background: colors.gradientMain }}
             >
               {isSubmitting ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <FilePlus size={18} /> Ajukan Izin
+                  <FilePlus size={16} /> Ajukan Izin
                 </>
               )}
             </button>
           </form>
         </div>
 
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex gap-3 items-start">
-          <FileText size={20} className="text-blue-600 shrink-0 mt-0.5" />
+        <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 flex gap-2.5 items-start">
+          <FileText size={16} className="text-blue-600 shrink-0 mt-0.5" />
           <div>
-            <h4 className="text-xs font-bold text-blue-800">Catatan Admin</h4>
-            <p className="text-[10px] text-blue-600 mt-1">
+            <h4 className="text-[10px] font-bold text-blue-800">Catatan Admin</h4>
+            <p className="text-[9px] text-blue-600 mt-0.5">
               Pengajuan ini akan langsung tercatat dengan status <b>PENDING</b> (Menunggu Konfirmasi) atau bisa disesuaikan flow-nya agar langsung <b>APPROVED</b> jika diinginkan (tergantung kebijakan). Saat ini default: Pending.
             </p>
           </div>

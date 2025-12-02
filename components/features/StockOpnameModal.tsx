@@ -42,6 +42,12 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
         ));
     };
 
+    const handleNameChange = (id: string, newName: string) => {
+        setItems(prev => prev.map(item =>
+            item.id === id ? { ...item, name: newName } : item
+        ));
+    };
+
     const calculateVariance = (system: number, physical: number | '') => {
         if (physical === '') return 0;
         return physical - system;
@@ -78,64 +84,64 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
             />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-2xl bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden flex flex-col max-h-[90vh] animate-scale-up">
+            <div className="relative w-full max-w-2xl bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/50 overflow-hidden flex flex-col max-h-[85vh] animate-scale-up ring-1 ring-white/50">
 
                 {/* Header */}
-                <div className="p-6 border-b border-white/40 flex items-center justify-between bg-gradient-to-r from-orange-50 to-amber-50">
+                <div className="p-5 border-b border-gray-100/50 flex items-center justify-between bg-gradient-to-r from-orange-50/50 to-amber-50/50 backdrop-blur-xl">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-orange-100 rounded-xl text-orange-600 shadow-sm">
-                            <Package size={24} />
+                        <div className="p-2.5 bg-gradient-to-br from-orange-100 to-orange-50 rounded-2xl text-orange-600 shadow-sm border border-orange-100">
+                            <Package size={22} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black text-gray-800 tracking-tight">Stock Opname</h2>
-                            <p className="text-xs text-gray-500 font-medium">{isReadOnly ? 'Laporan Stok Fisik Outlet' : 'Input stok fisik harian outlet'}</p>
+                            <h2 className="text-lg font-black text-gray-800 tracking-tight">Stock Opname</h2>
+                            <p className="text-[10px] text-gray-500 font-medium">{isReadOnly ? 'Laporan Stok Fisik' : 'Input stok fisik harian'}</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-black/5 rounded-full transition-colors text-gray-400 hover:text-gray-600"
+                        className="p-2 hover:bg-gray-100/80 rounded-full transition-all text-gray-400 hover:text-gray-600 active:scale-95"
                     >
-                        <X size={24} />
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Category Tabs */}
-                <div className="px-6 pt-4 pb-2 flex gap-2">
+                <div className="px-5 pt-4 pb-2 flex gap-3">
                     <button
                         onClick={() => setActiveTab('FOH')}
-                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'FOH'
-                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                            : 'bg-white/50 text-gray-500 hover:bg-white hover:text-orange-500'
+                        className={`flex-1 py-2.5 rounded-xl text-[10px] font-bold transition-all border uppercase tracking-wider ${activeTab === 'FOH'
+                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 border-orange-400'
+                            : 'bg-white text-gray-500 hover:bg-gray-50 border-gray-200 hover:border-orange-200'
                             }`}
                     >
-                        Front of House (FOH)
+                        Front of House
                     </button>
                     <button
                         onClick={() => setActiveTab('BOH')}
-                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'BOH'
-                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                            : 'bg-white/50 text-gray-500 hover:bg-white hover:text-orange-500'
+                        className={`flex-1 py-2.5 rounded-xl text-[10px] font-bold transition-all border uppercase tracking-wider ${activeTab === 'BOH'
+                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 border-orange-400'
+                            : 'bg-white text-gray-500 hover:bg-gray-50 border-gray-200 hover:border-orange-200'
                             }`}
                     >
-                        Back of House (BOH)
+                        Back of House
                     </button>
                 </div>
 
                 {/* Body - Scrollable */}
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-white/40">
+                <div className="flex-1 overflow-y-auto p-5 custom-scrollbar bg-gray-50/30">
                     {success ? (
                         <div className="flex flex-col items-center justify-center h-64 text-center animate-fade-in">
-                            <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-4 text-emerald-600 shadow-lg shadow-emerald-200">
-                                <CheckCircle size={40} />
+                            <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600 shadow-xl shadow-emerald-200 ring-4 ring-white">
+                                <CheckCircle size={48} />
                             </div>
                             <h3 className="text-2xl font-black text-gray-800 mb-2">Laporan Tersimpan!</h3>
                             <p className="text-gray-500">Stok opname berhasil diperbarui ke sistem.</p>
 
                             {/* Dynamic Result Display */}
                             {resultData && resultData.totalVariance !== 0 && (
-                                <div className={`mt-4 p-3 rounded-xl border ${resultData.totalVariance < 0 ? 'bg-rose-50 border-rose-100' : 'bg-emerald-50 border-emerald-100'}`}>
+                                <div className={`mt-6 p-4 rounded-2xl border w-full max-w-xs ${resultData.totalVariance < 0 ? 'bg-rose-50 border-rose-100' : 'bg-emerald-50 border-emerald-100'}`}>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Financial Impact</p>
-                                    <div className={`text-lg font-black ${resultData.totalVariance < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                                    <div className={`text-xl font-black ${resultData.totalVariance < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                                         {resultData.totalVariance < 0 ? '-' : '+'} Rp {Math.abs(resultData.totalVariance).toLocaleString('id-ID')}
                                     </div>
                                     <p className="text-[10px] text-gray-400 mt-1">
@@ -154,7 +160,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
                                 <div className="text-center py-10 text-gray-400">Memuat data stok...</div>
                             ) : (
                                 <>
-                                    <div className="grid grid-cols-12 gap-4 px-2 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-200/50">
+                                    <div className="grid grid-cols-12 gap-3 px-2 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-200">
                                         <div className="col-span-5">Nama Barang</div>
                                         <div className="col-span-2 text-center">Sistem</div>
                                         <div className="col-span-3 text-center">Fisik</div>
@@ -172,16 +178,26 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
                                             const isMismatch = variance !== 0 && item.physicalStock !== '';
 
                                             return (
-                                                <div key={item.id} className="grid grid-cols-12 gap-4 items-center p-3 bg-white/60 rounded-2xl border border-white/60 shadow-sm hover:shadow-md transition-all group">
-                                                    {/* Item Info */}
+                                                <div key={item.id} className="grid grid-cols-12 gap-3 items-center p-3 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                                                    {/* Item Info (Editable) */}
                                                     <div className="col-span-5">
-                                                        <p className="font-bold text-gray-800 text-sm">{item.name}</p>
-                                                        <p className="text-[10px] text-gray-500">Last: {item.lastOpname}</p>
+                                                        {isReadOnly ? (
+                                                            <p className="font-bold text-gray-800 text-sm leading-tight">{item.name}</p>
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                value={item.name}
+                                                                onChange={(e) => handleNameChange(item.id, e.target.value)}
+                                                                className="w-full bg-transparent border-b border-transparent focus:border-orange-300 focus:bg-orange-50/50 rounded-t-sm outline-none font-bold text-gray-800 text-sm leading-tight transition-all placeholder-gray-300"
+                                                                placeholder="Nama Item"
+                                                            />
+                                                        )}
+                                                        <p className="text-[10px] text-gray-400 mt-0.5">Last: {item.lastOpname}</p>
                                                     </div>
 
                                                     {/* System Stock */}
                                                     <div className="col-span-2 text-center">
-                                                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-lg">
+                                                        <span className="text-[10px] font-bold text-gray-500 bg-gray-50 px-1.5 py-1 rounded-lg border border-gray-100 block">
                                                             {item.systemStock} {item.unit}
                                                         </span>
                                                     </div>
@@ -190,7 +206,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
                                                     <div className="col-span-3">
                                                         <div className="relative">
                                                             {isReadOnly ? (
-                                                                <div className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-2 text-center font-bold text-gray-800`}>
+                                                                <div className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-2 py-2 text-center font-bold text-gray-800 text-sm`}>
                                                                     {item.physicalStock === '' ? '-' : item.physicalStock}
                                                                 </div>
                                                             ) : (
@@ -199,28 +215,25 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
                                                                     value={item.physicalStock}
                                                                     onChange={(e) => handleStockChange(item.id, e.target.value)}
                                                                     placeholder="0"
-                                                                    className={`w-full bg-white border-2 rounded-xl px-3 py-2 text-center font-bold text-gray-800 outline-none focus:ring-2 transition-all ${isMismatch ? 'border-rose-200 focus:border-rose-400 focus:ring-rose-100' :
+                                                                    className={`w-full bg-white border-2 rounded-xl px-1 py-2 text-center font-bold text-gray-800 outline-none focus:ring-4 transition-all text-sm ${isMismatch ? 'border-rose-200 focus:border-rose-400 focus:ring-rose-100' :
                                                                         isMatch ? 'border-emerald-200 focus:border-emerald-400 focus:ring-emerald-100' :
                                                                             'border-gray-100 focus:border-orange-300 focus:ring-orange-100'
                                                                         }`}
                                                                 />
                                                             )}
-                                                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-medium pointer-events-none">
-                                                                {item.unit}
-                                                            </span>
                                                         </div>
                                                     </div>
 
                                                     {/* Variance */}
                                                     <div className="col-span-2 text-right flex justify-end">
                                                         {item.physicalStock !== '' ? (
-                                                            <span className={`text-xs font-black px-2 py-1 rounded-lg flex items-center gap-1 ${variance === 0 ? 'text-emerald-600 bg-emerald-100' :
-                                                                variance > 0 ? 'text-blue-600 bg-blue-100' : 'text-rose-600 bg-rose-100'
+                                                            <span className={`text-[10px] font-black px-1.5 py-1 rounded-lg flex items-center gap-0.5 ${variance === 0 ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' :
+                                                                variance > 0 ? 'text-blue-600 bg-blue-50 border border-blue-100' : 'text-rose-600 bg-rose-50 border border-rose-100'
                                                                 }`}>
                                                                 {variance > 0 ? '+' : ''}{variance}
                                                             </span>
                                                         ) : (
-                                                            <span className="text-gray-300">-</span>
+                                                            <span className="text-gray-300 font-bold">-</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -235,36 +248,38 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
 
                 {/* Footer */}
                 {!success && !isReadOnly && (
-                    <div className="p-6 border-t border-white/40 bg-white/60 backdrop-blur-md flex justify-between items-center">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <AlertCircle size={14} />
-                            <span>Pastikan hitungan fisik akurat</span>
-                        </div>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={onClose}
-                                className="px-6 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition-colors"
-                                disabled={loading}
-                            >
-                                Batal
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                className="px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
-                            >
-                                {loading ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        Menyimpan...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save size={18} />
-                                        Simpan Laporan
-                                    </>
-                                )}
-                            </button>
+                    <div className="p-5 border-t border-gray-100 bg-white z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-2 text-xs text-gray-400 font-medium hidden sm:flex">
+                                <AlertCircle size={14} />
+                                <span>Pastikan akurat</span>
+                            </div>
+                            <div className="flex gap-3 w-full sm:w-auto">
+                                <button
+                                    onClick={onClose}
+                                    className="flex-1 sm:flex-none px-6 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors border border-transparent hover:border-gray-200"
+                                    disabled={loading}
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={loading}
+                                    className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[140px]"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={18} />
+                                            Simpan
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}

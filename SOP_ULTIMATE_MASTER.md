@@ -811,6 +811,23 @@ Always Do:
 ✅ Authentication checks
 ✅ Authorization checks
 
+5.5 LOGIN & VERIFICATION PROTOCOL (ANTI-STRESS RULE)
+--------------------------------------------------------------------------------
+
+The "Driver" Principle:
+AI builds the car, User drives it out of the garage.
+
+RULES:
+1. APP LOGIN (LOCALHOST):
+   - FORBIDDEN: AI must NOT attempt to auto-login to the App (UI) or guess Phone Numbers/OTP.
+   - PROCEDURE: AI starts server -> AI Pauses -> User Logins Manually -> User says "Proceed" -> AI inspects features.
+
+2. DEPLOYMENT LOGIN (CLOUDFLARE/GIT):
+   - ALLOWED: AI is fully authorized to handle CLI authentication, Git Pushes, and Cloudflare Deployment autonomously. This is backend work, not UI interaction.
+
+Why?
+Prevent "False Positives" where AI thinks the app is broken just because it failed to bypass the OTP screen.
+
 ================================================================================
 PART 6: MOBILE APP DEVELOPMENT (APK + PLAY STORE)
 ================================================================================

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useEmployeeStore } from '../../store/employeeStore';
@@ -8,8 +7,11 @@ import { AttendanceLog, AttendanceStatus, UserRole, Employee, EmployeeArea, Owne
 import { colors } from '../../theme/colors';
 import { useNotificationStore } from '../../store/notificationStore';
 import { PeriodFilter } from '../../components/PeriodFilter';
+import { GlassDatePicker } from '../../components/ui/GlassDatePicker';
 import { PremiumGlassCard } from '../../components/PremiumGlassCard';
 import { StockOpnameModal } from '../../components/features/StockOpnameModal';
+import { RestaurantManagerPanel } from './RestaurantManagerPanel';
+import { MarketingManagerPanel } from './MarketingManagerPanel';
 
 interface AdminDashboardProps {
     onNavigate?: (screen: string) => void;
@@ -107,6 +109,11 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
     const handlePeriodChange = (period: { month: number; year: number }) => {
         setMonth(period.month);
         setYear(period.year);
+    };
+
+    const handleDateChange = (date: Date) => {
+        setMonth(date.getMonth() + 1);
+        setYear(date.getFullYear());
     };
 
     return (
@@ -248,11 +255,22 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
                         </div>
                     </div>
                 </div>
+            ) : user?.role === UserRole.RESTAURANT_MANAGER ? (
+                <RestaurantManagerPanel onNavigate={onNavigate || (() => { })} />
+            ) : user?.role === UserRole.MARKETING_MANAGER ? (
+                <MarketingManagerPanel onBack={() => { }} onNavigate={onNavigate || (() => { })} />
             ) : (
                 <div className="px-4 -mt-6 relative z-10 space-y-3">
                     <div className={`sticky ${isImpersonating ? 'top-12' : 'top-0'} z-20 bg-white/90 backdrop-blur-md p-2.5 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center`}>
                         <div className="flex items-center gap-2 text-gray-500 text-xs font-bold uppercase"><Filter size={12} /> Periode</div>
-                        <PeriodFilter onPeriodChange={handlePeriodChange} />
+                        <div className="w-48">
+                            <GlassDatePicker
+                                selectedDate={new Date(year, month - 1, 1)}
+                                onChange={handleDateChange}
+                                theme="light"
+                                placeholder="Pilih Periode"
+                            />
+                        </div>
                     </div>
 
                     {/* Quick Actions Grid - PREMIUM GLASS STYLE */}
@@ -266,19 +284,9 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
                                 <PremiumGlassCard title="Cuti" subtitle="Izin Karyawan" icon={FilePlus} onClick={() => onNavigate && onNavigate('adminLeaveRequest')} themeColor="teal" />
                                 <PremiumGlassCard title="Monitoring Harian" subtitle="Checklist & Jobdesk" icon={Eye} onClick={() => onNavigate && onNavigate('hrDailyMonitorHub')} themeColor="purple" />
                             </>}
-                            {user?.role === UserRole.RESTAURANT_MANAGER && <>
-                                <PremiumGlassCard title="Checklist" subtitle="Performa Harian" icon={CheckSquare} onClick={() => onNavigate && onNavigate('dailyChecklistList')} themeColor="orange" />
-                                <PremiumGlassCard title="Shift" subtitle="Jadwal Staff" icon={Calendar} onClick={() => onNavigate && onNavigate('shiftScheduler')} themeColor="blue" />
-                                <PremiumGlassCard title="Cuti" subtitle="Input Izin" icon={FilePlus} onClick={() => onNavigate && onNavigate('adminLeaveRequest')} themeColor="teal" />
-                                <PremiumGlassCard title="Monitoring" subtitle="Laporan Staff" icon={AlertTriangle} onClick={() => onNavigate && onNavigate('jobdeskMonitor')} themeColor="red" />
-                                <PremiumGlassCard title="Stock Opname" subtitle="Input Stok Fisik" icon={Package} onClick={() => setShowStockOpname(true)} themeColor="green" />
-                            </>}
                             {user?.role === UserRole.FINANCE_MANAGER && <>
                                 <PremiumGlassCard title="Input Keuangan" subtitle="Tambah Transaksi" icon={DollarSign} onClick={() => onNavigate && onNavigate('financeInput')} themeColor="green" />
                                 <PremiumGlassCard title="Laporan" subtitle="Cek Laporan" icon={ClipboardList} onClick={() => onNavigate && onNavigate('reportFinancial')} themeColor="blue" />
-                            </>}
-                            {user?.role === UserRole.MARKETING_MANAGER && <>
-                                <PremiumGlassCard title="Campaign" subtitle="Promosi & Iklan" icon={Megaphone} onClick={() => onNavigate && onNavigate('marketingPanel')} themeColor="purple" />
                             </>}
                         </div>
                     </div>

@@ -19,7 +19,9 @@ export const HRSpCoachingFormScreen: React.FC<Props> = ({ onBack }) => {
       return;
     }
     setIsSubmitting(true);
-    await performanceApi.saveHRRecord({ type: spType, desc: spDesc, empName: spEmpName });
+    // Mock empId generation for now since we only have name input
+    const mockEmpId = spEmpName.toLowerCase().replace(/\s+/g, '-');
+    await performanceApi.saveHRRecord({ type: spType, desc: spDesc, empId: mockEmpId });
     setIsSubmitting(false);
     alert('Catatan HR Tersimpan');
     setSpEmpName('');
@@ -30,29 +32,29 @@ export const HRSpCoachingFormScreen: React.FC<Props> = ({ onBack }) => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm px-4 py-4">
+      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <ArrowLeft size={20} className="text-gray-600" />
+          <button onClick={onBack} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <ArrowLeft size={18} className="text-gray-600" />
           </button>
           <div className="flex-1">
-            <h2 className="font-bold text-gray-800 text-lg leading-tight">Input SP / Coaching</h2>
-            <p className="text-xs text-gray-500 font-medium mt-0.5">Catat pelanggaran atau sesi coaching</p>
+            <h2 className="font-bold text-gray-800 text-base leading-tight">Input SP / Coaching</h2>
+            <p className="text-[10px] text-gray-500 font-medium mt-0.5">Catat pelanggaran atau sesi coaching</p>
           </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-          <div className="space-y-4">
+      <div className="p-4 space-y-3">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+          <div className="space-y-3">
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase mb-1.5 block">Nama Karyawan</label>
+              <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Nama Karyawan</label>
               <div className="relative">
-                <Users size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                <Users size={14} className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Cari nama karyawan..."
-                  className="w-full p-3 pl-10 border rounded-xl text-sm bg-gray-50 outline-none focus:border-orange-500 transition-colors"
+                  className="w-full p-2.5 pl-9 border rounded-xl text-xs bg-gray-50 outline-none focus:border-orange-500 transition-colors"
                   value={spEmpName}
                   onChange={(e) => setSpEmpName(e.target.value)}
                 />
@@ -60,11 +62,11 @@ export const HRSpCoachingFormScreen: React.FC<Props> = ({ onBack }) => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase mb-1.5 block">Jenis Catatan</label>
+              <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Jenis Catatan</label>
               <div className="relative">
-                 <FileText size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                <FileText size={14} className="absolute left-3 top-3 text-gray-400" />
                 <select
-                  className="w-full p-3 pl-10 border rounded-xl text-sm bg-gray-50 outline-none focus:border-orange-500 appearance-none"
+                  className="w-full p-2.5 pl-9 border rounded-xl text-xs bg-gray-50 outline-none focus:border-orange-500 appearance-none"
                   value={spType}
                   onChange={(e) => setSpType(e.target.value)}
                 >
@@ -77,30 +79,30 @@ export const HRSpCoachingFormScreen: React.FC<Props> = ({ onBack }) => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase mb-1.5 block">Keterangan Pelanggaran / Hasil Coaching</label>
+              <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Keterangan Pelanggaran / Hasil Coaching</label>
               <textarea
-                rows={6}
+                rows={5}
                 placeholder="Jelaskan secara detail..."
-                className="w-full p-3 border rounded-xl text-sm bg-gray-50 outline-none focus:border-orange-500 resize-none"
+                className="w-full p-2.5 border rounded-xl text-xs bg-gray-50 outline-none focus:border-orange-500 resize-none"
                 value={spDesc}
                 onChange={(e) => setSpDesc(e.target.value)}
               />
             </div>
-            
-            <div className="pt-2">
-                <button
+
+            <div className="pt-1">
+              <button
                 onClick={handleSaveSP}
                 disabled={isSubmitting}
-                className="w-full py-3.5 bg-red-500 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 active:scale-95 transition-transform flex items-center justify-center gap-2 disabled:opacity-70"
-                >
+                className="w-full py-3 bg-red-500 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 active:scale-95 transition-transform flex items-center justify-center gap-1.5 disabled:opacity-70 text-xs"
+              >
                 {isSubmitting ? (
-                    'Menyimpan...'
+                  'Menyimpan...'
                 ) : (
-                    <>
-                    <Save size={16} /> Simpan Catatan
-                    </>
+                  <>
+                    <Save size={14} /> Simpan Catatan
+                  </>
                 )}
-                </button>
+              </button>
             </div>
           </div>
         </div>
