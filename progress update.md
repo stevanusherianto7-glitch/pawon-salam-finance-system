@@ -41,6 +41,7 @@ Successfully implemented the Marketing Budget Controller for the Marketing Manag
         *   **Fix:** `HPPCalculatorService` Math Logic (Migrated to Integer Math).
         *   **UI Standardization (Clone Protocol):** Cloned `HPPCalculatorModal` (Golden Sample) styles to `StockOpname`, `MarketingBudget`, and `SmartOpex` to ensure 100% mobile layout consistency (Safe Area, Z-Index, Padding).
         *   **Layout Migration (VH Standard):** Refactored all modals to use "Safe Floating" Viewport Logic (`top-[12vh]`, `h-[78vh]`) for perfect scaling across devices.
+        *   **Architecture Upgrade (Fixed App Shell):** Implemented "Native App" behavior by locking the global body and creating a dedicated scrollable content area in `App.tsx`. Eliminated browser scroll and rubber-banding.
 
 ## 2. SOP Update
 *   **Updated `SOP_ULTIMATE_MASTER.md`:**

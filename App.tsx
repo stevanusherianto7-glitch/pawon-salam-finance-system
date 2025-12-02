@@ -205,13 +205,13 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-200 flex justify-center font-sans" style={{ backgroundColor: '#e5e7eb' }}>
-        <div className="w-full max-w-md bg-gray-50 min-h-screen relative overflow-hidden border-x border-gray-200">
+      <div className="h-full w-full bg-gray-200 flex justify-center font-sans overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
+        <div className="w-full max-w-md bg-gray-50 h-full relative flex flex-col border-x border-gray-200 shadow-2xl overflow-hidden">
           <ImpersonationBanner />
           <ToastContainer />
           <SpecialNotificationBanner />
 
-          <div className={`${isImpersonating ? 'pt-12' : ''} h-full`}>
+          <div className={`flex-1 overflow-y-auto overscroll-contain pb-32 ${isImpersonating ? 'pt-16' : ''}`} id="main-content">
             {renderScreen()}
           </div>
 
