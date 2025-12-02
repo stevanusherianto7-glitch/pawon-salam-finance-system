@@ -104,7 +104,7 @@ export const SmartOpexModal: React.FC<Props> = ({ isOpen, onClose }) => {
         <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            <div className="relative w-full sm:max-w-md h-[calc(100vh-110px)] mb-[110px] sm:h-[90vh] sm:mb-0 bg-gray-50 rounded-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scale-up">
+            <div className="relative w-full sm:max-w-md mt-[120px] h-[calc(100vh-230px)] mb-[110px] sm:h-[90vh] sm:mb-0 sm:mt-0 bg-gray-50 rounded-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scale-up">
 
                 {/* Header */}
                 <div className="bg-white p-4 flex justify-between items-center border-b border-gray-100 z-20">

@@ -20,6 +20,9 @@ Successfully implemented the Marketing Budget Controller for the Marketing Manag
     *   **`MarketingManagerPanel.tsx`:**
         *   **Entry Point:** "Marketing Command" card with live budget status.
         *   **Layout Fix:** Removed redundant "Marketing Manager" title header to resolve "Double Header" issue.
+    *   **Mobile UI Fixes:**
+        *   **HPP Calculator:** Added top margin (`mt-[120px]`) to prevent browser address bar overlap.
+        *   **Smart Opex:** Added top margin (`mt-[120px]`) to prevent browser address bar overlap.
 
 ## 2. SOP Update
 *   **Updated `SOP_ULTIMATE_MASTER.md`:**
