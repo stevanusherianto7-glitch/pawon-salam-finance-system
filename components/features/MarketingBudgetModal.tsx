@@ -166,10 +166,10 @@ export const MarketingBudgetModal: React.FC<Props> = ({ isOpen, onClose }) => {
     );
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
+        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4 pointer-events-none">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity pointer-events-auto" onClick={onClose} />
 
-            <div className="relative w-full sm:max-w-md h-[calc(100vh-110px)] mb-[110px] sm:h-[90vh] sm:mb-0 bg-gray-50 rounded-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scale-up">
+            <div className="relative w-full sm:max-w-md md:max-w-lg lg:max-w-4xl mt-[120px] h-[calc(100vh-230px)] mb-[110px] sm:h-[90vh] sm:mb-0 sm:mt-0 bg-gray-50 rounded-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scale-up pointer-events-auto">
 
                 {/* Header */}
                 <div className="bg-gradient-to-r from-[#E87722] to-[#F9A055] p-6 flex justify-between items-center border-b border-white/10 z-20">
