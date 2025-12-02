@@ -76,7 +76,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
@@ -128,7 +128,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
                 </div>
 
                 {/* Body - Scrollable */}
-                <div className="flex-1 overflow-y-auto p-5 custom-scrollbar bg-gray-50/30">
+                <div className="flex-1 overflow-y-auto p-5 pb-32 custom-scrollbar bg-gray-50/30">
                     {success ? (
                         <div className="flex flex-col items-center justify-center h-64 text-center animate-fade-in">
                             <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600 shadow-xl shadow-emerald-200 ring-4 ring-white">
@@ -248,7 +248,7 @@ export const StockOpnameModal: React.FC<Props> = ({ isOpen, onClose, isReadOnly 
 
                 {/* Footer */}
                 {!success && !isReadOnly && (
-                    <div className="p-5 border-t border-gray-100 bg-white z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                    <div className="p-5 border-t border-gray-100 bg-white z-[10000] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div className="flex items-center gap-2 text-xs text-gray-400 font-medium hidden sm:flex">
                                 <AlertCircle size={14} />

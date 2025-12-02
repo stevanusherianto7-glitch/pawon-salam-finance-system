@@ -29,6 +29,11 @@ Successfully implemented the Marketing Budget Controller for the Marketing Manag
         *   **Waste:** Implemented inline form and list for tracking food waste.
         *   **UI:** Consistent "Glass" design with "Total Expense" integration.
 
+    *   **Global Fix: Z-Index Layering:**
+        *   **Problem:** Bottom Navigation Bar was overlapping modal footers.
+        *   **Fix:** Standardized all full-screen modals (`StockOpname`, `HPPCalculator`, `SmartOpex`) to use `z-[9999]` for overlay and `z-[10000]` for footers.
+        *   **Padding:** Added `pb-32` to scrollable areas to ensure content isn't hidden behind footers.
+
 ## 2. SOP Update
 *   **Updated `SOP_ULTIMATE_MASTER.md`:**
     *   Added **Section 5.5: LOGIN & VERIFICATION PROTOCOL (ANTI-STRESS RULE)**.
