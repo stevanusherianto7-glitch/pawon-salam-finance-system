@@ -79,6 +79,27 @@ PART 4: TECHNICAL ARCHITECTURE & DOCTRINE
 - Data must survive a browser refresh.
 - UI must be Reactive (Update instantly upon input).
 
+4.4 THE "NATIVE FEEL" ARCHITECTURE (APP SHELL)
+--------------------------------------------------------------------------------
+DO NOT build a scrolling website. Build a FIXED APP SHELL.
+
+1. VIEWPORT LOCKING:
+   - `html, body` MUST be `fixed`, `h-100%`, `overflow-hidden`.
+   - Prevent the "Rubber Band" effect on iOS (`overscroll-behavior: none`).
+   - The Application Background is STATIC. It never moves.
+
+2. SCROLL ZONES:
+   - Only the specific Content Container (`flex-1`) allows `overflow-y-auto`.
+   - Headers and Bottom Navigation Bars are `flex-none` and PERMANENTLY FIXED (no sticky hack).
+
+3. MODAL GEOMETRY (THE VH RULE):
+   - NEVER use hardcoded pixels for full-screen modal positioning (e.g., `top-100px` is banned).
+   - ALWAYS use Viewport Height (`vh`) units for robust scaling.
+   - **Golden Formula:**
+     - Top: `top-[12vh]` (Safe for Notch/Address Bar)
+     - Height: `h-[78vh]` (Leaves room for Bottom Nav)
+     - Width: `w-[92%]`, `left-[4%]` (Centered)
+
 ================================================================================
 PART 5: WORKFLOW & QUALITY ASSURANCE
 ================================================================================

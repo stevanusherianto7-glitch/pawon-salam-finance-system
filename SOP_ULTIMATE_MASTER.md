@@ -1548,3 +1548,18 @@ export const trustedTime = new TrustedTimeService();
 ```
 
 END OF SOP
+
+================================================================================
+PART X: PWA NATIVE FEEL DOCTRINE
+================================================================================
+
+DO:
+- ALWAYS use display: standalone in manifest
+- ALWAYS implement service worker with cache-first strategy
+- ALWAYS include apple-mobile-web-app meta tags
+- ALWAYS use env(safe-area-inset-*) for notch devices
+
+DON'T:
+- DON'T allow browser default gestures (pull-to-refresh)
+- DON'T use tap highlight color
+- DON'T allow text selection on UI elements

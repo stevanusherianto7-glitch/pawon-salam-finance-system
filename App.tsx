@@ -46,9 +46,35 @@ import { JobdeskMonitorScreen } from './screens/admin/JobdeskMonitorScreen';
 import { BroadcastScreen } from './screens/employee/BroadcastScreen';
 import { HRDailyMonitorHubScreen } from './screens/admin/HRDailyMonitorHubScreen';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+
+import { useNotificationStore } from './store/notificationStore';
+import { haptics } from './utils/haptics';
 
 const App = () => {
   const { isAuthenticated, user, isImpersonating } = useAuthStore();
+  const { showNotification } = useNotificationStore();
+
+  useEffect(() => {
+    const handleOnline = () => {
+      showNotification('Koneksi Kembali Online', 'success');
+      haptics.success();
+    };
+
+    const handleOffline = () => {
+      showNotification('Koneksi Terputus - Mode Offline', 'error');
+      haptics.error();
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const [currentScreen, setCurrentScreen] = useState('shiftScheduler');
   const [screenParams, setScreenParams] = useState<any>(null);
   const [selectedEmpId, setSelectedEmpId] = useState<string | null>(null);
@@ -210,8 +236,9 @@ const App = () => {
           <ImpersonationBanner />
           <ToastContainer />
           <SpecialNotificationBanner />
+          <PWAInstallPrompt />
 
-          <div className={`flex-1 overflow-y-auto overscroll-contain pb-32 ${isImpersonating ? 'pt-16' : ''}`} id="main-content">
+          <div className={`flex-1 overflow-y-auto overscroll-contain pb-[calc(8rem+env(safe-area-inset-bottom))] ${isImpersonating ? 'pt-16' : ''}`} id="main-content">
             {renderScreen()}
           </div>
 
