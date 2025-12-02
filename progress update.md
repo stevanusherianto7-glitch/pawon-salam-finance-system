@@ -34,6 +34,12 @@ Successfully implemented the Marketing Budget Controller for the Marketing Manag
         *   **Fix:** Standardized all full-screen modals (`StockOpname`, `HPPCalculator`, `SmartOpex`) to use `z-[9999]` for overlay and `z-[10000]` for footers.
         *   **Padding:** Added `pb-32` to scrollable areas to ensure content isn't hidden behind footers.
 
+    *   **System Health & Compliance:**
+        *   **SOP V2:** Injected `SOP_ULTIMATE_MASTER_V2.md` (The Sentient Protocol).
+        *   **Audit:** Generated `HEALTH_REPORT.md` and identified critical math/layout issues.
+        *   **Fix:** `StockOpnameModal` Layout (Safe Area Margins & Padding).
+        *   **Fix:** `HPPCalculatorService` Math Logic (Migrated to Integer Math).
+
 ## 2. SOP Update
 *   **Updated `SOP_ULTIMATE_MASTER.md`:**
     *   Added **Section 5.5: LOGIN & VERIFICATION PROTOCOL (ANTI-STRESS RULE)**.

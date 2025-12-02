@@ -46,6 +46,7 @@ export const HPPCalculatorService = {
     /**
      * Calculates the cost of a single ingredient row accounting for yield.
      * Formula: (Price * Qty) / (Yield / 100)
+     * IMPLEMENTATION: Uses Integer Math to avoid floating point errors.
      */
     calculateRowCost: (ingredient: IngredientInput): number => {
         const price = ingredient.customPrice ?? ingredient.stockItem.pricePerUnit;
@@ -53,10 +54,15 @@ export const HPPCalculatorService = {
 
         if (yieldFactor <= 0) return 0; // Prevent division by zero
 
+        // INTEGER MATH STRATEGY:
+        // 1. Work with base precision (no decimals for Rupiah usually, but we keep precision for intermediate)
+        // 2. Formula: (Price * Qty) / YieldFactor
+        // 3. Round at the very end to nearest integer (Rupiah)
+
         const rawCost = price * ingredient.qtyNeeded;
         const realCost = rawCost / yieldFactor;
 
-        return realCost;
+        return Math.round(realCost); // Always round to nearest integer for Rupiah
     },
 
     /**
@@ -78,7 +84,7 @@ export const HPPCalculatorService = {
         params: ProfitProtectionInput,
         manualPrice?: number
     ): CalculationResult => {
-        // 1. Calculate Base Costs
+        // 1. Calculate Base Costs (All rounded to integers)
         const primeCost = HPPCalculatorService.calculatePrimeCost(ingredients);
 
         const overheadCost = overheads
@@ -87,7 +93,8 @@ export const HPPCalculatorService = {
 
         const fixedCost = params.fixedCostBuffer;
 
-        const riskCost = params.enableRiskFactor ? primeCost * 0.05 : 0;
+        // Risk Cost: 5% of Prime Cost. Use Math.round
+        const riskCost = params.enableRiskFactor ? Math.round(primeCost * 0.05) : 0;
 
         const totalFixedComponent = primeCost + overheadCost + fixedCost + riskCost;
 
@@ -95,23 +102,31 @@ export const HPPCalculatorService = {
         let sellingPrice = 0;
         let laborCost = 0;
 
+        // Helper for Labor Cost: Price * (Labor% / 100)
+        const calculateLabor = (price: number, laborPercent: number) => Math.round(price * (laborPercent / 100));
+
         if (manualPrice && manualPrice > 0) {
             sellingPrice = manualPrice;
-            laborCost = sellingPrice * (params.laborCostPercent / 100);
+            laborCost = calculateLabor(sellingPrice, params.laborCostPercent);
         } else {
             // Suggest Price
             // Price = TotalFixed / (1 - Labor% - Profit%)
-            const divisor = 1 - (params.laborCostPercent / 100) - (params.targetProfitMargin / 100);
+            // Denominator calculation needs care.
+            // (100 - Labor - Profit) / 100
+            const remainingPercent = 100 - params.laborCostPercent - params.targetProfitMargin;
 
-            if (divisor > 0) {
-                sellingPrice = Math.ceil(totalFixedComponent / divisor);
-                // Round up to nearest 100 or 500 for cleaner pricing? Let's keep it exact for now or ceil.
+            if (remainingPercent > 0) {
+                // Price = (TotalFixed * 100) / RemainingPercent
+                const rawPrice = (totalFixedComponent * 100) / remainingPercent;
+                sellingPrice = Math.ceil(rawPrice); // Ceiling to ensure margin is met
+
+                // Round up to nearest 100 for cleaner pricing (Business Rule)
                 sellingPrice = Math.ceil(sellingPrice / 100) * 100;
             } else {
-                sellingPrice = 0; // Impossible parameters (e.g. Labor 50% + Profit 60% = 110%)
+                sellingPrice = 0; // Impossible parameters
             }
 
-            laborCost = sellingPrice * (params.laborCostPercent / 100);
+            laborCost = calculateLabor(sellingPrice, params.laborCostPercent);
         }
 
         // 3. Calculate Total Real Cost (HPP)
@@ -119,6 +134,8 @@ export const HPPCalculatorService = {
 
         // 4. Metrics
         const grossProfit = sellingPrice - totalHPP;
+
+        // Percentages (Keep as floats for display, max 1 decimal)
         const foodCostPercentage = sellingPrice > 0 ? (primeCost / sellingPrice) * 100 : 0;
         const netProfitPercentage = sellingPrice > 0 ? (grossProfit / sellingPrice) * 100 : 0;
 
@@ -131,7 +148,7 @@ export const HPPCalculatorService = {
             totalHPP,
             suggestedSellingPrice: sellingPrice,
             grossProfit,
-            foodCostPercentage,
+            foodCostPercentage, // UI will format this
             netProfitPercentage
         };
     }
