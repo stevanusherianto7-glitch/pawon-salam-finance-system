@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Printer, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Download, Plus, Trash2 } from 'lucide-react';
 import { useEmployeeStore } from '../../store/employeeStore';
 import { Logo } from '../../components/Logo';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 interface FinancialItem {
     id: number;
@@ -22,6 +24,8 @@ interface EmployeeData {
 
 export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const { employees, fetchEmployees } = useEmployeeStore();
+    const payslipRef = useRef<HTMLDivElement>(null);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     // State Data Karyawan
     const [employee, setEmployee] = useState<EmployeeData>({
@@ -107,9 +111,49 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         else setDeductions(updateList(deductions));
     };
 
-    // Handler: Print
-    const handlePrint = () => {
-        window.print();
+    // Handler: Download PDF
+    const handleDownloadPDF = async () => {
+        if (!payslipRef.current) return;
+
+        setIsGenerating(true);
+
+        try {
+            // Wait for any potential re-renders or font loads
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const canvas = await html2canvas(payslipRef.current, {
+                scale: 2, // Higher scale for better quality
+                useCORS: true, // Enable CORS for images
+                logging: false,
+                backgroundColor: '#ffffff', // Ensure white background
+                windowWidth: 1123, // A4 Landscape width in pixels (approx at 96dpi)
+                windowHeight: 794 // A4 Landscape height in pixels
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+
+            // A4 Landscape dimensions in mm
+            const pdfWidth = 297;
+            const pdfHeight = 210;
+
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+            // Generate filename based on employee name and period
+            const filename = `Slip_Gaji_${employee.name.replace(/\s+/g, '_')}_${employee.period.replace(/\s+/g, '_')}.pdf`;
+
+            pdf.save(filename);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Gagal membuat PDF. Silakan coba lagi.');
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     return (
@@ -129,8 +173,8 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 `}
             </style>
 
-            {/* Action Bar (Hidden saat Print) */}
-            <div className="max-w-[297mm] mx-auto mb-6 flex justify-between items-center print:hidden px-4">
+            {/* Action Bar (Hidden saat Print/Capture) */}
+            <div className="max-w-[297mm] mx-auto mb-6 flex justify-between items-center print:hidden px-4" data-html2canvas-ignore>
                 <div className="flex items-center gap-4">
                     {onBack && (
                         <button onClick={onBack} className="text-gray-600 hover:text-gray-900 flex items-center gap-2 font-medium">
@@ -152,17 +196,27 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         ))}
                     </select>
                     <button
-                        onClick={handlePrint}
-                        className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+                        onClick={handleDownloadPDF}
+                        disabled={isGenerating}
+                        className={`flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        <Printer size={18} /> Cetak PDF
+                        {isGenerating ? (
+                            <span className="flex items-center gap-2">Generating...</span>
+                        ) : (
+                            <>
+                                <Download size={18} /> Save PDF
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
 
             {/* KERTAS A4 LANDSCAPE (Fixed Size) */}
-            <div className="mx-auto bg-white shadow-xl print:shadow-none print:mx-0 relative"
-                style={{ width: '297mm', minHeight: '210mm', padding: '30mm' }}>
+            <div
+                ref={payslipRef}
+                className="mx-auto bg-white shadow-xl print:shadow-none print:mx-0 relative"
+                style={{ width: '297mm', minHeight: '210mm', padding: '30mm' }}
+            >
 
                 {/* HEADER */}
                 <div className="flex justify-between items-start border-b-4 border-[#ff6b35] pb-6 mb-6 w-full">
@@ -248,6 +302,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                         <button
                                             onClick={() => deleteRow('earning', item.id)}
                                             className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden"
+                                            data-html2canvas-ignore
                                         >
                                             <Trash2 size={14} />
                                         </button>
@@ -258,6 +313,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             <button
                                 onClick={() => addRow('earning')}
                                 className="text-xs text-[#ff6b35] font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden"
+                                data-html2canvas-ignore
                             >
                                 <Plus size={14} /> Tambah Item
                             </button>
@@ -293,6 +349,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                         <button
                                             onClick={() => deleteRow('deduction', item.id)}
                                             className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden"
+                                            data-html2canvas-ignore
                                         >
                                             <Trash2 size={14} />
                                         </button>
@@ -303,6 +360,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             <button
                                 onClick={() => addRow('deduction')}
                                 className="text-xs text-red-500 font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden"
+                                data-html2canvas-ignore
                             >
                                 <Plus size={14} /> Tambah Item
                             </button>
