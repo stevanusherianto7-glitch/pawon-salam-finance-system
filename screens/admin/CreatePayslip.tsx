@@ -284,7 +284,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     {/* EARNINGS COLUMN */}
                     <div>
                         <div className="bg-[#ff6b35] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2">
-                            Penerimaan (Earnings)
+                            Penerimaan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
                             {earnings.map((item) => (
@@ -331,7 +331,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     {/* DEDUCTIONS COLUMN */}
                     <div>
                         <div className="bg-[#d64518] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2">
-                            Potongan (Deductions)
+                            Potongan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
                             {deductions.map((item) => (
@@ -378,11 +378,11 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                 {/* TAKE HOME PAY */}
                 <div className="flex items-center mb-8 w-full">
-                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-4 text-sm tracking-widest uppercase w-1/3 rounded-l">
+                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-2 text-sm tracking-widest uppercase w-1/3 rounded-l">
                         TAKE HOME PAY
                     </div>
-                    <div className="bg-orange-50 flex-1 py-3 px-6 text-right border border-[#ff6b35] border-l-0 rounded-r">
-                        <span className="text-3xl font-black text-[#ff6b35]">{formatRupiah(takeHomePay)}</span>
+                    <div className="bg-orange-50 flex-1 py-2 px-6 text-right border border-[#ff6b35] border-l-0 rounded-r">
+                        <span className="text-xl font-black text-[#ff6b35]">{formatRupiah(takeHomePay)}</span>
                     </div>
                 </div>
 
