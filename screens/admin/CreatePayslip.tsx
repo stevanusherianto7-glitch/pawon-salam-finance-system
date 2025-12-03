@@ -370,7 +370,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     {/* EARNINGS COLUMN */}
                     < div >
-                        <div className="bg-[#ff6b35] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm antialiased">
+                        <div className="bg-[#ff6b35] text-white px-3 py-4 text-xs font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
                             Penerimaan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
@@ -421,7 +421,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     {/* DEDUCTIONS COLUMN */}
                     < div >
-                        <div className="bg-[#d64518] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm antialiased">
+                        <div className="bg-[#d64518] text-white px-3 py-4 text-xs font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
                             Potongan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
@@ -473,7 +473,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                 {/* TAKE HOME PAY */}
                 < div className="flex items-center mb-8 w-full shadow-sm rounded overflow-hidden" >
-                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-2 text-sm tracking-widest uppercase w-1/3 flex items-center antialiased">
+                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-4 text-sm tracking-widest uppercase w-1/3 flex items-center antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
                         TAKE HOME PAY
                     </div>
                     <div className="bg-orange-50 flex-1 py-2 px-6 text-right border border-[#ff6b35] border-l-0">
