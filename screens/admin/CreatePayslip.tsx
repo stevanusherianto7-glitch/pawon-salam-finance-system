@@ -254,9 +254,19 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             {/* KERTAS A4 LANDSCAPE (Fixed Size) */}
             <div
                 ref={payslipRef}
-                className="mx-auto bg-white shadow-2xl print:shadow-none print:mx-0 relative transform transition-transform duration-500"
+                className="mx-auto bg-white shadow-2xl print:shadow-none print:mx-0 relative transform transition-transform duration-500 overflow-hidden"
                 style={{ width: '297mm', minHeight: '210mm', padding: '30mm' }}
             >
+                {/* DECORATIVE MOTIF (Watermark Top-Right) */}
+                <div className="absolute top-0 right-0 pointer-events-none opacity-10">
+                    <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M300 0H150C232.843 0 300 67.1573 300 150V0Z" fill="#ff6b35" />
+                        <circle cx="300" cy="0" r="100" stroke="#ff6b35" strokeWidth="2" strokeDasharray="4 4" />
+                        <circle cx="300" cy="0" r="140" stroke="#ff6b35" strokeWidth="1" />
+                        <circle cx="300" cy="0" r="180" stroke="#ff6b35" strokeWidth="0.5" strokeDasharray="8 8" />
+                        <path d="M300 200C244.772 200 200 155.228 200 100" stroke="#ff6b35" strokeWidth="1" />
+                    </svg>
+                </div>
 
                 {/* HEADER */}
                 <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-6 w-full">
@@ -479,7 +489,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     <p className="text-[10px] text-gray-400 antialiased">Dicetak secara otomatis oleh sistem Pawon Salam Payroll</p>
                 </div>
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
