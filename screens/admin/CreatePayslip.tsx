@@ -296,7 +296,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 {/* HEADER */}
                 <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-6 w-full relative z-10">
                     <div className="flex flex-row items-center gap-6">
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 aspect-square">
                             <Logo size="xl" variant="color" showText={false} />
                         </div>
                         <div className="flex-1 max-w-md">
