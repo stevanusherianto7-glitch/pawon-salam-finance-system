@@ -370,7 +370,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     {/* EARNINGS COLUMN */}
                     < div >
-                        <div className="bg-[#ff6b35] text-white px-3 py-4 text-xs font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
+                        <div className="bg-[#ff6b35] text-white px-3 py-4 text-sm font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
                             Penerimaan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
@@ -421,7 +421,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     {/* DEDUCTIONS COLUMN */}
                     < div >
-                        <div className="bg-[#d64518] text-white px-3 py-4 text-xs font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
+                        <div className="bg-[#d64518] text-white px-3 py-4 text-sm font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
                             Potongan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
