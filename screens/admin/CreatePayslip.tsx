@@ -12,20 +12,20 @@ interface CreatePayslipProps {
 
 const SlipMotifTopRight = () => (
     <div className="absolute top-0 right-0 z-0 pointer-events-none">
-        <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-0 right-0 w-[60%] md:w-auto h-auto print:w-[15cm]">
-            {/* Background Blob - Vibrant Orange */}
-            <path d="M400 0L400 220C320 200 200 180 120 0H400Z" fill="#FB923C" fillOpacity="0.5" />
+        <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-0 right-0 w-[50%] md:w-auto h-auto print:w-[10cm]">
+            {/* Background Blob - Vibrant Orange - Resized smaller */}
+            <path d="M300 0L300 150C250 120 180 100 150 0H300Z" fill="#FB923C" fillOpacity="0.5" />
 
-            {/* Round Motifs / Bubbles to match other corners */}
-            <circle cx="360" cy="60" r="25" fill="#EA580C" fillOpacity="0.6" />
-            <circle cx="310" cy="40" r="15" fill="#F97316" fillOpacity="0.8" />
-            <circle cx="260" cy="30" r="10" fill="#FB923C" fillOpacity="0.9" />
+            {/* Round Motifs / Bubbles - Repositioned closer to corner */}
+            <circle cx="270" cy="40" r="20" fill="#EA580C" fillOpacity="0.6" />
+            <circle cx="230" cy="30" r="12" fill="#F97316" fillOpacity="0.8" />
+            <circle cx="190" cy="20" r="8" fill="#FB923C" fillOpacity="0.9" />
 
-            <circle cx="320" cy="100" r="18" fill="#FDBA74" fillOpacity="0.7" />
-            <circle cx="280" cy="140" r="8" fill="#EA580C" fillOpacity="0.5" />
+            <circle cx="250" cy="70" r="15" fill="#FDBA74" fillOpacity="0.7" />
+            <circle cx="220" cy="90" r="6" fill="#EA580C" fillOpacity="0.5" />
 
-            <circle cx="380" cy="130" r="12" fill="#C2410C" fillOpacity="0.6" />
-            <circle cx="350" cy="160" r="6" fill="#FDBA74" fillOpacity="0.8" />
+            <circle cx="280" cy="90" r="10" fill="#C2410C" fillOpacity="0.6" />
+            <circle cx="260" cy="110" r="5" fill="#FDBA74" fillOpacity="0.8" />
         </svg>
     </div>
 );
@@ -41,8 +41,8 @@ const SlipMotifTopLeft = () => (
 );
 
 const SlipMotifBottomLeft = () => (
-    <svg width="200" height="150" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute bottom-0 left-0 z-0 pointer-events-none w-[30%] md:w-auto h-auto print:w-[8cm]">
-        <path d="M0 150C20 100 80 80 120 150H0Z" fill="#FDBA74" fillOpacity="0.8" /> {/* Orange 300 */}
+    <svg width="150" height="100" viewBox="0 0 150 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute bottom-0 left-0 z-0 pointer-events-none w-[25%] md:w-auto h-auto print:w-[6cm]">
+        <path d="M0 100C10 70 40 60 70 100H0Z" fill="#FDBA74" fillOpacity="0.8" /> {/* Orange 300 - Resized smaller */}
     </svg>
 );
 
