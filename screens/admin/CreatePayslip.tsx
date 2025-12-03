@@ -413,7 +413,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             </button>
                         </div>
 
-                        <div className="flex justify-between items-center bg-gray-50 p-2 rounded mt-4 border-t-2 border-gray-200">
+                        <div className="flex justify-between items-center bg-gray-50 px-6 py-4 rounded mt-4 border border-gray-200">
                             <span className="font-bold text-gray-600 text-sm">Total Penerimaan</span>
                             <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalEarnings)}</span>
                         </div>
@@ -464,7 +464,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             </button>
                         </div>
 
-                        <div className="flex justify-between items-center bg-gray-50 p-2 rounded mt-4 border-t-2 border-gray-200">
+                        <div className="flex justify-between items-center bg-gray-50 px-6 py-4 rounded mt-4 border border-gray-200">
                             <span className="font-bold text-gray-600 text-sm">Total Potongan</span>
                             <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalDeductions)}</span>
                         </div>
@@ -476,7 +476,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     <div className="bg-[#ff6b35] text-white font-bold px-6 py-4 text-sm tracking-widest uppercase w-1/3 flex items-center antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
                         TAKE HOME PAY
                     </div>
-                    <div className="bg-orange-50 flex-1 py-2 px-6 text-right border border-[#ff6b35] border-l-0">
+                    <div className="bg-orange-50 flex-1 py-4 px-6 text-right border border-[#ff6b35]">
                         <span className="text-xl font-black text-[#ff6b35] antialiased subpixel-antialiased">{formatRupiah(takeHomePay)}</span>
                     </div>
                 </div >
