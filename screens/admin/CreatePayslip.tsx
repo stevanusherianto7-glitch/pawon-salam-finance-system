@@ -185,8 +185,10 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
         }));
     };
 
-    const formatNumber = (amount: number): string => {
+    const formatCurrency = (amount: number): string => {
         return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(amount);
@@ -203,6 +205,10 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
     const calculateNet = (): number => {
         return calculateGross() - calculateTotalDeductions();
     };
+
+    const totalEarnings = calculateGross();
+    const totalDeductions = calculateTotalDeductions();
+    const netSalary = calculateNet();
 
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
