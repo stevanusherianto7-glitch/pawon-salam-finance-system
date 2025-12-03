@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Printer, Plus, Trash2 } from 'lucide-react';
 import { useEmployeeStore } from '../../store/employeeStore';
+import { Logo } from '../../components/Logo';
 
 interface FinancialItem {
     id: number;
@@ -113,9 +114,23 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
     return (
         <div className="min-h-screen bg-gray-100 py-10 overflow-x-auto print:bg-white print:p-0 print:overflow-hidden">
+            <style>
+                {`
+                @page {
+                    size: A4 landscape;
+                    margin: 0;
+                }
+                @media print {
+                    body {
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                }
+                `}
+            </style>
 
             {/* Action Bar (Hidden saat Print) */}
-            <div className="max-w-[210mm] mx-auto mb-6 flex justify-between items-center print:hidden px-4">
+            <div className="max-w-[297mm] mx-auto mb-6 flex justify-between items-center print:hidden px-4">
                 <div className="flex items-center gap-4">
                     {onBack && (
                         <button onClick={onBack} className="text-gray-600 hover:text-gray-900 flex items-center gap-2 font-medium">
@@ -145,24 +160,17 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 </div>
             </div>
 
-            {/* KERTAS A4 (Fixed Size) */}
+            {/* KERTAS A4 LANDSCAPE (Fixed Size) */}
             <div className="mx-auto bg-white shadow-xl print:shadow-none print:mx-0 relative"
-                style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
+                style={{ width: '297mm', minHeight: '210mm', padding: '30mm' }}>
 
                 {/* HEADER */}
-                <div className="flex justify-between items-start border-b-4 border-[#ff6b35] pb-6 mb-6">
-                    <div className="flex gap-4">
-                        {/* Logo Placeholder */}
-                        <div className="w-20 h-20 bg-orange-100 rounded-lg flex flex-col items-center justify-center border-2 border-dashed border-[#ff6b35] text-[#ff6b35]">
-                            <div className="text-2xl font-bold">PS</div>
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-800 tracking-wide">PAWON SALAM</h1>
-                            <p className="text-sm font-semibold text-[#ff6b35]">RESTO & CATERING</p>
-                            <p className="text-xs text-gray-500 mt-1 max-w-[200px]">
-                                Jl. Raya Example No. 123, Kota Malang, Jawa Timur
-                            </p>
-                        </div>
+                <div className="flex justify-between items-start border-b-4 border-[#ff6b35] pb-6 mb-6 w-full">
+                    <div className="flex flex-col items-start">
+                        <Logo size="lg" variant="color" showText={true} />
+                        <p className="text-xs text-gray-500 mt-2 text-center w-full">
+                            Jl. Raya Example No. 123, Kota Malang, Jawa Timur
+                        </p>
                     </div>
                     <div className="text-right">
                         <h2 className="text-3xl font-black text-gray-800 uppercase tracking-wider mb-1">SLIP GAJI</h2>
@@ -172,7 +180,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 </div>
 
                 {/* EMPLOYEE INFO GRID */}
-                <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-8 text-sm">
+                <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-8 text-sm w-full">
                     <div className="space-y-2">
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">Nama Karyawan</span>
@@ -214,14 +222,14 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 </div>
 
                 {/* FINANCIAL SPLIT */}
-                <div className="grid grid-cols-2 gap-8 mb-8">
+                <div className="grid grid-cols-2 gap-8 mb-8 w-full">
 
                     {/* EARNINGS COLUMN */}
                     <div>
                         <div className="bg-[#ff6b35] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2">
                             Penerimaan (Earnings)
                         </div>
-                        <div className="space-y-2 min-h-[200px]">
+                        <div className="space-y-2 min-h-[150px]">
                             {earnings.map((item) => (
                                 <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200">
                                     <input
@@ -266,7 +274,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         <div className="bg-[#d64518] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2">
                             Potongan (Deductions)
                         </div>
-                        <div className="space-y-2 min-h-[200px]">
+                        <div className="space-y-2 min-h-[150px]">
                             {deductions.map((item) => (
                                 <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200">
                                     <input
@@ -308,7 +316,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 </div>
 
                 {/* TAKE HOME PAY */}
-                <div className="flex items-center mb-12">
+                <div className="flex items-center mb-8 w-full">
                     <div className="bg-[#ff6b35] text-white font-bold px-6 py-4 text-sm tracking-widest uppercase w-1/3 rounded-l">
                         TAKE HOME PAY
                     </div>
@@ -318,8 +326,8 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 </div>
 
                 {/* FOOTER INFO & SIGNATURE */}
-                <div className="grid grid-cols-2 gap-12 mt-auto">
-                    <div className="text-sm text-gray-600">
+                <div className="grid grid-cols-3 gap-8 mt-auto w-full items-end">
+                    <div className="text-sm text-gray-600 col-span-1">
                         <p className="font-bold text-gray-800 mb-2 uppercase text-xs tracking-wide">Ditransfer Ke:</p>
                         <div className="bg-gray-50 p-3 rounded border border-gray-200">
                             <p className="font-bold">BCA (Bank Central Asia)</p>
@@ -328,14 +336,17 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-end text-center text-xs">
+                    <div className="text-center text-xs col-span-1">
                         <div className="mb-4">
                             <p className="mb-16 font-semibold text-gray-500">Disetujui Oleh,</p>
-                            <p className="font-bold text-gray-800 border-t border-gray-300 pt-2 px-4">HRD Manager</p>
+                            <p className="font-bold text-gray-800 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px]">HRD Manager</p>
                         </div>
+                    </div>
+
+                    <div className="text-center text-xs col-span-1">
                         <div className="mb-4">
                             <p className="mb-16 font-semibold text-gray-500">Diterima Oleh,</p>
-                            <p className="font-bold text-gray-800 border-t border-gray-300 pt-2 px-4">{employee.name}</p>
+                            <p className="font-bold text-gray-800 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px]">{employee.name}</p>
                         </div>
                     </div>
                 </div>
