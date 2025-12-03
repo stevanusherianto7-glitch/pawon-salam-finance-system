@@ -229,8 +229,8 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             <p>Jawa Barat 40295</p>
                         </div>
                     </div>
-                    <div className="text-right">
-                        <h2 className="text-3xl font-black text-gray-800 uppercase tracking-wider mb-1">SLIP GAJI</h2>
+                    <div className="text-right mt-2">
+                        <h2 className="text-3xl font-black text-[#ff6b35] uppercase tracking-wider mb-1" style={{ fontFamily: '"Times New Roman", Times, serif' }}>SLIP GAJI</h2>
                         <p className="text-sm text-gray-500">Periode: <span className="font-bold text-gray-800">{employee.period}</span></p>
                         <p className="text-xs text-gray-400 mt-1">No: PS/2025/12/001</p>
                     </div>
