@@ -315,7 +315,7 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
                     <div className="mt-8 flex flex-col sm:flex-row gap-4">
                         <button
                             onClick={handleGenerate}
-                            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 duration-300 shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-300"
+                            className="w-full bg-gradient-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-lg text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] border border-white/20"
                         >
                             🎯 Generate Slip Gaji
                         </button>
@@ -324,7 +324,7 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
                                 {/* Desktop Print Button */}
                                 <button
                                     onClick={handlePrint}
-                                    className="hidden md:block w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 duration-300 shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-300"
+                                    className="hidden md:block w-full bg-white/80 backdrop-blur-lg text-gray-800 font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] border border-gray-200/50"
                                 >
                                     🖨️ Print / Save (Desktop)
                                 </button>
@@ -332,15 +332,15 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
                                 <button
                                     onClick={handleDownloadPDF}
                                     disabled={isGeneratingPDF || !assetsLoaded}
-                                    className="md:hidden w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 duration-300 shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed"
+                                    className="md:hidden w-full bg-gradient-to-br from-blue-500/90 to-blue-600/90 backdrop-blur-lg text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/20"
                                 >
                                     {isGeneratingPDF ? '⏳ Generating...' : '📥 Download PDF (Mobile)'}
                                 </button>
-                                {/* Universal Download Button for Desktop (optional) */}
+                                {/* Universal Download Button for Desktop */}
                                 <button
                                     onClick={handleDownloadPDF}
                                     disabled={isGeneratingPDF || !assetsLoaded}
-                                    className="hidden md:block w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 duration-300 shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed"
+                                    className="hidden md:block w-full bg-gradient-to-br from-blue-500/90 to-blue-600/90 backdrop-blur-lg text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/20"
                                 >
                                     {isGeneratingPDF ? '⏳ Generating...' : '📥 Download PDF'}
                                 </button>
