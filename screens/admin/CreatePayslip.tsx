@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Plus, Trash2 } from 'lucide-react';
+import { Download, Plus, Trash2, ChevronLeft } from 'lucide-react';
 import { useEmployeeStore } from '../../store/employeeStore';
 import { Logo } from '../../components/Logo';
 import html2canvas from 'html2canvas';
@@ -157,7 +157,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 py-10 overflow-x-auto print:bg-white print:p-0 print:overflow-hidden">
+        <div className="min-h-screen bg-gray-50/50 py-10 overflow-x-auto print:bg-white print:p-0 print:overflow-hidden">
             <style>
                 {`
                 @page {
@@ -174,19 +174,22 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             </style>
 
             {/* Action Bar (Hidden saat Print/Capture) */}
-            <div className="max-w-[297mm] mx-auto mb-6 flex justify-between items-center print:hidden px-4" data-html2canvas-ignore>
-                <div className="flex items-center gap-4">
+            <div className="max-w-[297mm] mx-auto mb-8 flex flex-col md:flex-row justify-between items-center print:hidden px-4 gap-4" data-html2canvas-ignore>
+                <div className="flex items-center gap-6 w-full md:w-auto">
                     {onBack && (
-                        <button onClick={onBack} className="text-gray-600 hover:text-gray-900 flex items-center gap-2 font-medium">
-                            &larr; Kembali
+                        <button
+                            onClick={onBack}
+                            className="glass px-4 py-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-white/50 transition-all duration-300 flex items-center gap-2 font-medium shadow-sm hover:shadow-md active:scale-95"
+                        >
+                            <ChevronLeft size={20} /> Kembali
                         </button>
                     )}
-                    <h2 className="text-xl font-bold text-gray-700">Slip Gaji Generator</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Slip Gaji Generator</h2>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                     <select
-                        className="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 py-2.5 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all cursor-pointer hover:bg-white"
                         onChange={handleEmployeeSelect}
                         defaultValue=""
                     >
@@ -195,18 +198,36 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             <option key={emp.id} value={emp.id}>{emp.name}</option>
                         ))}
                     </select>
+
                     <button
                         onClick={handleDownloadPDF}
                         disabled={isGenerating}
-                        className={`flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`
+                            relative overflow-hidden group
+                            glass bg-gradient-to-br from-orange-500/90 to-orange-600/90 
+                            text-white px-6 py-2.5 rounded-xl 
+                            shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30
+                            transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
+                            flex items-center justify-center gap-2 font-medium min-w-[140px]
+                            border-white/20
+                            ${isGenerating ? 'opacity-70 cursor-not-allowed' : ''}
+                        `}
                     >
                         {isGenerating ? (
-                            <span className="flex items-center gap-2">Generating...</span>
+                            <span className="flex items-center gap-2">
+                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Generating...
+                            </span>
                         ) : (
                             <>
-                                <Download size={18} /> Save PDF
+                                <Download size={18} className="group-hover:scale-110 transition-transform" />
+                                <span>Save PDF</span>
                             </>
                         )}
+                        <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
                     </button>
                 </div>
             </div>
@@ -214,7 +235,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             {/* KERTAS A4 LANDSCAPE (Fixed Size) */}
             <div
                 ref={payslipRef}
-                className="mx-auto bg-white shadow-xl print:shadow-none print:mx-0 relative"
+                className="mx-auto bg-white shadow-2xl print:shadow-none print:mx-0 relative transform transition-transform duration-500"
                 style={{ width: '297mm', minHeight: '210mm', padding: '30mm' }}
             >
 
@@ -245,7 +266,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                 type="text"
                                 value={employee.name}
                                 onChange={(e) => setEmployee({ ...employee, name: e.target.value })}
-                                className="font-bold text-right text-gray-800 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2"
+                                className="font-bold text-right text-gray-800 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors"
                             />
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
@@ -254,7 +275,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                 type="text"
                                 value={employee.role}
                                 onChange={(e) => setEmployee({ ...employee, role: e.target.value })}
-                                className="font-medium text-right text-gray-800 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2"
+                                className="font-medium text-right text-gray-800 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors"
                             />
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
@@ -283,28 +304,28 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     {/* EARNINGS COLUMN */}
                     <div>
-                        <div className="bg-[#ff6b35] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2">
+                        <div className="bg-[#ff6b35] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm">
                             Penerimaan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
                             {earnings.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200">
+                                <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
                                     <input
                                         type="text"
                                         value={item.label}
                                         onChange={(e) => updateRow('earning', item.id, 'label', e.target.value)}
-                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1"
+                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
                                     />
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={item.amount}
                                             onChange={(e) => updateRow('earning', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1"
+                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
                                         />
                                         <button
                                             onClick={() => deleteRow('earning', item.id)}
-                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden"
+                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity"
                                             data-html2canvas-ignore
                                         >
                                             <Trash2 size={14} />
@@ -315,7 +336,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                             <button
                                 onClick={() => addRow('earning')}
-                                className="text-xs text-[#ff6b35] font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden"
+                                className="text-xs text-[#ff6b35] font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden transition-all"
                                 data-html2canvas-ignore
                             >
                                 <Plus size={14} /> Tambah Item
@@ -330,28 +351,28 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     {/* DEDUCTIONS COLUMN */}
                     <div>
-                        <div className="bg-[#d64518] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2">
+                        <div className="bg-[#d64518] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm">
                             Potongan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
                             {deductions.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200">
+                                <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
                                     <input
                                         type="text"
                                         value={item.label}
                                         onChange={(e) => updateRow('deduction', item.id, 'label', e.target.value)}
-                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1"
+                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
                                     />
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={item.amount}
                                             onChange={(e) => updateRow('deduction', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1"
+                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
                                         />
                                         <button
                                             onClick={() => deleteRow('deduction', item.id)}
-                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden"
+                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity"
                                             data-html2canvas-ignore
                                         >
                                             <Trash2 size={14} />
@@ -362,7 +383,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                             <button
                                 onClick={() => addRow('deduction')}
-                                className="text-xs text-red-500 font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden"
+                                className="text-xs text-red-500 font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden transition-all"
                                 data-html2canvas-ignore
                             >
                                 <Plus size={14} /> Tambah Item
@@ -377,11 +398,11 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 </div>
 
                 {/* TAKE HOME PAY */}
-                <div className="flex items-center mb-8 w-full">
-                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-2 text-sm tracking-widest uppercase w-1/3 rounded-l">
+                <div className="flex items-center mb-8 w-full shadow-sm rounded overflow-hidden">
+                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-2 text-sm tracking-widest uppercase w-1/3 flex items-center">
                         TAKE HOME PAY
                     </div>
-                    <div className="bg-orange-50 flex-1 py-2 px-6 text-right border border-[#ff6b35] border-l-0 rounded-r">
+                    <div className="bg-orange-50 flex-1 py-2 px-6 text-right border border-[#ff6b35] border-l-0">
                         <span className="text-xl font-black text-[#ff6b35]">{formatRupiah(takeHomePay)}</span>
                     </div>
                 </div>
