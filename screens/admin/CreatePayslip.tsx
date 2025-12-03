@@ -240,19 +240,27 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             >
 
                 {/* HEADER */}
-                <div className="flex justify-between items-start border-b-4 border-[#ff6b35] pb-6 mb-6 w-full">
-                    <div className="flex flex-col items-start">
-                        <Logo size="lg" variant="color" showText={true} />
-                        <div className="text-xs text-gray-500 mt-4 leading-tight text-left">
-                            <p>Beryl Commercial, Summarecon</p>
-                            <p>Jl. Bulevar Selatan No.78, Cisaranten Kidul</p>
-                            <p>Kec. Gedebage, Kota Bandung</p>
-                            <p>Jawa Barat 40295</p>
+                <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-6 w-full">
+                    <div className="flex flex-row items-center gap-6">
+                        <div className="flex-shrink-0">
+                            <Logo size="xl" variant="color" showText={false} />
+                        </div>
+                        <div className="flex-1 max-w-md">
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight antialiased subpixel-antialiased mb-1" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+                                Pawon Salam
+                            </h1>
+                            <p className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-2">Resto & Catering</p>
+                            <div className="text-xs text-gray-900 leading-relaxed antialiased subpixel-antialiased">
+                                <p>Beryl Commercial, Summarecon</p>
+                                <p>Jl. Bulevar Selatan No.78, Cisaranten Kidul</p>
+                                <p>Kec. Gedebage, Kota Bandung</p>
+                                <p>Jawa Barat 40295</p>
+                            </div>
                         </div>
                     </div>
-                    <div className="text-right mt-2">
-                        <h2 className="text-3xl font-black text-[#ff6b35] uppercase tracking-wider mb-1" style={{ fontFamily: '"Times New Roman", Times, serif' }}>SLIP GAJI</h2>
-                        <p className="text-sm text-gray-500">Periode: <span className="font-bold text-gray-800">{employee.period}</span></p>
+                    <div className="text-right self-start mt-2">
+                        <h2 className="text-3xl font-black text-[#ff6b35] uppercase tracking-wider mb-1 antialiased subpixel-antialiased" style={{ fontFamily: '"Times New Roman", Times, serif' }}>SLIP GAJI</h2>
+                        <p className="text-sm text-gray-600 antialiased">Periode: <span className="font-bold text-gray-900">{employee.period}</span></p>
                         <p className="text-xs text-gray-400 mt-1">No: PS/2025/12/001</p>
                     </div>
                 </div>
@@ -266,7 +274,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                 type="text"
                                 value={employee.name}
                                 onChange={(e) => setEmployee({ ...employee, name: e.target.value })}
-                                className="font-bold text-right text-gray-800 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors"
+                                className="font-bold text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased"
                             />
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
@@ -275,26 +283,26 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                 type="text"
                                 value={employee.role}
                                 onChange={(e) => setEmployee({ ...employee, role: e.target.value })}
-                                className="font-medium text-right text-gray-800 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors"
+                                className="font-medium text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased"
                             />
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">Departemen</span>
-                            <span className="font-medium text-gray-800">{employee.department}</span>
+                            <span className="font-medium text-gray-900 antialiased">{employee.department}</span>
                         </div>
                     </div>
                     <div className="space-y-2">
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">NIK / ID</span>
-                            <span className="font-medium text-gray-800">{employee.nik}</span>
+                            <span className="font-medium text-gray-900 antialiased">{employee.nik}</span>
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">Status</span>
-                            <span className="font-medium text-gray-800">{employee.status}</span>
+                            <span className="font-medium text-gray-900 antialiased">{employee.status}</span>
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">Grade / Gol</span>
-                            <span className="font-medium text-gray-800">{employee.grade}</span>
+                            <span className="font-medium text-gray-900 antialiased">{employee.grade}</span>
                         </div>
                     </div>
                 </div>
@@ -304,7 +312,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     {/* EARNINGS COLUMN */}
                     <div>
-                        <div className="bg-[#ff6b35] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm">
+                        <div className="bg-[#ff6b35] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm antialiased">
                             Penerimaan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
@@ -314,14 +322,14 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                         type="text"
                                         value={item.label}
                                         onChange={(e) => updateRow('earning', item.id, 'label', e.target.value)}
-                                        className="w-full bg-transparent h-auto py-2 leading-relaxed text-gray-800 border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all"
+                                        className="w-full bg-transparent h-auto py-2 leading-relaxed text-gray-800 border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
                                     />
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={item.amount}
                                             onChange={(e) => updateRow('earning', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 bg-transparent h-auto py-2 leading-relaxed border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all"
+                                            className="text-right font-mono text-gray-700 w-24 bg-transparent h-auto py-2 leading-relaxed border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
                                         />
                                         <button
                                             onClick={() => deleteRow('earning', item.id)}
@@ -345,13 +353,13 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                         <div className="flex justify-between items-center bg-gray-50 p-2 rounded mt-4 border-t-2 border-gray-200">
                             <span className="font-bold text-gray-600 text-sm">Total Penerimaan</span>
-                            <span className="font-bold text-gray-800">{formatRupiah(totalEarnings)}</span>
+                            <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalEarnings)}</span>
                         </div>
                     </div>
 
                     {/* DEDUCTIONS COLUMN */}
                     <div>
-                        <div className="bg-[#d64518] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm">
+                        <div className="bg-[#d64518] text-white px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-t mb-2 shadow-sm antialiased">
                             Potongan
                         </div>
                         <div className="space-y-2 min-h-[150px]">
@@ -361,14 +369,14 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                         type="text"
                                         value={item.label}
                                         onChange={(e) => updateRow('deduction', item.id, 'label', e.target.value)}
-                                        className="w-full bg-transparent h-auto py-2 leading-relaxed text-gray-800 border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all"
+                                        className="w-full bg-transparent h-auto py-2 leading-relaxed text-gray-800 border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
                                     />
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={item.amount}
                                             onChange={(e) => updateRow('deduction', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 bg-transparent h-auto py-2 leading-relaxed border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all"
+                                            className="text-right font-mono text-gray-700 w-24 bg-transparent h-auto py-2 leading-relaxed border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
                                         />
                                         <button
                                             onClick={() => deleteRow('deduction', item.id)}
@@ -392,50 +400,52 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                         <div className="flex justify-between items-center bg-gray-50 p-2 rounded mt-4 border-t-2 border-gray-200">
                             <span className="font-bold text-gray-600 text-sm">Total Potongan</span>
-                            <span className="font-bold text-gray-800">{formatRupiah(totalDeductions)}</span>
+                            <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalDeductions)}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* TAKE HOME PAY */}
                 <div className="flex items-center mb-8 w-full shadow-sm rounded overflow-hidden">
-                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-2 text-sm tracking-widest uppercase w-1/3 flex items-center">
+                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-2 text-sm tracking-widest uppercase w-1/3 flex items-center antialiased">
                         TAKE HOME PAY
                     </div>
                     <div className="bg-orange-50 flex-1 py-2 px-6 text-right border border-[#ff6b35] border-l-0">
-                        <span className="text-xl font-black text-[#ff6b35]">{formatRupiah(takeHomePay)}</span>
+                        <span className="text-xl font-black text-[#ff6b35] antialiased subpixel-antialiased">{formatRupiah(takeHomePay)}</span>
                     </div>
                 </div>
 
                 {/* FOOTER INFO & SIGNATURE */}
-                <div className="grid grid-cols-3 gap-8 mt-auto w-full items-end">
-                    <div className="text-sm text-gray-600 col-span-1">
-                        <p className="font-bold text-gray-800 mb-2 uppercase text-xs tracking-wide">Ditransfer Ke:</p>
+                <div className="flex flex-row justify-between items-end mt-auto w-full gap-4">
+                    <div className="flex-1 basis-0 text-sm text-gray-600">
+                        <p className="font-bold text-gray-800 mb-2 uppercase text-xs tracking-wide antialiased">Ditransfer Ke:</p>
                         <div className="bg-gray-50 p-3 rounded border border-gray-200">
-                            <p className="font-bold">BCA (Bank Central Asia)</p>
-                            <p className="font-mono text-gray-800 my-1">123-456-7890</p>
-                            <p className="text-xs uppercase">a.n. {employee.name}</p>
+                            <p className="font-bold text-gray-900 antialiased">BCA (Bank Central Asia)</p>
+                            <p className="font-mono text-gray-800 my-1 antialiased">123-456-7890</p>
+                            <p className="text-xs uppercase text-gray-700 antialiased">a.n. {employee.name}</p>
                         </div>
                     </div>
 
-                    <div className="text-center text-xs col-span-1">
-                        <div className="mb-4">
-                            <p className="mb-16 font-semibold text-gray-500">Disetujui Oleh,</p>
-                            <p className="font-bold text-gray-800 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px]">HRD Manager</p>
+                    <div className="flex-1 basis-0 text-center text-xs">
+                        <div className="mb-4 flex flex-col items-center">
+                            <p className="font-semibold text-gray-500 mb-2">Disetujui Oleh,</p>
+                            <div className="h-32 w-full"></div> {/* Space for signature */}
+                            <p className="font-bold text-gray-900 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px] antialiased subpixel-antialiased">HRD Manager</p>
                         </div>
                     </div>
 
-                    <div className="text-center text-xs col-span-1">
-                        <div className="mb-4">
-                            <p className="mb-16 font-semibold text-gray-500">Diterima Oleh,</p>
-                            <p className="font-bold text-gray-800 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px]">{employee.name}</p>
+                    <div className="flex-1 basis-0 text-center text-xs">
+                        <div className="mb-4 flex flex-col items-center">
+                            <p className="font-semibold text-gray-500 mb-2">Diterima Oleh,</p>
+                            <div className="h-32 w-full"></div> {/* Space for signature */}
+                            <p className="font-bold text-gray-900 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px] antialiased subpixel-antialiased">{employee.name}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* FOOTER COPYRIGHT */}
                 <div className="absolute bottom-4 left-0 w-full text-center">
-                    <p className="text-[10px] text-gray-400">Dicetak secara otomatis oleh sistem Pawon Salam Payroll</p>
+                    <p className="text-[10px] text-gray-400 antialiased">Dicetak secara otomatis oleh sistem Pawon Salam Payroll</p>
                 </div>
 
             </div>
