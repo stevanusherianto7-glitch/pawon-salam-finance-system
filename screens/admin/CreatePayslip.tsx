@@ -314,14 +314,14 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                         type="text"
                                         value={item.label}
                                         onChange={(e) => updateRow('earning', item.id, 'label', e.target.value)}
-                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
+                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1 py-1 transition-colors"
                                     />
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={item.amount}
                                             onChange={(e) => updateRow('earning', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
+                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1 py-1 transition-colors"
                                         />
                                         <button
                                             onClick={() => deleteRow('earning', item.id)}
@@ -361,14 +361,14 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                                         type="text"
                                         value={item.label}
                                         onChange={(e) => updateRow('deduction', item.id, 'label', e.target.value)}
-                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
+                                        className="w-1/2 focus:outline-none focus:bg-orange-50 rounded px-1 py-1 transition-colors"
                                     />
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="number"
                                             value={item.amount}
                                             onChange={(e) => updateRow('deduction', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1 transition-colors"
+                                            className="text-right font-mono text-gray-700 w-24 focus:outline-none focus:bg-orange-50 rounded px-1 py-1 transition-colors"
                                         />
                                         <button
                                             onClick={() => deleteRow('deduction', item.id)}
