@@ -262,109 +262,112 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 font-sans p-8 md:p-12 print:p-0 print:m-0 print:bg-white">
-            {/* Form Section - Hidden when printing */}
-            <div className="max-w-4xl mx-auto mb-8 print:hidden">
-                {onBack && (
-                    <button onClick={onBack} className="mb-4 text-gray-600 hover:text-gray-900 flex items-center gap-2">
-                        &larr; Kembali
-                    </button>
-                )}
-                <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                    <div className="flex items-center gap-4 mb-6">
-                        <Logo size="lg" variant="color" showText={false} />
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900">Slip Gaji</h1>
-                            <p className="text-gray-600">Pawon Salam Resto & Catering</p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                        <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Data Karyawan</h3>
-                        <PayrollInput label="Periode Gaji (Bulan & Tahun)" id="month" name="month" value={formData.month} onChange={handleInputChange} />
-
-                        {/* Employee Dropdown */}
-                        <div className="flex flex-col">
-                            <label htmlFor="employeeSelect" className="mb-1 text-sm font-medium text-gray-700">Pilih Karyawan</label>
-                            <select
-                                id="employeeSelect"
-                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white"
-                                onChange={handleEmployeeSelect}
-                                defaultValue=""
-                            >
-                                <option value="" disabled>-- Pilih Karyawan --</option>
-                                {employees.map(emp => (
-                                    <option key={emp.id} value={emp.id}>{emp.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <PayrollInput label="Nama Karyawan (Auto)" id="employeeName" name="employeeName" value={formData.employeeName} onChange={handleInputChange} />
-                        <PayrollInput label="NIK (Auto)" id="nik" name="nik" value={formData.nik} onChange={handleInputChange} />
-                        <PayrollInput label="Jabatan (Auto)" id="position" name="position" value={formData.position} onChange={handleInputChange} />
-                        <PayrollInput label="Jumlah Hari Masuk" id="attendanceDays" name="attendanceDays" type="number" value={formData.attendanceDays} onChange={handleInputChange} inputMode="numeric" />
-
-                        <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">Penerimaan</h3>
-                        <PayrollInput label="Upah Pokok" id="basicSalary" name="basicSalary" type="number" value={formData.basicSalary} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                        <PayrollInput label="Tunjangan Jabatan" id="positionAllowance" name="positionAllowance" type="number" value={formData.positionAllowance} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                        <PayrollInput label="Lembur" id="overtime" name="overtime" type="number" value={formData.overtime} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                        <PayrollInput label="Paket" id="allowances" name="allowances" type="number" value={formData.allowances} onChange={handleInputChange} isCurrency inputMode="numeric" />
-
-                        <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">Potongan</h3>
-                        <PayrollInput label="Pajak" id="tax" name="tax" type="number" value={formData.tax} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                        <PayrollInput label="Lain-lain" id="otherDeductions" name="otherDeductions" type="number" value={formData.otherDeductions} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                    </div>
-                    <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                        <button
-                            onClick={handleGenerate}
-                            className="w-full bg-gradient-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-lg text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] border border-white/20"
-                        >
-                            🎯 Generate Slip Gaji
+            {/* Form Section - Hidden when showing slip */}
+            {!showSlip && (
+                <div className="max-w-4xl mx-auto mb-8 print:hidden animate-slide-in-down">
+                    {onBack && (
+                        <button onClick={onBack} className="mb-4 text-gray-600 hover:text-gray-900 flex items-center gap-2">
+                            &larr; Kembali
                         </button>
-                        {showSlip && (
-                            <>
-                                {/* Desktop Print Button */}
-                                <button
-                                    onClick={handlePrint}
-                                    className="hidden md:block w-full bg-white/80 backdrop-blur-lg text-gray-800 font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] border border-gray-200/50"
+                    )}
+                    <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                        <div className="flex items-center gap-4 mb-6">
+                            <Logo size="lg" variant="color" showText={false} />
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900">Slip Gaji</h1>
+                                <p className="text-gray-600">Pawon Salam Resto & Catering</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                            <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Data Karyawan</h3>
+                            <PayrollInput label="Periode Gaji (Bulan & Tahun)" id="month" name="month" value={formData.month} onChange={handleInputChange} />
+
+                            {/* Employee Dropdown */}
+                            <div className="flex flex-col">
+                                <label htmlFor="employeeSelect" className="mb-1 text-sm font-medium text-gray-700">Pilih Karyawan</label>
+                                <select
+                                    id="employeeSelect"
+                                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white"
+                                    onChange={handleEmployeeSelect}
+                                    defaultValue=""
                                 >
-                                    🖨️ Print / Save (Desktop)
-                                </button>
-                                {/* Mobile Download Button */}
-                                <button
-                                    onClick={handleDownloadPDF}
-                                    disabled={isGeneratingPDF || !assetsLoaded}
-                                    className="md:hidden w-full bg-gradient-to-br from-blue-500/90 to-blue-600/90 backdrop-blur-lg text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/20"
-                                >
-                                    {isGeneratingPDF ? '⏳ Generating...' : '📥 Download PDF (Mobile)'}
-                                </button>
-                                {/* Universal Download Button for Desktop */}
-                                <button
-                                    onClick={handleDownloadPDF}
-                                    disabled={isGeneratingPDF || !assetsLoaded}
-                                    className="hidden md:block w-full bg-gradient-to-br from-blue-500/90 to-blue-600/90 backdrop-blur-lg text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/20"
-                                >
-                                    {isGeneratingPDF ? '⏳ Generating...' : '📥 Download PDF'}
-                                </button>
-                            </>
-                        )}
+                                    <option value="" disabled>-- Pilih Karyawan --</option>
+                                    {employees.map(emp => (
+                                        <option key={emp.id} value={emp.id}>{emp.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <PayrollInput label="Nama Karyawan (Auto)" id="employeeName" name="employeeName" value={formData.employeeName} onChange={handleInputChange} />
+                            <PayrollInput label="NIK (Auto)" id="nik" name="nik" value={formData.nik} onChange={handleInputChange} />
+                            <PayrollInput label="Jabatan (Auto)" id="position" name="position" value={formData.position} onChange={handleInputChange} />
+                            <PayrollInput label="Jumlah Hari Masuk" id="attendanceDays" name="attendanceDays" type="number" value={formData.attendanceDays} onChange={handleInputChange} inputMode="numeric" />
+
+                            <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">Penerimaan</h3>
+                            <PayrollInput label="Upah Pokok" id="basicSalary" name="basicSalary" type="number" value={formData.basicSalary} onChange={handleInputChange} isCurrency inputMode="numeric" />
+                            <PayrollInput label="Tunjangan Jabatan" id="positionAllowance" name="positionAllowance" type="number" value={formData.positionAllowance} onChange={handleInputChange} isCurrency inputMode="numeric" />
+                            <PayrollInput label="Lembur" id="overtime" name="overtime" type="number" value={formData.overtime} onChange={handleInputChange} isCurrency inputMode="numeric" />
+                            <PayrollInput label="Paket" id="allowances" name="allowances" type="number" value={formData.allowances} onChange={handleInputChange} isCurrency inputMode="numeric" />
+
+                            <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">Potongan</h3>
+                            <PayrollInput label="Pajak" id="tax" name="tax" type="number" value={formData.tax} onChange={handleInputChange} isCurrency inputMode="numeric" />
+                            <PayrollInput label="Lain-lain" id="otherDeductions" name="otherDeductions" type="number" value={formData.otherDeductions} onChange={handleInputChange} isCurrency inputMode="numeric" />
+                        </div>
+                        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                            <button
+                                onClick={handleGenerate}
+                                className="w-full bg-gradient-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-lg text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] border border-white/20"
+                            >
+                                🎯 Generate Slip Gaji
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
-            {/* Payslip View - Blank A4 Template with Locked Aspect Ratio */}
+            {/* Payslip View - Replaces form when shown */}
             {showSlip && (
-                <div
-                    ref={printRef}
-                    className="bg-white rounded-xl shadow-2xl overflow-hidden relative font-serif text-gray-800 w-full max-w-4xl mx-auto aspect-[210/297] print:aspect-auto print:static print:w-[210mm] print:h-auto print:bg-white print:shadow-none print:rounded-none print:m-0 print:overflow-visible print:min-h-[297mm] flex flex-col"
-                >
-                    {/* DECORATIVE MOTIFS - Professional & Elegant */}
-                    <SlipMotifTopLeft />
-                    <SlipMotifTopRight />
-                    <SlipMotifBottomLeft />
-                    <SlipMotifBottomRight />
+                <div className="max-w-4xl mx-auto p-2 md:p-4 animate-slide-in-down">
+                    {/* Back to Edit Button */}
+                    <button
+                        onClick={() => setShowSlip(false)}
+                        className="mb-4 bg-white/80 backdrop-blur-lg text-gray-800 font-semibold py-2 px-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] border border-gray-200/50 flex items-center gap-2 print:hidden"
+                    >
+                        ← Kembali ke Edit
+                    </button>
 
-                    {/* BLANK CANVAS - Ready for content */}
-                    <div className="w-full h-full flex items-center justify-center">
-                        <p className="text-gray-400 text-sm">A4 Template with Decorative Motifs</p>
+                    {/* Action Buttons */}
+                    <div className="mb-4 flex flex-col sm:flex-row gap-3 print:hidden">
+                        <button
+                            onClick={handlePrint}
+                            className="hidden md:block flex-1 bg-white/80 backdrop-blur-lg text-gray-800 font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] border border-gray-200/50"
+                        >
+                            🖨️ Print / Save (Desktop)
+                        </button>
+                        <button
+                            onClick={handleDownloadPDF}
+                            disabled={isGeneratingPDF || !assetsLoaded}
+                            className="flex-1 bg-gradient-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-lg text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/20"
+                        >
+                            {isGeneratingPDF ? '⏳ Generating...' : '📥 Cetak / Simpan PDF'}
+                        </button>
+                    </div>
+
+                    {/* Payslip Preview - Blank A4 Template */}
+                    <div
+                        ref={printRef}
+                        className="bg-white rounded-xl shadow-2xl overflow-hidden relative font-serif text-gray-800 w-full max-w-4xl mx-auto aspect-[210/297] print:aspect-auto print:static print:w-[210mm] print:h-auto print:bg-white print:shadow-none print:rounded-none print:m-0 print:overflow-visible print:min-h-[297mm] flex flex-col"
+                    >
+                        {/* DECORATIVE MOTIFS - Professional & Elegant */}
+                        <SlipMotifTopLeft />
+                        <SlipMotifTopRight />
+                        <SlipMotifBottomLeft />
+                        <SlipMotifBottomRight />
+
+                        {/* BLANK CANVAS - Ready for content */}
+                        <div className="w-full h-full flex items-center justify-center">
+                            <p className="text-gray-400 text-sm">A4 Template with Decorative Motifs</p>
+                        </div>
                     </div>
                 </div>
             )}
