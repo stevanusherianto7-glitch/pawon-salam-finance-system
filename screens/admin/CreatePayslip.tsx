@@ -101,14 +101,33 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         else setDeductions(deductions.filter(item => item.id !== id));
     };
 
-    // Handler: Update Nilai
-    const updateRow = (type: 'earning' | 'deduction', id: number, field: keyof FinancialItem, value: string | number) => {
-        const updateList = (list: FinancialItem[]) => list.map(item =>
-            item.id === id ? { ...item, [field]: field === 'amount' ? Number(value) : value } : item
-        );
+    // Handler: Update Nilai (ContentEditable)
+    const handleTextChange = (
+        type: 'employee' | 'earning' | 'deduction',
+        id: number | null,
+        field: string,
+        value: string
+    ) => {
+        if (type === 'employee') {
+            setEmployee(prev => ({ ...prev, [field]: value }));
+        } else if (type === 'earning') {
+            setEarnings(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+        } else if (type === 'deduction') {
+            setDeductions(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+        }
+    };
 
-        if (type === 'earning') setEarnings(updateList(earnings));
-        else setDeductions(updateList(deductions));
+    const handleAmountBlur = (
+        type: 'earning' | 'deduction',
+        id: number,
+        value: string
+    ) => {
+        const numericValue = Number(value.replace(/\D/g, '')) || 0;
+        if (type === 'earning') {
+            setEarnings(prev => prev.map(item => item.id === id ? { ...item, amount: numericValue } : item));
+        } else {
+            setDeductions(prev => prev.map(item => item.id === id ? { ...item, amount: numericValue } : item));
+        }
     };
 
     // Handler: Download PDF
@@ -270,21 +289,25 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     <div className="space-y-2">
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">Nama Karyawan</span>
-                            <input
-                                type="text"
-                                value={employee.name}
-                                onChange={(e) => setEmployee({ ...employee, name: e.target.value })}
-                                className="font-bold text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased"
-                            />
+                            <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => handleTextChange('employee', null, 'name', e.currentTarget.textContent || '')}
+                                className="font-bold text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased break-words whitespace-pre-wrap min-h-[24px] py-1"
+                            >
+                                {employee.name}
+                            </div>
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">Jabatan</span>
-                            <input
-                                type="text"
-                                value={employee.role}
-                                onChange={(e) => setEmployee({ ...employee, role: e.target.value })}
-                                className="font-medium text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased"
-                            />
+                            <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => handleTextChange('employee', null, 'role', e.currentTarget.textContent || '')}
+                                className="font-medium text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased break-words whitespace-pre-wrap min-h-[24px] py-1"
+                            >
+                                {employee.role}
+                            </div>
                         </div>
                         <div className="flex justify-between border-b border-gray-100 pb-1">
                             <span className="text-gray-500">Departemen</span>
@@ -317,23 +340,27 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         </div>
                         <div className="space-y-2 min-h-[150px]">
                             {earnings.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
-                                    <input
-                                        type="text"
-                                        value={item.label}
-                                        onChange={(e) => updateRow('earning', item.id, 'label', e.target.value)}
-                                        className="w-full bg-transparent h-auto py-2 leading-relaxed text-gray-800 border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
-                                    />
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="number"
-                                            value={item.amount}
-                                            onChange={(e) => updateRow('earning', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 bg-transparent h-auto py-2 leading-relaxed border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
-                                        />
+                                <div key={item.id} className="flex items-start justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
+                                    <div
+                                        contentEditable
+                                        suppressContentEditableWarning
+                                        onBlur={(e) => handleTextChange('earning', item.id, 'label', e.currentTarget.textContent || '')}
+                                        className="w-full bg-transparent h-auto py-1 leading-relaxed text-gray-800 focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                    >
+                                        {item.label}
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <div
+                                            contentEditable
+                                            suppressContentEditableWarning
+                                            onBlur={(e) => handleAmountBlur('earning', item.id, e.currentTarget.textContent || '')}
+                                            className="text-right font-mono text-gray-700 w-32 bg-transparent h-auto py-1 leading-relaxed focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                        >
+                                            {formatRupiah(item.amount)}
+                                        </div>
                                         <button
                                             onClick={() => deleteRow('earning', item.id)}
-                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity"
+                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity mt-1"
                                             data-html2canvas-ignore
                                         >
                                             <Trash2 size={14} />
@@ -364,23 +391,27 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         </div>
                         <div className="space-y-2 min-h-[150px]">
                             {deductions.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
-                                    <input
-                                        type="text"
-                                        value={item.label}
-                                        onChange={(e) => updateRow('deduction', item.id, 'label', e.target.value)}
-                                        className="w-full bg-transparent h-auto py-2 leading-relaxed text-gray-800 border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
-                                    />
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="number"
-                                            value={item.amount}
-                                            onChange={(e) => updateRow('deduction', item.id, 'amount', e.target.value)}
-                                            className="text-right font-mono text-gray-700 w-24 bg-transparent h-auto py-2 leading-relaxed border-b border-transparent hover:border-gray-300 focus:border-orange-400 focus:outline-none transition-all antialiased"
-                                        />
+                                <div key={item.id} className="flex items-start justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
+                                    <div
+                                        contentEditable
+                                        suppressContentEditableWarning
+                                        onBlur={(e) => handleTextChange('deduction', item.id, 'label', e.currentTarget.textContent || '')}
+                                        className="w-full bg-transparent h-auto py-1 leading-relaxed text-gray-800 focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                    >
+                                        {item.label}
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <div
+                                            contentEditable
+                                            suppressContentEditableWarning
+                                            onBlur={(e) => handleAmountBlur('deduction', item.id, e.currentTarget.textContent || '')}
+                                            className="text-right font-mono text-gray-700 w-32 bg-transparent h-auto py-1 leading-relaxed focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                        >
+                                            {formatRupiah(item.amount)}
+                                        </div>
                                         <button
                                             onClick={() => deleteRow('deduction', item.id)}
-                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity"
+                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity mt-1"
                                             data-html2canvas-ignore
                                         >
                                             <Trash2 size={14} />
