@@ -364,9 +364,20 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
                         <SlipMotifBottomLeft />
                         <SlipMotifBottomRight />
 
-                        {/* BLANK CANVAS - Ready for content */}
-                        <div className="w-full h-full flex items-center justify-center">
-                            <p className="text-gray-400 text-sm">A4 Template with Decorative Motifs</p>
+                        {/* HEADER SECTION */}
+                        <div className="relative z-10 px-12 pt-16 pb-8 flex flex-col items-center justify-center border-b-4 border-double border-orange-200 mx-12">
+                            <SlipLogo />
+                            <div className="mt-6 text-center">
+                                <h2 className="text-2xl font-bold text-gray-800 tracking-widest uppercase border-b-2 border-orange-500 inline-block pb-1">Slip Gaji Karyawan</h2>
+                                <p className="text-gray-500 text-sm mt-2 font-medium tracking-wide">Periode: {formData.month}</p>
+                            </div>
+                        </div>
+
+                        {/* CONTENT AREA - Placeholder for next session */}
+                        <div className="flex-1 px-16 py-8 relative z-10">
+                            <div className="h-full border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center bg-gray-50/50">
+                                <p className="text-gray-400 italic">Content Area (Earnings & Deductions) - Coming Soon</p>
+                            </div>
                         </div>
                     </div>
                 </div>
