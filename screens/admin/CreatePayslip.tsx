@@ -364,19 +364,145 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
                         <SlipMotifBottomLeft />
                         <SlipMotifBottomRight />
 
-                        {/* HEADER SECTION */}
-                        <div className="relative z-10 px-12 pt-16 pb-8 flex flex-col items-center justify-center border-b-4 border-double border-orange-200 mx-12">
-                            <SlipLogo />
-                            <div className="mt-6 text-center">
-                                <h2 className="text-2xl font-bold text-gray-800 tracking-widest uppercase border-b-2 border-orange-500 inline-block pb-1">Slip Gaji Karyawan</h2>
-                                <p className="text-gray-500 text-sm mt-2 font-medium tracking-wide">Periode: {formData.month}</p>
+                        {/* MEKARI STYLE LAYOUT - PAWON SALAM THEME */}
+                        <div className="p-12 h-full flex flex-col relative z-10">
+                            {/* 1. Header Section */}
+                            <div className="flex justify-between items-end border-b-2 border-gray-800 pb-4 mb-6">
+                                <div className="flex items-center gap-4">
+                                    {/* Logo Placeholder / Actual Logo */}
+                                    <div className="w-16 h-16 text-orange-600">
+                                        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="5" className="w-full h-full">
+                                            <circle cx="50" cy="50" r="44" />
+                                            <path d="M28 72 Q 28 28 72 28 Q 72 72 28 72 Z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-gray-900 font-serif">Pawon Salam</h1>
+                                        <p className="text-sm text-gray-500 uppercase tracking-widest">Resto & Catering</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <h2 className="text-xl font-bold text-gray-400 uppercase tracking-wider">Slip Gaji</h2>
+                                    <p className="text-gray-600 font-medium mt-1">{formData.month}</p>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* CONTENT AREA - Placeholder for next session */}
-                        <div className="flex-1 px-16 py-8 relative z-10">
-                            <div className="h-full border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center bg-gray-50/50">
-                                <p className="text-gray-400 italic">Content Area (Earnings & Deductions) - Coming Soon</p>
+                            {/* 2. Employee Info Section */}
+                            <div className="grid grid-cols-2 gap-12 mb-8 text-sm text-gray-700">
+                                <div className="space-y-2">
+                                    <div className="flex">
+                                        <span className="w-32 font-semibold text-gray-500">Nama</span>
+                                        <span className="font-bold text-gray-900">: {formData.employeeName}</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-32 font-semibold text-gray-500">Jabatan</span>
+                                        <span className="text-gray-900">: {formData.position}</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-32 font-semibold text-gray-500">NIK</span>
+                                        <span className="text-gray-900">: {formData.nik}</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex">
+                                        <span className="w-32 font-semibold text-gray-500">Departemen</span>
+                                        <span className="text-gray-900">: Operasional</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-32 font-semibold text-gray-500">Status</span>
+                                        <span className="text-gray-900">: Karyawan Tetap</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-32 font-semibold text-gray-500">Kehadiran</span>
+                                        <span className="text-gray-900">: {formData.attendanceDays} Hari</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. Earnings & Deductions Columns */}
+                            <div className="grid grid-cols-2 gap-8 mb-8">
+                                {/* Earnings Column */}
+                                <div>
+                                    <div className="bg-orange-600 text-white font-bold px-3 py-2 text-sm uppercase tracking-wider mb-2 rounded-sm">
+                                        PENERIMAAN (EARNINGS)
+                                    </div>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between border-b border-gray-100 pb-1">
+                                            <span className="text-gray-600">Gaji Pokok</span>
+                                            <span className="font-medium text-gray-900">{formatCurrency(formData.basicSalary)}</span>
+                                        </div>
+                                        <div className="flex justify-between border-b border-gray-100 pb-1">
+                                            <span className="text-gray-600">Tunjangan Jabatan</span>
+                                            <span className="font-medium text-gray-900">{formatCurrency(formData.positionAllowance)}</span>
+                                        </div>
+                                        <div className="flex justify-between border-b border-gray-100 pb-1">
+                                            <span className="text-gray-600">Lembur</span>
+                                            <span className="font-medium text-gray-900">{formatCurrency(formData.overtime)}</span>
+                                        </div>
+                                        <div className="flex justify-between border-b border-gray-100 pb-1">
+                                            <span className="text-gray-600">Tunjangan Lain (Paket)</span>
+                                            <span className="font-medium text-gray-900">{formatCurrency(formData.allowances)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 bg-gray-100 px-3 py-2 flex justify-between items-center rounded-sm">
+                                        <span className="font-bold text-gray-600 text-sm">TOTAL PENERIMAAN</span>
+                                        <span className="font-bold text-gray-900">{formatCurrency(totalEarnings)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Deductions Column */}
+                                <div>
+                                    <div className="bg-orange-700 text-white font-bold px-3 py-2 text-sm uppercase tracking-wider mb-2 rounded-sm">
+                                        POTONGAN (DEDUCTIONS)
+                                    </div>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between border-b border-gray-100 pb-1">
+                                            <span className="text-gray-600">Pajak (PPh 21)</span>
+                                            <span className="font-medium text-gray-900 text-red-600">({formatCurrency(formData.tax)})</span>
+                                        </div>
+                                        <div className="flex justify-between border-b border-gray-100 pb-1">
+                                            <span className="text-gray-600">Potongan Lain</span>
+                                            <span className="font-medium text-gray-900 text-red-600">({formatCurrency(formData.otherDeductions)})</span>
+                                        </div>
+                                        {/* Spacer for alignment if needed */}
+                                        <div className="h-6"></div>
+                                        <div className="h-6"></div>
+                                    </div>
+                                    <div className="mt-4 bg-gray-100 px-3 py-2 flex justify-between items-center rounded-sm">
+                                        <span className="font-bold text-gray-600 text-sm">TOTAL POTONGAN</span>
+                                        <span className="font-bold text-red-600">({formatCurrency(totalDeductions)})</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 4. Net Pay Section */}
+                            <div className="flex mb-12">
+                                <div className="bg-orange-600 text-white font-bold px-6 py-3 text-sm uppercase tracking-wider w-1/3 flex items-center rounded-l-md">
+                                    TAKE HOME PAY
+                                </div>
+                                <div className="bg-orange-50 border-2 border-orange-600 text-orange-700 font-bold px-6 py-3 text-xl w-2/3 text-right rounded-r-md flex items-center justify-end">
+                                    {formatCurrency(netSalary)}
+                                </div>
+                            </div>
+
+                            {/* 5. Footer Section */}
+                            <div className="mt-auto grid grid-cols-2 gap-12">
+                                <div>
+                                    <p className="text-xs font-bold text-gray-500 uppercase mb-2">Ditransfer Ke:</p>
+                                    <p className="text-sm font-semibold text-gray-800">BCA (Bank Central Asia)</p>
+                                    <p className="text-sm text-gray-600">No. Rek: 001 1234567</p>
+                                    <p className="text-sm text-gray-600">a.n. {formData.employeeName}</p>
+                                </div>
+                                <div className="flex justify-between text-center">
+                                    <div>
+                                        <p className="text-xs text-gray-500 mb-16">Disetujui Oleh:</p>
+                                        <p className="text-sm font-bold text-gray-900 border-b border-gray-300 pb-1">Manager HRD</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 mb-16">Diterima Oleh:</p>
+                                        <p className="text-sm font-bold text-gray-900 border-b border-gray-300 pb-1">{formData.employeeName}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
