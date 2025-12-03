@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Zap, Droplets, Wifi, Flame, Plus, Trash2, Wallet, AlertTriangle } from 'lucide-react';
-import { useOpexStore, OpexLog } from '../../stores/useOpexStore';
+import { useOpexStore, OpexLog } from '../../store/useOpexStore';
 
 interface Props {
     isOpen: boolean;

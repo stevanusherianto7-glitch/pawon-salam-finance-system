@@ -138,6 +138,33 @@ export const FinanceInputScreen: React.FC<Props> = ({ onBack }) => {
                             />
                         </div>
 
+                        {/* Amount Input */}
+                        <div>
+                            <label className="text-xs font-bold text-gray-500 mb-1 block ml-1">Jumlah</label>
+                            <div className="relative">
+                                <DollarSign size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <input
+                                    type="number"
+                                    inputMode="numeric"
+                                    value={amount}
+                                    onChange={(e) => setAmount(e.target.value)}
+                                    placeholder="0"
+                                    required
+                                    className="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-3 py-3 text-sm font-bold text-gray-800 outline-none focus:border-orange-500 transition"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            <Plus size={18} />
+                            {isSubmitting ? 'Menyimpan...' : 'Simpan Transaksi'}
+                        </button>
+                    </form>
                 </div>
 
                 {/* Recent Transactions List */}

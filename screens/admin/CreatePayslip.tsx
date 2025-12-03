@@ -350,68 +350,21 @@ export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
                 </div>
             </div>
 
-            {/* Payslip View - Visible ONLY when generated, and takes over screen on Print */}
+            {/* Payslip View - Blank A4 Template with Locked Aspect Ratio */}
             {showSlip && (
                 <div
                     ref={printRef}
-                    className="
-                        max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative font-serif text-gray-800
-                        print:fixed print:inset-0 print:w-[210mm] print:h-[297mm] print:z-[9999] print:bg-white print:shadow-none print:rounded-none print:m-0 print:overflow-hidden
-                    "
+                    className="bg-white rounded-xl shadow-2xl overflow-hidden relative font-serif text-gray-800 w-full max-w-4xl mx-auto aspect-[210/297] print:aspect-auto print:static print:w-[210mm] print:h-auto print:bg-white print:shadow-none print:rounded-none print:m-0 print:overflow-visible print:min-h-[297mm] flex flex-col"
                 >
-                    {/* Motifs - Absolute positioned within the A4 container */}
+                    {/* DECORATIVE MOTIFS - Professional & Elegant */}
                     <SlipMotifTopLeft />
                     <SlipMotifTopRight />
                     <SlipMotifBottomLeft />
                     <SlipMotifBottomRight />
 
-                    <div className="px-16 pt-12 pb-32 md:px-32 md:pt-20 md:pb-44 print:px-[2.5cm] print:py-[2cm] relative z-10 h-full flex flex-col">
-                        <header className="text-center">
-                            {/* Logo */}
-                            <div className="flex justify-start -ml-10 md:-ml-20">
-                                <SlipLogo />
-                            </div>
-                            <h1 className="text-xl font-bold tracking-wider mt-12 mb-8">PERINCIAN GAJI KARYAWAN</h1>
-                        </header>
-
-                        <section className="text-sm mb-8 space-y-1">
-                            <SlipRow label="Gaji Bulan" value={formData.month} disableMono={true} />
-                            <SlipRow label="Nama" value={formData.employeeName} disableMono={true} />
-                            <SlipRow label="NIK" value={formData.nik} disableMono={true} />
-                            <SlipRow label="Jabatan" value={formData.position} disableMono={true} />
-                        </section>
-
-                        <SlipSection title="PENERIMAAN - PENERIMAAN">
-                            <SlipRow label="Upah Pokok" value={formatNumber(formData.basicSalary)} />
-                            <SlipRow label="Paket" value={formData.allowances > 0 ? formatNumber(formData.allowances) : '-'} />
-                            <SlipRow label="T. Jabatan" value={formatNumber(formData.positionAllowance)} />
-                            <div className="flex items-start text-sm">
-                                <div className="w-1/2 flex justify-between pr-10">
-                                    <span>T. Kehadiran</span>
-                                    <span>{formData.attendanceDays}</span>
-                                </div>
-                                <div className="w-auto pr-4">:</div>
-                                <div className="flex-1 text-right font-mono tabular-nums">{formData.attendanceDays > 0 ? formatNumber(1450000) : '-'}</div>
-                            </div>
-                            <SlipRow label="Lembur" value={formatNumber(formData.overtime)} />
-                            <SlipSeparator symbol="+" />
-                            <SlipRow label="BRUTO" value={formatNumber(calculateGross())} isBold={true} />
-                        </SlipSection>
-
-                        <SlipSection title="POTONGAN - POTONGAN">
-                            <SlipRow label="Pajak" value={formatNumber(formData.tax)} />
-                            <SlipRow label="Lain-lain" value={formatNumber(formData.otherDeductions)} />
-                            <SlipSeparator symbol="-" />
-                            <SlipRow label="TOTAL POTONGAN" value={formatNumber(calculateTotalDeductions())} isBold={true} />
-                        </SlipSection>
-
-                        <section className="mt-8">
-                            <SlipRow label="PENERIMAAN GAJI BERSIH" value={formatNumber(calculateNet())} isBold={true} />
-                        </section>
-
-                        <div className="mt-auto mb-16 text-center print:mb-0 print:mt-auto">
-                            <p className="italic text-gray-600 font-medium text-sm">"Terima kasih atas kinerjanya, Tuhan memberkati"</p>
-                        </div>
+                    {/* BLANK CANVAS - Ready for content */}
+                    <div className="w-full h-full flex items-center justify-center">
+                        <p className="text-gray-400 text-sm">A4 Template with Decorative Motifs</p>
                     </div>
                 </div>
             )}

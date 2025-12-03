@@ -278,8 +278,8 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
                         <h3 className="font-bold text-gray-800 mb-2.5 text-xs uppercase tracking-wider">Menu Utama</h3>
                         <div className="grid grid-cols-2 gap-2">
                             {user?.role === UserRole.HR_MANAGER && <>
-                                <PremiumGlassCard title="Payroll" subtitle="Slip Gaji" icon={Banknote} onClick={() => onNavigate && onNavigate('payslipList')} themeColor="green" />
-                                <PremiumGlassCard title="Generator (NEW)" subtitle="Buat Slip Baru" icon={FilePlus} onClick={() => onNavigate && onNavigate('createPayslip')} themeColor="orange" />
+                                <PremiumGlassCard title="Payroll" subtitle="Slip Gaji" icon={Banknote} onClick={() => onNavigate && onNavigate('createPayslip')} themeColor="green" />
+
                                 <PremiumGlassCard title="Shift" subtitle="Penjadwalan Staff" icon={Calendar} onClick={() => onNavigate && onNavigate('shiftScheduler')} themeColor="blue" />
                                 <PremiumGlassCard title="SP/Coach" subtitle="Catatan HR" icon={Users} onClick={() => onNavigate && onNavigate('hrSpCoachingForm')} themeColor="red" />
                                 <PremiumGlassCard title="Cuti" subtitle="Izin Karyawan" icon={FilePlus} onClick={() => onNavigate && onNavigate('adminLeaveRequest')} themeColor="teal" />

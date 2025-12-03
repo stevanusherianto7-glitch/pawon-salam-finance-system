@@ -11,8 +11,21 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="PawonSalam" />
+  <!-- iOS Splash Screens -->
+  <link rel="apple-touch-startup-image" href="/icon-512x512.png"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" />
+  <link rel="apple-touch-startup-image" href="/icon-512x512.png"
+    media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
+  <link rel="apple-touch-startup-image" href="/icon-512x512.png"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
+  <link rel="apple-touch-startup-image" href="/icon-512x512.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
+  <link rel="apple-touch-startup-image" href="/icon-512x512.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
+  <link rel="apple-touch-startup-image" href="/icon-512x512.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" />
   <!-- Cache Buster: v1.4-restore-html -->
-  <title>AbsensiKu - Pawon Salam Resto</title>
+  <title>Payroll Slip Pawon Salam</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&family=Great+Vibes&family=Montserrat:wght@700&display=swap"
     rel="stylesheet">
@@ -141,22 +154,20 @@
 
     @media print {
       @page {
-        size: A4;
+        size: A4 portrait;
         margin: 0 !important;
-        /* CRITICAL: Removes browser header/footer (Date, Title, URL) */
       }
 
       html,
       body {
         width: 210mm;
-        height: 297mm;
+        min-height: 297mm;
         margin: 0 !important;
         padding: 0 !important;
         background-color: white !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        overflow: hidden;
-        /* Prevents scrollbars in print preview */
+        overflow: visible;
       }
 
       /* Hide everything by default, we will expose the print container explicitly */

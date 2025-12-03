@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Megaphone, Target, TrendingUp, BarChart3, Users } from 'lucide-react';
 import { colors } from '../../theme/colors';
 import { MarketingBudgetModal } from '../../components/features/MarketingBudgetModal';
-import { useMarketingStore } from '../../stores/useMarketingStore';
+import { useMarketingStore } from '../../store/useMarketingStore';
 
 interface PanelProps {
     onBack: () => void;

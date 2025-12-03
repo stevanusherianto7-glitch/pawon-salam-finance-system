@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Megaphone, Target, TrendingUp, Plus, Trash2, DollarSign, Image, AlertCircle, BarChart3 } from 'lucide-react';
-import { useMarketingStore } from '../../stores/useMarketingStore';
+import { useMarketingStore } from '../../store/useMarketingStore';
 
 interface Props {
     isOpen: boolean;

@@ -32,6 +32,7 @@ import { BottomTab } from './components/BottomTab';
 import { ImpersonationBanner } from './components/ImpersonationBanner';
 import { ToastContainer } from './components/Toast';
 import { SpecialNotificationBanner } from './components/SpecialNotificationBanner';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { UserRole } from './types';
 import { colors } from './theme/colors';
 
@@ -48,6 +49,7 @@ import { HRDailyMonitorHubScreen } from './screens/admin/HRDailyMonitorHubScreen
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { CreatePayslip } from './screens/admin/CreatePayslip';
+import { PayslipGeneratorScreen } from './screens/admin/PayslipGeneratorScreen';
 import { OfflineBanner } from './components/OfflineBanner';
 
 // Initialize Axios Interceptor (must import to activate)
@@ -80,7 +82,7 @@ const App = () => {
     };
   }, []);
 
-  const [currentScreen, setCurrentScreen] = useState('shiftScheduler');
+  const [currentScreen, setCurrentScreen] = useState('dashboard');
   const [screenParams, setScreenParams] = useState<any>(null);
   const [selectedEmpId, setSelectedEmpId] = useState<string | null>(null);
 
@@ -176,6 +178,8 @@ const App = () => {
           />;
         case 'createPayslip': // NEW ROUTE
           return <CreatePayslip onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'payslipGenerator':
+          return <PayslipGeneratorScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
         // Super Admin Tools
         case 'systemSettings': return <SystemSettingsScreen onBack={() => setCurrentScreen('adminDashboard')} />;
@@ -250,6 +254,7 @@ const App = () => {
           <ToastContainer />
           <SpecialNotificationBanner />
           <PWAInstallPrompt />
+          <OfflineIndicator />
 
           <div className={`flex-1 overflow-y-auto overscroll-contain pb-[calc(8rem+env(safe-area-inset-bottom))] ${isImpersonating ? 'pt-16' : ''} print:overflow-visible print:h-auto print:pb-0 print:static`} id="main-content">
             {renderScreen()}
