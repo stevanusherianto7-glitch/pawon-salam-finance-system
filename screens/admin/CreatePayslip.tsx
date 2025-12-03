@@ -222,9 +222,12 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 <div className="flex justify-between items-start border-b-4 border-[#ff6b35] pb-6 mb-6 w-full">
                     <div className="flex flex-col items-start">
                         <Logo size="lg" variant="color" showText={true} />
-                        <p className="text-xs text-gray-500 mt-2 text-center w-full">
-                            Beryl Commercial, Summarecon, Jl. Bulevar Selatan No.78, Cisaranten Kidul, Kec. Gedebage, Kota Bandung, Jawa Barat 40295
-                        </p>
+                        <div className="text-xs text-gray-500 mt-2 text-center w-full leading-tight">
+                            <p>Beryl Commercial, Summarecon</p>
+                            <p>Jl. Bulevar Selatan No.78, Cisaranten Kidul</p>
+                            <p>Kec. Gedebage, Kota Bandung</p>
+                            <p>Jawa Barat 40295</p>
+                        </div>
                     </div>
                     <div className="text-right">
                         <h2 className="text-3xl font-black text-gray-800 uppercase tracking-wider mb-1">SLIP GAJI</h2>
