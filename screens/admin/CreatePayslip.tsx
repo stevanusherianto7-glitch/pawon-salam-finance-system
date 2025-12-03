@@ -293,6 +293,45 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     </svg>
                 </div>
 
+                {/* CENTER WATERMARK - Very Faint Logo */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                    <svg width="384" height="384" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 opacity-[0.03]">
+                        {/* Lingkaran Luar */}
+                        <circle cx="50" cy="50" r="44" />
+                        {/* Daun Diagonal */}
+                        <path d="M28 72 Q 28 28 72 28 Q 72 72 28 72 Z" />
+                        {/* Tulang Daun (Garis Tengah) */}
+                        <line x1="28" y1="72" x2="72" y2="28" />
+                        {/* Tangkai Daun (Menempel ke Lingkaran) */}
+                        <line x1="28" y1="72" x2="19" y2="81" />
+                    </svg>
+                </div>
+
+                {/* BOTTOM-LEFT CULINARY PATTERN */}
+                <div className="absolute bottom-0 left-0 pointer-events-none z-0">
+                    <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-200">
+                        {/* Spoon */}
+                        <path d="M20 140 Q20 120 35 110 Q50 100 50 80 L50 30" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4" />
+                        <ellipse cx="50" cy="25" rx="8" ry="12" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.4" />
+
+                        {/* Fork */}
+                        <path d="M90 30 L90 110 Q90 125 100 135" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4" />
+                        <line x1="82" y1="30" x2="82" y2="70" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+                        <line x1="90" y1="30" x2="90" y2="70" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+                        <line x1="98" y1="30" x2="98" y2="70" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+
+                        {/* Decorative Leaf */}
+                        <path d="M130 100 Q140 80 150 100 Q140 120 130 100 Z" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.3" />
+                        <line x1="140" y1="80" x2="140" y2="120" stroke="currentColor" strokeWidth="1" opacity="0.2" />
+
+                        {/* Small Dots Pattern */}
+                        <circle cx="60" cy="150" r="2" fill="currentColor" opacity="0.2" />
+                        <circle cx="75" cy="155" r="1.5" fill="currentColor" opacity="0.2" />
+                        <circle cx="120" cy="145" r="2" fill="currentColor" opacity="0.2" />
+                    </svg>
+                </div>
+
+
                 {/* HEADER */}
                 <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-6 w-full relative z-10">
                     <div className="flex flex-row items-center gap-6">
