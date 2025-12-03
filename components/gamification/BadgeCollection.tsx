@@ -1,6 +1,6 @@
 import React from 'react';
 import { Award, Lock } from 'lucide-react';
-import { Badge, BadgeType } from '../types';
+import { Badge, BadgeType } from '../../types';
 
 interface BadgeCriteria {
     type: BadgeType;
@@ -72,8 +72,8 @@ export const BadgeCollection: React.FC<Props> = ({ badges }) => {
                         <div
                             key={criteria.type}
                             className={`p-4 rounded-xl text-center transition-all ${earned
-                                    ? `bg-gradient-to-br ${getBadgeColor(criteria.color)} border-2 shadow-sm`
-                                    : 'bg-gray-100 opacity-40 border border-gray-200'
+                                ? `bg-gradient-to-br ${getBadgeColor(criteria.color)} border-2 shadow-sm`
+                                : 'bg-gray-100 opacity-40 border border-gray-200'
                                 }`}
                         >
                             <div className="text-4xl mb-2">{earned ? criteria.icon : <Lock size={32} className="mx-auto text-gray-400" />}</div>
