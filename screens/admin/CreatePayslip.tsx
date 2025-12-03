@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Plus, Trash2, ChevronLeft } from 'lucide-react';
+import { Download, Plus, Trash2, ChevronLeft, Send } from 'lucide-react';
 import { useEmployeeStore } from '../../store/employeeStore';
+import { usePayslipStore } from '../../store/payslipStore';
+import { useMessageStore } from '../../store/messageStore';
+import { useAuthStore } from '../../store/authStore';
 import { Logo } from '../../components/Logo';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -24,8 +27,12 @@ interface EmployeeData {
 
 export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const { employees, fetchEmployees } = useEmployeeStore();
+    const { addPayslip } = usePayslipStore();
+    const { sendMessage } = useMessageStore();
+    const { user } = useAuthStore();
     const payslipRef = useRef<HTMLDivElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isSending, setIsSending] = useState(false);
 
     // State Data Karyawan
     const [employee, setEmployee] = useState<EmployeeData>({
@@ -175,6 +182,75 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         }
     };
 
+    // Handler: Send Payslip to Employee
+    const handleSendPayslip = async () => {
+        if (!payslipRef.current) return;
+
+        //Find selected employee
+        const selectedEmp = employees.find(emp => emp.name === employee.name);
+        if (!selectedEmp) {
+            alert('Employee tidak ditemukan!');
+            return;
+        }
+
+        setIsSending(true);
+
+        try {
+            // Wait for any potential re-renders or font loads
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Generate PDF
+            const canvas = await html2canvas(payslipRef.current, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                windowWidth: 1123,
+                windowHeight: 794
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+            pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+
+            // Get PDF as base64 data URL
+            const pdfBlob = pdf.output('dataurlstring');
+
+            // Save to payslip store
+            addPayslip({
+                id: Date.now().toString(),
+                employeeId: selectedEmp.id,
+                employeeName: employee.name,
+                period: employee.period,
+                pdfBlob,
+                sentAt: Date.now(),
+                earnings,
+                deductions,
+                takeHomePay
+            });
+
+            // Send announcement notification
+            if (user) {
+                await sendMessage(
+                    user as any,
+                    `📄 Slip Gaji ${employee.period} Anda sudah tersedia. Silakan cek di menu Slip Gaji untuk mengunduh.`,
+                    'individual' as any
+                );
+            }
+
+            alert(`Slip gaji berhasil dikirim ke ${employee.name}!`);
+        } catch (error) {
+            console.error('Error sending payslip:', error);
+            alert('Gagal mengirim slip gaji. Silakan coba lagi.');
+        } finally {
+            setIsSending(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50/50 py-10 overflow-x-auto print:bg-white print:p-0 print:overflow-hidden">
             <style>
@@ -244,6 +320,37 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             <>
                                 <Download size={18} className="group-hover:scale-110 transition-transform" />
                                 <span>Save PDF</span>
+                            </>
+                        )}
+                        <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
+                    </button>
+
+                    <button
+                        onClick={handleSendPayslip}
+                        disabled={isSending || !employee.name}
+                        className={`
+                            relative overflow-hidden group
+                            glass bg-gradient-to-br from-green-500/90 to-green-600/90 
+                            text-white px-6 py-2.5 rounded-xl 
+                            shadow-lg shadow-green-500/20 hover:shadow-green-500/30
+                            transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
+                            flex items-center justify-center gap-2 font-medium min-w-[140px]
+                            border-white/20
+                            ${isSending ? 'opacity-70 cursor-not-allowed' : ''}
+                        `}
+                    >
+                        {isSending ? (
+                            <span className="flex items-center gap-2">
+                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Mengirim...
+                            </span>
+                        ) : (
+                            <>
+                                <Send size={18} className="group-hover:scale-110 transition-transform" />
+                                <span>Kirim</span>
                             </>
                         )}
                         <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
