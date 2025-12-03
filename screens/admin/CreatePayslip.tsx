@@ -1,521 +1,436 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { PayrollData } from '../../types';
-import { Logo } from '../../components/Logo';
-import PayrollInput from '../../components/PayrollInput';
+import React, { useState, useEffect, useRef } from 'react';
 import { useEmployeeStore } from '../../store/employeeStore';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { Plus, Trash2, Upload, Calendar, Printer, Download } from 'lucide-react';
+import { Logo } from '../../components/Logo';
 
-interface CreatePayslipProps {
-    onBack?: () => void;
+// --- Types ---
+interface FinancialItem {
+    id: string;
+    label: string;
+    amount: number;
+    isFixed?: boolean; // For items that shouldn't be deleted easily like Basic Salary
 }
 
-const SlipMotifTopRight = () => (
-    <div className="absolute top-0 right-0 z-0 pointer-events-none">
-        <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-0 right-0 w-[50%] md:w-auto h-auto print:w-[10cm]">
-            {/* Background Blob - Vibrant Orange - Resized smaller */}
-            <path d="M300 0L300 150C250 120 180 100 150 0H300Z" fill="#FB923C" fillOpacity="0.5" />
+interface PayslipData {
+    month: string;
+    year: string;
+    slipNumber: string;
+    employeeId: string;
+    employeeName: string;
+    employeeRole: string;
+    employeeGrade: string; // "Golongan"
+    employeeDept: string;
+    employeeStatus: string;
+    earnings: FinancialItem[];
+    deductions: FinancialItem[];
+    bankName: string;
+    bankAccount: string;
+    bankHolder: string;
+}
 
-            {/* Round Motifs / Bubbles - Repositioned closer to corner */}
-            <circle cx="270" cy="40" r="20" fill="#EA580C" fillOpacity="0.6" />
-            <circle cx="230" cy="30" r="12" fill="#F97316" fillOpacity="0.8" />
-            <circle cx="190" cy="20" r="8" fill="#FB923C" fillOpacity="0.9" />
+// --- Helper Components ---
 
-            <circle cx="250" cy="70" r="15" fill="#FDBA74" fillOpacity="0.7" />
-            <circle cx="220" cy="90" r="6" fill="#EA580C" fillOpacity="0.5" />
-
-            <circle cx="280" cy="90" r="10" fill="#C2410C" fillOpacity="0.6" />
-            <circle cx="260" cy="110" r="5" fill="#FDBA74" fillOpacity="0.8" />
-        </svg>
-    </div>
+const EditableField = ({
+    value,
+    onChange,
+    className = "",
+    placeholder = "",
+    type = "text"
+}: {
+    value: string | number;
+    onChange: (val: string) => void;
+    className?: string;
+    placeholder?: string;
+    type?: "text" | "number" | "date";
+}) => (
+    <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`bg-transparent border-b border-transparent hover:border-gray-300 focus:border-orange-500 focus:outline-none transition-colors px-1 py-0.5 w-full ${className} print:border-none print:p-0`}
+    />
 );
 
-const SlipMotifTopLeft = () => (
-    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-0 left-0 z-0 pointer-events-none w-[30%] md:w-auto h-auto print:w-[8cm]">
-        <circle cx="30" cy="50" r="18" fill="#F97316" fillOpacity="0.8" /> {/* Orange 500 */}
-        <circle cx="65" cy="25" r="10" fill="#FB923C" fillOpacity="0.8" /> {/* Orange 400 */}
-        <circle cx="20" cy="90" r="8" fill="#FDBA74" fillOpacity="0.9" />  {/* Orange 300 */}
-        <circle cx="60" cy="70" r="5" fill="#EA580C" fillOpacity="0.6" />
-        <circle cx="85" cy="45" r="4" fill="#C2410C" fillOpacity="0.5" /> {/* Orange 700 */}
-    </svg>
-);
+const MoneyInput = ({
+    amount,
+    onChange,
+    className = ""
+}: {
+    amount: number;
+    onChange: (val: number) => void;
+    className?: string;
+}) => {
+    const format = (val: number) => new Intl.NumberFormat('id-ID').format(val);
 
-const SlipMotifBottomLeft = () => (
-    <svg width="150" height="100" viewBox="0 0 150 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute bottom-0 left-0 z-0 pointer-events-none w-[25%] md:w-auto h-auto print:w-[6cm]">
-        <path d="M0 100C10 70 40 60 70 100H0Z" fill="#FDBA74" fillOpacity="0.8" /> {/* Orange 300 - Resized smaller */}
-    </svg>
-);
+    // Local state to handle typing
+    const [displayValue, setDisplayValue] = useState(format(amount));
 
-const SlipMotifBottomRight = () => (
-    <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute bottom-0 right-0 z-0 pointer-events-none w-[25%] md:w-auto h-auto print:w-[6cm]">
-        <circle cx="120" cy="110" r="12" fill="#F97316" fillOpacity="0.8" />
-        <circle cx="95" cy="130" r="8" fill="#FB923C" fillOpacity="0.8" />
-        <circle cx="130" cy="80" r="5" fill="#FDBA74" fillOpacity="0.9" />
-        <circle cx="80" cy="140" r="4" fill="#EA580C" fillOpacity="0.6" />
-    </svg>
-);
+    useEffect(() => {
+        setDisplayValue(format(amount));
+    }, [amount]);
 
-const SlipLogo = () => (
-    <div className="flex items-center gap-5 text-orange-600">
-        <div className="w-24 h-24 text-orange-600 relative flex items-center justify-center">
-            <svg
-                viewBox="0 0 100 100"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-full h-full"
-            >
-                <circle cx="50" cy="50" r="44" />
-                <path d="M28 72 Q 28 28 72 28 Q 72 72 28 72 Z" />
-                <line x1="28" y1="72" x2="72" y2="28" />
-                <line x1="28" y1="72" x2="19" y2="81" />
-            </svg>
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value.replace(/\./g, '');
+        if (!isNaN(Number(val))) {
+            onChange(Number(val));
+            setDisplayValue(format(Number(val)));
+        }
+    };
+
+    return (
+        <div className={`flex items-center ${className}`}>
+            <span className="text-gray-500 mr-1">Rp</span>
+            <input
+                type="text"
+                value={displayValue}
+                onChange={handleChange}
+                className="bg-transparent border-b border-transparent hover:border-gray-300 focus:border-orange-500 focus:outline-none text-right w-full font-mono transition-colors print:border-none print:p-0"
+            />
         </div>
-        <div className="text-left">
-            <p className="text-5xl font-bold tracking-tight" style={{ fontFamily: '"Times New Roman", Times, serif' }}>Pawon Salam</p>
-            <p className="text-base tracking-[0.3em] uppercase text-orange-600 opacity-90 font-medium mt-1">Resto & Catering</p>
-        </div>
+    );
+};
+
+const SectionHeader = ({ title, colorClass = "bg-orange-600" }: { title: string, colorClass?: string }) => (
+    <div className={`${colorClass} text-white px-4 py-2 font-bold text-sm uppercase tracking-wider print:bg-orange-600 print:text-white print:print-color-adjust-exact`}>
+        {title}
     </div>
 );
 
-const SlipRow: React.FC<{ label: string; value: string | number; valuePrefix?: string, isBold?: boolean, rightAlign?: boolean, disableMono?: boolean }> = ({ label, value, valuePrefix, isBold = false, rightAlign = true, disableMono = false }) => (
-    <div className={`flex items-start ${isBold ? 'font-bold' : ''}`}>
-        <div className="w-1/2 break-words pr-2">{label}</div>
-        <div className="w-auto pr-4">:</div>
-        <div className={`flex-1 ${rightAlign ? 'text-right' : 'text-left'} ${(!disableMono && rightAlign) ? 'font-mono tabular-nums' : ''} break-words`}>{valuePrefix}{value}</div>
-    </div>
-);
+// --- Main Component ---
 
-const SlipSeparator: React.FC<{ symbol: string }> = ({ symbol }) => (
-    <div className="flex items-center">
-        <div className="w-1/2"></div>
-        <div className="w-auto pr-4 invisible">:</div>
-        <div className="flex-1 flex items-center text-right">
-            <div className="flex-grow border-b border-gray-800"></div>
-            <span className="ml-2 w-4 font-bold text-lg">{symbol}</span>
-        </div>
-    </div>
-);
-
-const SlipSection: React.FC<{ title: string, children: React.ReactNode }> = ({ title, children }) => (
-    <div className="mt-6">
-        <p className="font-bold tracking-wide">{title}</p>
-        <div className="mt-2 space-y-1 text-sm">
-            {children}
-        </div>
-    </div>
-);
-
-
-export const CreatePayslip: React.FC<CreatePayslipProps> = ({ onBack }) => {
-    const printRef = useRef<HTMLDivElement>(null);
+export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const { employees, fetchEmployees } = useEmployeeStore();
 
-    const [showSlip, setShowSlip] = useState(false);
-    const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-    const [assetsLoaded, setAssetsLoaded] = useState(false);
+    // --- State ---
+    const [data, setData] = useState<PayslipData>({
+        month: 'Desember',
+        year: '2025',
+        slipNumber: 'PS/2025/12/001',
+        employeeId: '',
+        employeeName: '',
+        employeeRole: '',
+        employeeGrade: '-',
+        employeeDept: 'Operasional',
+        employeeStatus: 'Karyawan Tetap',
+        earnings: [
+            { id: '1', label: 'Gaji Pokok', amount: 0, isFixed: true },
+            { id: '2', label: 'Tunjangan Jabatan', amount: 0 },
+            { id: '3', label: 'Uang Makan', amount: 0 },
+        ],
+        deductions: [
+            { id: '1', label: 'PPh 21', amount: 0 },
+            { id: '2', label: 'BPJS Kesehatan', amount: 0 },
+        ],
+        bankName: 'BCA',
+        bankAccount: '',
+        bankHolder: '',
+    });
 
     useEffect(() => {
         fetchEmployees();
     }, [fetchEmployees]);
 
-    // Preload assets to prevent logo/image disappearing in PDF
-    useEffect(() => {
-        const images = printRef.current?.querySelectorAll('svg, img');
-        if (images && images.length > 0) {
-            Promise.all(
-                Array.from(images).map((img) => {
-                    if (img instanceof HTMLImageElement && !img.complete) {
-                        return new Promise((resolve) => {
-                            img.onload = resolve;
-                            img.onerror = resolve;
-                        });
-                    }
-                    return Promise.resolve();
-                })
-            ).then(() => setAssetsLoaded(true));
-        } else {
-            setAssetsLoaded(true);
-        }
-    }, [showSlip]);
+    // --- Calculations ---
+    const totalEarnings = data.earnings.reduce((acc, item) => acc + item.amount, 0);
+    const totalDeductions = data.deductions.reduce((acc, item) => acc + item.amount, 0);
+    const takeHomePay = totalEarnings - totalDeductions;
 
-    const [formData, setFormData] = useState<PayrollData>({
-        month: 'NOVEMBER 2025',
-        employeeName: 'Stepanus Herianto',
-        nik: '3271030909790009',
-        position: 'Manajer Marketing',
-        basicSalary: 3000000,
-        allowances: 0, // 'Paket' in the screenshot
-        positionAllowance: 2750000,
-        attendanceDays: 29,
-        overtime: 1450000, // 'Lembur' in the screenshot
-        tax: 0,
-        otherDeductions: 0,
-    });
-
+    // --- Handlers ---
     const handleEmployeeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = e.target.value;
-        const employee = employees.find(emp => emp.id === selectedId);
-
-        if (employee) {
-            setFormData(prev => ({
+        const emp = employees.find(emp => emp.id === e.target.value);
+        if (emp) {
+            setData(prev => ({
                 ...prev,
-                employeeName: employee.name,
-                nik: employee.id, // Using ID as NIK placeholder
-                position: employee.role.replace('_', ' '), // Simple formatting
-            }));
-        } else {
-            // Reset if "Pilih Karyawan" is selected
-            setFormData(prev => ({
-                ...prev,
-                employeeName: '',
-                nik: '',
-                position: '',
+                employeeId: emp.id,
+                employeeName: emp.name,
+                employeeRole: emp.role.replace(/_/g, ' '),
+                // Reset financials or load defaults if you had them
+                earnings: [
+                    { id: '1', label: 'Gaji Pokok', amount: 3000000, isFixed: true }, // Example default
+                    { id: '2', label: 'Tunjangan Jabatan', amount: 500000 },
+                    { id: '3', label: 'Uang Makan', amount: 0 },
+                ],
+                bankHolder: emp.name
             }));
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type } = e.target;
-        setFormData(prev => ({
+    const updateItem = (type: 'earnings' | 'deductions', id: string, field: 'label' | 'amount', value: string | number) => {
+        setData(prev => ({
             ...prev,
-            [name]: type === 'number' ? parseFloat(value) || 0 : value,
+            [type]: prev[type].map(item => item.id === id ? { ...item, [field]: value } : item)
         }));
     };
 
-    const formatCurrency = (amount: number): string => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount);
+    const addItem = (type: 'earnings' | 'deductions') => {
+        const newItem: FinancialItem = {
+            id: Math.random().toString(36).substr(2, 9),
+            label: 'Item Baru',
+            amount: 0
+        };
+        setData(prev => ({
+            ...prev,
+            [type]: [...prev[type], newItem]
+        }));
     };
 
-    const calculateGross = (): number => {
-        return formData.basicSalary + formData.allowances + formData.positionAllowance + formData.overtime;
+    const deleteItem = (type: 'earnings' | 'deductions', id: string) => {
+        setData(prev => ({
+            ...prev,
+            [type]: prev[type].filter(item => item.id !== id)
+        }));
     };
-
-    const calculateTotalDeductions = (): number => {
-        return formData.tax + formData.otherDeductions;
-    };
-
-    const calculateNet = (): number => {
-        return calculateGross() - calculateTotalDeductions();
-    };
-
-    const totalEarnings = calculateGross();
-    const totalDeductions = calculateTotalDeductions();
-    const netSalary = calculateNet();
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     const handlePrint = () => {
-        // Backup current payslip data to prevent loss during print
-        const currentState = JSON.stringify(formData);
-        localStorage.setItem('payslip-print-backup', currentState);
-
-        // Small delay to ensure localStorage sync
-        setTimeout(() => {
-            window.print();
-        }, 100);
+        window.print();
     };
 
-    const handleDownloadPDF = async () => {
-        const element = printRef.current;
-        if (!element || !assetsLoaded) {
-            alert('Please wait, assets are still loading...');
-            return;
-        }
-
-        setIsGeneratingPDF(true);
-
-        try {
-            // High-resolution canvas for crisp text and logo
-            const canvas = await html2canvas(element, {
-                scale: 2, // 2x resolution for clarity
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            });
-
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-            // Dynamic filename: [Employee Name]_[Period].pdf
-            const sanitizedName = formData.employeeName.replace(/[^a-zA-Z0-9]/g, '-');
-            const sanitizedPeriod = formData.month.replace(/[^a-zA-Z0-9]/g, '-');
-            const filename = `Slip-Gaji_${sanitizedName}_${sanitizedPeriod}.pdf`;
-
-            pdf.save(filename);
-        } catch (error) {
-            console.error('PDF generation error:', error);
-            alert('Failed to generate PDF. Please try again.');
-        } finally {
-            setIsGeneratingPDF(false);
-        }
-    };
-
-    const handleGenerate = () => {
-        setShowSlip(true);
-    };
-
+    // --- Render ---
     return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 font-sans p-8 md:p-12 print:p-0 print:m-0 print:bg-white">
-            {/* Form Section - Hidden when showing slip */}
-            {!showSlip && (
-                <div className="max-w-4xl mx-auto mb-8 print:hidden animate-slide-in-down">
+        <div className="min-h-screen bg-gray-100 p-4 md:p-8 print:p-0 print:bg-white font-sans text-gray-800">
+
+            {/* Toolbar - Hidden on Print */}
+            <div className="max-w-[210mm] mx-auto mb-6 flex justify-between items-center print:hidden">
+                <div className="flex items-center gap-4">
                     {onBack && (
-                        <button onClick={onBack} className="mb-4 text-gray-600 hover:text-gray-900 flex items-center gap-2">
+                        <button onClick={onBack} className="text-gray-600 hover:text-gray-900 flex items-center gap-2 font-medium">
                             &larr; Kembali
                         </button>
                     )}
-                    <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                        <div className="flex items-center gap-4 mb-6">
-                            <Logo size="lg" variant="color" showText={false} />
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-900">Slip Gaji</h1>
-                                <p className="text-gray-600">Pawon Salam Resto & Catering</p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                            <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2">Data Karyawan</h3>
-                            <PayrollInput label="Periode Gaji (Bulan & Tahun)" id="month" name="month" value={formData.month} onChange={handleInputChange} />
-
-                            {/* Employee Dropdown */}
-                            <div className="flex flex-col">
-                                <label htmlFor="employeeSelect" className="mb-1 text-sm font-medium text-gray-700">Pilih Karyawan</label>
-                                <select
-                                    id="employeeSelect"
-                                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white"
-                                    onChange={handleEmployeeSelect}
-                                    defaultValue=""
-                                >
-                                    <option value="" disabled>-- Pilih Karyawan --</option>
-                                    {employees.map(emp => (
-                                        <option key={emp.id} value={emp.id}>{emp.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <PayrollInput label="Nama Karyawan (Auto)" id="employeeName" name="employeeName" value={formData.employeeName} onChange={handleInputChange} />
-                            <PayrollInput label="NIK (Auto)" id="nik" name="nik" value={formData.nik} onChange={handleInputChange} />
-                            <PayrollInput label="Jabatan (Auto)" id="position" name="position" value={formData.position} onChange={handleInputChange} />
-                            <PayrollInput label="Jumlah Hari Masuk" id="attendanceDays" name="attendanceDays" type="number" value={formData.attendanceDays} onChange={handleInputChange} inputMode="numeric" />
-
-                            <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">Penerimaan</h3>
-                            <PayrollInput label="Upah Pokok" id="basicSalary" name="basicSalary" type="number" value={formData.basicSalary} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                            <PayrollInput label="Tunjangan Jabatan" id="positionAllowance" name="positionAllowance" type="number" value={formData.positionAllowance} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                            <PayrollInput label="Lembur" id="overtime" name="overtime" type="number" value={formData.overtime} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                            <PayrollInput label="Paket" id="allowances" name="allowances" type="number" value={formData.allowances} onChange={handleInputChange} isCurrency inputMode="numeric" />
-
-                            <h3 className="md:col-span-2 text-lg font-semibold text-gray-800 border-b pb-2 mb-2 mt-4">Potongan</h3>
-                            <PayrollInput label="Pajak" id="tax" name="tax" type="number" value={formData.tax} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                            <PayrollInput label="Lain-lain" id="otherDeductions" name="otherDeductions" type="number" value={formData.otherDeductions} onChange={handleInputChange} isCurrency inputMode="numeric" />
-                        </div>
-                        <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                            <button
-                                onClick={handleGenerate}
-                                className="w-full bg-gradient-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-lg text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] border border-white/20"
-                            >
-                                🎯 Generate Slip Gaji
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Payslip View - Replaces form when shown */}
-            {showSlip && (
-                <div className="max-w-4xl mx-auto p-2 md:p-4 animate-slide-in-down">
-                    {/* Back to Edit Button */}
-                    <button
-                        onClick={() => setShowSlip(false)}
-                        className="mb-4 bg-white/80 backdrop-blur-lg text-gray-800 font-semibold py-2 px-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] border border-gray-200/50 flex items-center gap-2 print:hidden"
+                    <select
+                        className="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        onChange={handleEmployeeSelect}
+                        value={data.employeeId}
                     >
-                        ← Kembali ke Edit
+                        <option value="">-- Pilih Karyawan --</option>
+                        {employees.map(emp => (
+                            <option key={emp.id} value={emp.id}>{emp.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex gap-3">
+                    <button
+                        onClick={handlePrint}
+                        className="bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-700 transition-colors shadow-sm"
+                    >
+                        <Printer size={18} /> Print
                     </button>
+                </div>
+            </div>
 
-                    {/* Action Buttons */}
-                    <div className="mb-4 flex flex-col sm:flex-row gap-3 print:hidden">
-                        <button
-                            onClick={handlePrint}
-                            className="hidden md:block flex-1 bg-white/80 backdrop-blur-lg text-gray-800 font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] border border-gray-200/50"
-                        >
-                            🖨️ Print / Save (Desktop)
-                        </button>
-                        <button
-                            onClick={handleDownloadPDF}
-                            disabled={isGeneratingPDF || !assetsLoaded}
-                            className="flex-1 bg-gradient-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-lg text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/20"
-                        >
-                            {isGeneratingPDF ? '⏳ Generating...' : '📥 Cetak / Simpan PDF'}
-                        </button>
+            {/* A4 Paper Container */}
+            <div className="max-w-[210mm] mx-auto bg-white shadow-2xl print:shadow-none min-h-[297mm] relative print:w-full print:max-w-none">
+
+                {/* Content Padding */}
+                <div className="p-12 md:p-16 print:p-8 h-full flex flex-col">
+
+                    {/* 1. Header */}
+                    <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
+                        <div className="flex gap-6 items-center">
+                            {/* Logo Placeholder */}
+                            <div className="w-20 h-20 bg-orange-50 rounded-lg border-2 border-dashed border-orange-200 flex items-center justify-center text-orange-400 print:border-none print:bg-transparent">
+                                <Logo variant="color" size="lg" showText={false} />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">PAWON SALAM</h1>
+                                <p className="text-sm text-gray-500 uppercase tracking-widest font-medium mt-1">Resto & Catering</p>
+                                <p className="text-xs text-gray-400 mt-1 max-w-[200px]">Jl. Raya Example No. 123, Kota Malang, Jawa Timur</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <h2 className="text-3xl font-bold text-gray-800 uppercase tracking-widest mb-2">Slip Gaji</h2>
+                            <div className="flex items-center justify-end gap-2 text-gray-600 font-medium">
+                                <EditableField
+                                    value={data.month}
+                                    onChange={(val) => setData(prev => ({ ...prev, month: val }))}
+                                    className="text-right w-24 font-bold text-orange-600"
+                                />
+                                <EditableField
+                                    value={data.year}
+                                    onChange={(val) => setData(prev => ({ ...prev, year: val }))}
+                                    className="text-right w-16 font-bold text-orange-600"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">No: {data.slipNumber}</p>
+                        </div>
                     </div>
 
-                    {/* Scrollable Wrapper for Mobile - Ensures A4 Layout Integrity */}
-                    <div className="w-full overflow-x-auto pb-6 print:overflow-visible print:pb-0">
-                        {/* Payslip Preview - Fixed A4 Width */}
-                        <div
-                            ref={printRef}
-                            className="bg-white rounded-xl shadow-2xl overflow-hidden relative font-serif text-gray-800 mx-auto w-[210mm] min-w-[210mm] min-h-[297mm] print:w-[210mm] print:min-h-[297mm] print:shadow-none print:rounded-none print:m-0 flex flex-col"
-                        >
-                            {/* DECORATIVE MOTIFS */}
-                            <SlipMotifTopLeft />
-                            <SlipMotifTopRight />
-                            <SlipMotifBottomLeft />
-                            <SlipMotifBottomRight />
+                    {/* 2. Employee Info Grid */}
+                    <div className="grid grid-cols-2 gap-x-12 gap-y-2 mb-10 text-sm">
+                        <div className="space-y-2">
+                            <div className="flex">
+                                <span className="w-32 text-gray-500 font-medium">Nama</span>
+                                <span className="mr-2">:</span>
+                                <EditableField value={data.employeeName} onChange={(val) => setData(prev => ({ ...prev, employeeName: val }))} className="font-bold text-gray-900" />
+                            </div>
+                            <div className="flex">
+                                <span className="w-32 text-gray-500 font-medium">Jabatan</span>
+                                <span className="mr-2">:</span>
+                                <EditableField value={data.employeeRole} onChange={(val) => setData(prev => ({ ...prev, employeeRole: val }))} />
+                            </div>
+                            <div className="flex">
+                                <span className="w-32 text-gray-500 font-medium">Departemen</span>
+                                <span className="mr-2">:</span>
+                                <EditableField value={data.employeeDept} onChange={(val) => setData(prev => ({ ...prev, employeeDept: val }))} />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex">
+                                <span className="w-32 text-gray-500 font-medium">Status</span>
+                                <span className="mr-2">:</span>
+                                <EditableField value={data.employeeStatus} onChange={(val) => setData(prev => ({ ...prev, employeeStatus: val }))} />
+                            </div>
+                            <div className="flex">
+                                <span className="w-32 text-gray-500 font-medium">Golongan</span>
+                                <span className="mr-2">:</span>
+                                <EditableField value={data.employeeGrade} onChange={(val) => setData(prev => ({ ...prev, employeeGrade: val }))} />
+                            </div>
+                            <div className="flex">
+                                <span className="w-32 text-gray-500 font-medium">Periode</span>
+                                <span className="mr-2">:</span>
+                                <span className="font-medium text-gray-900">{data.month} {data.year}</span>
+                            </div>
+                        </div>
+                    </div>
 
-                            {/* MEKARI STYLE LAYOUT - PAWON SALAM THEME */}
-                            <div className="p-12 h-full flex flex-col relative z-10">
-                                {/* 1. Header Section - With Glass Background for Readability */}
-                                <div className="flex justify-between items-end border-b-2 border-gray-800 pb-4 mb-6 relative z-20">
-                                    <div className="flex items-center gap-4">
-                                        {/* Logo */}
-                                        <div className="w-16 h-16 text-orange-600">
-                                            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="5" className="w-full h-full">
-                                                <circle cx="50" cy="50" r="44" />
-                                                <path d="M28 72 Q 28 28 72 28 Q 72 72 28 72 Z" />
-                                            </svg>
+                    {/* 3. Financials Split */}
+                    <div className="grid grid-cols-2 gap-8 mb-8 flex-grow items-start">
+
+                        {/* Earnings Column */}
+                        <div className="flex flex-col h-full">
+                            <SectionHeader title="Penerimaan" colorClass="bg-orange-600" />
+                            <div className="mt-4 space-y-0 flex-grow">
+                                {data.earnings.map((item) => (
+                                    <div key={item.id} className="group flex items-center justify-between py-2 border-b border-gray-100 hover:bg-orange-50/30 transition-colors px-2 -mx-2 rounded">
+                                        <div className="flex items-center gap-2 flex-grow">
+                                            {!item.isFixed && (
+                                                <button
+                                                    onClick={() => deleteItem('earnings', item.id)}
+                                                    className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity print:hidden"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            )}
+                                            <EditableField
+                                                value={item.label}
+                                                onChange={(val) => updateItem('earnings', item.id, 'label', val)}
+                                                className="font-medium text-gray-700"
+                                            />
                                         </div>
-                                        <div>
-                                            <h1 className="text-3xl font-bold text-gray-900 font-serif tracking-tight">Pawon Salam</h1>
-                                            <p className="text-sm text-gray-600 uppercase tracking-[0.2em] font-medium">Resto & Catering</p>
+                                        <div className="w-32">
+                                            <MoneyInput
+                                                amount={item.amount}
+                                                onChange={(val) => updateItem('earnings', item.id, 'amount', val)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="text-right bg-white/50 backdrop-blur-sm p-2 rounded-lg">
-                                        <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-widest">Slip Gaji</h2>
-                                        <p className="text-gray-600 font-medium mt-1 text-lg">{formData.month}</p>
+                                ))}
+                                <button
+                                    onClick={() => addItem('earnings')}
+                                    className="mt-4 text-xs flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium print:hidden opacity-60 hover:opacity-100 transition-opacity"
+                                >
+                                    <Plus size={14} /> Tambah Item
+                                </button>
+                            </div>
+                            <div className="mt-4 pt-4 border-t-2 border-gray-200 flex justify-between items-center bg-gray-50 p-3 rounded print:bg-transparent print:p-0 print:border-gray-300">
+                                <span className="font-bold text-gray-700">Total Penerimaan</span>
+                                <span className="font-bold text-gray-900 text-lg">Rp {new Intl.NumberFormat('id-ID').format(totalEarnings)}</span>
+                            </div>
+                        </div>
+
+                        {/* Deductions Column */}
+                        <div className="flex flex-col h-full">
+                            <SectionHeader title="Potongan" colorClass="bg-red-600" />
+                            <div className="mt-4 space-y-0 flex-grow">
+                                {data.deductions.map((item) => (
+                                    <div key={item.id} className="group flex items-center justify-between py-2 border-b border-gray-100 hover:bg-red-50/30 transition-colors px-2 -mx-2 rounded">
+                                        <div className="flex items-center gap-2 flex-grow">
+                                            <button
+                                                onClick={() => deleteItem('deductions', item.id)}
+                                                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity print:hidden"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                            <EditableField
+                                                value={item.label}
+                                                onChange={(val) => updateItem('deductions', item.id, 'label', val)}
+                                                className="font-medium text-gray-700"
+                                            />
+                                        </div>
+                                        <div className="w-32">
+                                            <MoneyInput
+                                                amount={item.amount}
+                                                onChange={(val) => updateItem('deductions', item.id, 'amount', val)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                                <button
+                                    onClick={() => addItem('deductions')}
+                                    className="mt-4 text-xs flex items-center gap-1 text-red-600 hover:text-red-700 font-medium print:hidden opacity-60 hover:opacity-100 transition-opacity"
+                                >
+                                    <Plus size={14} /> Tambah Item
+                                </button>
+                            </div>
+                            <div className="mt-4 pt-4 border-t-2 border-gray-200 flex justify-between items-center bg-gray-50 p-3 rounded print:bg-transparent print:p-0 print:border-gray-300">
+                                <span className="font-bold text-gray-700">Total Potongan</span>
+                                <span className="font-bold text-red-600 text-lg">Rp {new Intl.NumberFormat('id-ID').format(totalDeductions)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 4. Footer & Net Pay */}
+                    <div className="mt-auto">
+                        <div className="flex items-center shadow-lg rounded-lg overflow-hidden print:shadow-none print:border print:border-orange-600">
+                            <div className="bg-orange-600 text-white px-8 py-4 font-bold text-lg uppercase tracking-wider w-1/3 print:bg-orange-600 print:print-color-adjust-exact">
+                                Take Home Pay
+                            </div>
+                            <div className="bg-white flex-1 px-8 py-4 text-right font-bold text-3xl text-orange-600 print:text-black">
+                                Rp {new Intl.NumberFormat('id-ID').format(takeHomePay)}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-12 mt-12">
+                            {/* Bank Details */}
+                            <div>
+                                <p className="text-xs font-bold text-gray-400 uppercase mb-3 tracking-wider">Ditransfer Ke:</p>
+                                <div className="space-y-1 text-sm text-gray-700">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold w-16">Bank</span>
+                                        <EditableField value={data.bankName} onChange={(val) => setData(prev => ({ ...prev, bankName: val }))} />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold w-16">No. Rek</span>
+                                        <EditableField value={data.bankAccount} onChange={(val) => setData(prev => ({ ...prev, bankAccount: val }))} placeholder="0000-0000-0000" />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold w-16">A.N.</span>
+                                        <EditableField value={data.bankHolder} onChange={(val) => setData(prev => ({ ...prev, bankHolder: val }))} />
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* 2. Employee Info Section */}
-                                <div className="grid grid-cols-2 gap-12 mb-8 text-sm text-gray-700">
-                                    <div className="space-y-3">
-                                        <div className="flex items-baseline">
-                                            <span className="w-32 font-semibold text-gray-500 uppercase text-xs tracking-wider">Nama</span>
-                                            <span className="font-bold text-gray-900 text-base">: {formData.employeeName}</span>
-                                        </div>
-                                        <div className="flex items-baseline">
-                                            <span className="w-32 font-semibold text-gray-500 uppercase text-xs tracking-wider">Jabatan</span>
-                                            <span className="text-gray-900 text-base">: {formData.position}</span>
-                                        </div>
-                                        <div className="flex items-baseline">
-                                            <span className="w-32 font-semibold text-gray-500 uppercase text-xs tracking-wider">NIK</span>
-                                            <span className="text-gray-900 font-mono">: {formData.nik}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <div className="flex items-baseline">
-                                            <span className="w-32 font-semibold text-gray-500 uppercase text-xs tracking-wider">Departemen</span>
-                                            <span className="text-gray-900">: Operasional</span>
-                                        </div>
-                                        <div className="flex items-baseline">
-                                            <span className="w-32 font-semibold text-gray-500 uppercase text-xs tracking-wider">Status</span>
-                                            <span className="text-gray-900">: Karyawan Tetap</span>
-                                        </div>
-                                        <div className="flex items-baseline">
-                                            <span className="w-32 font-semibold text-gray-500 uppercase text-xs tracking-wider">Kehadiran</span>
-                                            <span className="text-gray-900">: {formData.attendanceDays} Hari</span>
-                                        </div>
+                            {/* Signatures */}
+                            <div className="flex justify-between items-end text-center">
+                                <div className="flex flex-col items-center gap-16">
+                                    <p className="text-xs text-gray-400 uppercase tracking-wider">Disetujui Oleh</p>
+                                    <div className="border-t border-gray-400 w-32 pt-2">
+                                        <p className="font-bold text-sm text-gray-900">HRD Manager</p>
                                     </div>
                                 </div>
-
-                                {/* 3. Earnings & Deductions Columns */}
-                                <div className="grid grid-cols-2 gap-8 mb-8 flex-1">
-                                    {/* Earnings Column */}
-                                    <div className="border border-gray-100 rounded-lg overflow-hidden">
-                                        <div className="bg-orange-50 border-b border-orange-100 px-4 py-3">
-                                            <h3 className="text-orange-800 font-bold text-sm uppercase tracking-wider">Penerimaan (Earnings)</h3>
-                                        </div>
-                                        <div className="p-4 space-y-3">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Gaji Pokok</span>
-                                                <span className="font-semibold text-gray-900">{formatCurrency(formData.basicSalary)}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Tunjangan Jabatan</span>
-                                                <span className="font-semibold text-gray-900">{formatCurrency(formData.positionAllowance)}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Lembur</span>
-                                                <span className="font-semibold text-gray-900">{formatCurrency(formData.overtime)}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Tunjangan Lain</span>
-                                                <span className="font-semibold text-gray-900">{formatCurrency(formData.allowances)}</span>
-                                            </div>
-                                            <div className="pt-4 mt-2 border-t border-gray-100 flex justify-between items-center">
-                                                <span className="font-bold text-gray-700">Total Penerimaan</span>
-                                                <span className="font-bold text-orange-600 text-lg">{formatCurrency(totalEarnings)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Deductions Column */}
-                                    <div className="border border-gray-100 rounded-lg overflow-hidden">
-                                        <div className="bg-red-50 border-b border-red-100 px-4 py-3">
-                                            <h3 className="text-red-800 font-bold text-sm uppercase tracking-wider">Potongan (Deductions)</h3>
-                                        </div>
-                                        <div className="p-4 space-y-3">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Pajak (PPh 21)</span>
-                                                <span className="font-semibold text-red-600">({formatCurrency(formData.tax)})</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600">Potongan Lain</span>
-                                                <span className="font-semibold text-red-600">({formatCurrency(formData.otherDeductions)})</span>
-                                            </div>
-                                            <div className="pt-4 mt-10 border-t border-gray-100 flex justify-between items-center">
-                                                <span className="font-bold text-gray-700">Total Potongan</span>
-                                                <span className="font-bold text-red-600 text-lg">({formatCurrency(totalDeductions)})</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* 4. Net Pay Section */}
-                                <div className="flex mb-12 shadow-sm rounded-lg overflow-hidden border border-orange-200">
-                                    <div className="bg-orange-600 text-white font-bold px-8 py-4 text-lg uppercase tracking-wider w-1/3 flex items-center">
-                                        TAKE HOME PAY
-                                    </div>
-                                    <div className="bg-white text-orange-700 font-bold px-8 py-4 text-3xl w-2/3 text-right flex items-center justify-end">
-                                        {formatCurrency(netSalary)}
-                                    </div>
-                                </div>
-
-                                {/* 5. Footer Section */}
-                                <div className="grid grid-cols-2 gap-12 mt-4">
-                                    <div>
-                                        <p className="text-xs font-bold text-gray-400 uppercase mb-2 tracking-wider">Ditransfer Ke:</p>
-                                        <div className="bg-gray-50 p-3 rounded border border-gray-100">
-                                            <p className="text-sm font-bold text-gray-800">BCA (Bank Central Asia)</p>
-                                            <p className="text-sm text-gray-600 font-mono mt-1">001 1234567</p>
-                                            <p className="text-sm text-gray-600 mt-1">a.n. {formData.employeeName}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between text-center items-end">
-                                        <div className="flex flex-col items-center">
-                                            <p className="text-xs text-gray-400 mb-16 uppercase tracking-wider">Disetujui Oleh</p>
-                                            <p className="text-sm font-bold text-gray-900 border-t border-gray-300 pt-2 w-32">Manager HRD</p>
-                                        </div>
-                                        <div className="flex flex-col items-center">
-                                            <p className="text-xs text-gray-400 mb-16 uppercase tracking-wider">Diterima Oleh</p>
-                                            <p className="text-sm font-bold text-gray-900 border-t border-gray-300 pt-2 w-32">{formData.employeeName}</p>
-                                        </div>
+                                <div className="flex flex-col items-center gap-16">
+                                    <p className="text-xs text-gray-400 uppercase tracking-wider">Diterima Oleh</p>
+                                    <div className="border-t border-gray-400 w-32 pt-2">
+                                        <p className="font-bold text-sm text-gray-900">{data.employeeName || 'Karyawan'}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
-            )}
+            </div>
         </div>
     );
 };
