@@ -223,7 +223,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     <div className="flex flex-col items-start">
                         <Logo size="lg" variant="color" showText={true} />
                         <p className="text-xs text-gray-500 mt-2 text-center w-full">
-                            Jl. Raya Example No. 123, Kota Malang, Jawa Timur
+                            Beryl Commercial, Summarecon, Jl. Bulevar Selatan No.78, Cisaranten Kidul, Kec. Gedebage, Kota Bandung, Jawa Barat 40295
                         </p>
                     </div>
                     <div className="text-right">
