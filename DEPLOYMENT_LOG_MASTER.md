@@ -6,6 +6,23 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] Client-Side Payslip PDF Generation
+**Status:** ✅ Success
+**Commit:** feat: Client-side Payslip PDF Generation (Refactor)
+**URL:** https://pawon-salam-finance.pages.dev
+
+### Summary
+Refactored Payslip system to generate PDFs on the client-side, resolving server-side generation issues and improving performance.
+
+### Key Changes
+*   **Client-Side Generation:** PDF created in browser using `html2canvas` & `jsPDF`.
+*   **Data-Only Send:** HR sends raw data, making the process instant.
+*   **Reusable Template:** Created `PayslipTemplate.tsx` for consistent layout.
+
+### Verification
+*   Build Passed.
+*   Verified via Walkthrough.
+
 ## [2025-12-04] Debug Fix: Send Payslip
 **Status:** ✅ Success
 **Commit:** fix: Critical Debug for Send Payslip (Explicit Alerts & Mock Delay)
