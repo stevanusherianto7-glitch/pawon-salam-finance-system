@@ -6,6 +6,22 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] Final Fix: Send Payslip False Negative
+**Status:** ✅ Success
+**Commit:** fix: Remove mock delay and ensure Send Payslip success
+**URL:** https://pawon-salam-finance.pages.dev
+
+### Summary
+Resolved the "False Negative" error in Send Payslip by removing all mock upload delays and making notification non-blocking.
+
+### Key Changes
+*   **Removed:** `setTimeout` mock delay.
+*   **Non-Blocking:** `sendMessage` wrapped in try-catch.
+*   **Feedback:** Added explicit `alert('Sukses!')`.
+
+### Verification
+*   Verified via Walkthrough.
+
 ## [2025-12-04] Client-Side Payslip PDF Generation
 **Status:** ✅ Success
 **Commit:** feat: Client-side Payslip PDF Generation (Refactor)

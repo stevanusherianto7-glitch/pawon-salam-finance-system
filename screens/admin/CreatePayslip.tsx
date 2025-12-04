@@ -207,8 +207,6 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
     // Handler: Send Payslip to Employee
     const handleSendPayslip = async () => {
-        if (!payslipRef.current) return;
-
         // Validation
         if (!employee.name || !employee.role || earnings.length === 0) {
             alert('Lengkapi data slip gaji sebelum mengirim!');
@@ -227,43 +225,46 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         if (!isConfirmed) return;
 
         try {
-            // 1. PDF Generation Skipped (Client-side generation enabled)
             setSendingStatus('uploading');
 
-            // 2. Simulating Upload (Reduced Delay)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Part A: Data Dispatch (ONLY)
+            // We do NOT generate PDF here. We send a flag.
 
-            // 3. Save to Store
+            // Save to Store
             addPayslip({
                 id: Date.now().toString(),
                 employeeId: selectedEmp.id,
                 employeeName: employee.name,
                 period: employee.period,
-                pdfBlob: 'GENERATE_ON_CLIENT',
+                pdfBlob: 'GENERATE_ON_CLIENT', // Flag for client-side generation
                 sentAt: Date.now(),
                 earnings,
                 deductions,
                 takeHomePay
             });
 
-            // 4. Send Notification
+            // Send Notification (Non-blocking attempt)
             if (user) {
-                await sendMessage(
-                    user as any,
-                    `📄 Slip Gaji ${employee.period} Anda sudah tersedia. Silakan cek di menu Slip Gaji.`,
-                    'individual' as any
-                );
+                try {
+                    await sendMessage(
+                        user as any,
+                        `📄 Slip Gaji ${employee.period} Anda sudah tersedia. Silakan cek di menu Slip Gaji.`,
+                        'individual' as any
+                    );
+                } catch (notifyError) {
+                    console.warn('Failed to send notification:', notifyError);
+                    // Continue execution, don't block success
+                }
             }
 
-            // 5. Success Feedback
-            showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name}`, 'success');
+            // Success Feedback
             setSendingStatus('success');
+            showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name}`, 'success');
+            alert('Sukses! Data slip gaji berhasil dikirim.');
 
         } catch (error: any) {
-            // CRITICAL DEBUG ALERT
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('CRITICAL ERROR:', error);
-            alert("DEBUG ERROR: " + errorMessage);
+            console.error('Error sending payslip:', error);
+            alert("Gagal mengirim data: " + (error.message || String(error)));
             setSendingStatus('idle');
         }
     };
