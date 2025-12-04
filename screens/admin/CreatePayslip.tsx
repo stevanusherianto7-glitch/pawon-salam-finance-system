@@ -226,36 +226,49 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         const isConfirmed = window.confirm(`Kirim slip gaji bulan ${employee.period} ke ${employee.name}?`);
         if (!isConfirmed) return;
 
+        let pdfBlob = '';
+        let isPdfGenerated = false;
+
         try {
-            // 1. Generating PDF
+            // 1. Generating PDF (Attempt)
             setSendingStatus('generating');
 
-            // Wait for any potential re-renders or font loads
-            await new Promise(resolve => setTimeout(resolve, 500));
+            try {
+                // Wait for any potential re-renders or font loads
+                await new Promise(resolve => setTimeout(resolve, 500));
 
-            const canvas = await html2canvas(payslipRef.current, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff',
-                windowWidth: 1123,
-                windowHeight: 794
-            });
+                const canvas = await html2canvas(payslipRef.current, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: true, // Enable logging for debug
+                    backgroundColor: '#ffffff',
+                    windowWidth: 1123,
+                    windowHeight: 794
+                });
 
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4'
-            });
-            pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
 
-            // Get PDF as base64 data URL
-            const pdfBlob = pdf.output('dataurlstring');
+                // Get PDF as base64 data URL
+                pdfBlob = pdf.output('dataurlstring');
+                isPdfGenerated = true;
 
-            // 2. Simulating Upload
+            } catch (pdfError: any) {
+                console.error('PDF Generation Failed:', pdfError);
+                // Fallback: Proceed without PDF
+                pdfBlob = 'ERROR_PDF_GENERATION_FAILED';
+                alert("WARNING: PDF Generation Failed (" + pdfError.message + "). Sending Data Only.");
+            }
+
+            // 2. Simulating Upload (MOCK ONLY - NO FETCH)
             setSendingStatus('uploading');
-            await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5s delay
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 2s Mock Delay
 
             // 3. Save to Store
             addPayslip({
@@ -272,23 +285,36 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
             // 4. Send Notification
             if (user) {
+                const messageText = isPdfGenerated
+                    ? `📄 Slip Gaji ${employee.period} Anda sudah tersedia. Silakan cek di menu Slip Gaji untuk mengunduh.`
+                    : `⚠️ Slip Gaji ${employee.period} Anda sudah tersedia (Data Only). Hubungi HR untuk cetak fisik.`;
+
                 await sendMessage(
                     user as any,
-                    `📄 Slip Gaji ${employee.period} Anda sudah tersedia. Silakan cek di menu Slip Gaji untuk mengunduh.`,
+                    messageText,
                     'individual' as any
                 );
             }
 
             // 5. Success Feedback
-            showNotification(`Dokumen PDF Slip Gaji berhasil dibuat dan dikirim ke ${employee.name}`, 'success');
+            if (isPdfGenerated) {
+                showNotification(`Dokumen PDF Slip Gaji berhasil dibuat dan dikirim ke ${employee.name}`, 'success');
+            } else {
+                showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name} (Tanpa PDF)`, 'info');
+            }
+
             setSendingStatus('success');
 
-        } catch (error) {
-            console.error('Error sending payslip:', error);
-            showNotification('Gagal mengirim slip gaji. Silakan coba lagi.', 'error');
+        } catch (error: any) {
+            // CRITICAL DEBUG ALERT
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('CRITICAL ERROR:', error);
+            alert("DEBUG ERROR: " + errorMessage);
             setSendingStatus('idle');
         }
     };
+
+
 
     return (
         <div className="min-h-screen bg-gray-50/50 py-10 overflow-x-auto print:bg-white print:p-0 print:overflow-hidden">

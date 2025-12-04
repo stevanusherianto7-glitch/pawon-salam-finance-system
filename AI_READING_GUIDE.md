@@ -7,6 +7,7 @@ This document serves as the **MANDATORY INDEX** for any AI model or developer jo
 
 ## 1. THE FOUNDATION (READ FIRST)
 These documents define the "Soul" and "Law" of the project.
+*   **Repository:** [https://github.com/stevanusherianto7-glitch/pawon-salam-finance-system](https://github.com/stevanusherianto7-glitch/pawon-salam-finance-system)
 *   **`SOP_ULTIMATE_MASTER.md`**
     *   *The Original Foundation.*
     *   Contains: Philosophy, Roles, Responsibility Matrix, Deployment URLs, GitHub Repo.
