@@ -266,8 +266,41 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         }
     };
 
+    // State for Zoom/Scale
+    const [scale, setScale] = useState(1);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scale on mount/resize
+    useEffect(() => {
+        const handleResize = () => {
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.clientWidth;
+                const paperWidth = 1123; // 297mm in pixels (approx)
+                const padding = 32; // 2rem padding
+
+                // Calculate scale to fit width
+                const fitScale = (containerWidth - padding) / paperWidth;
+
+                // Only scale down, never up automatically (max 1)
+                // On mobile, this will be around 0.3-0.4
+                // On laptop, maybe 0.8-0.9 depending on sidebar
+                const newScale = Math.min(1, Math.max(0.3, fitScale));
+                setScale(newScale);
+            }
+        };
+
+        // Initial calculation
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const handleZoomIn = () => setScale(prev => Math.min(1.5, prev + 0.1));
+    const handleZoomOut = () => setScale(prev => Math.max(0.3, prev - 0.1));
+
     return (
-        <div className="min-h-screen bg-gray-50/50 py-10 overflow-x-auto print:bg-white print:p-0 print:overflow-hidden">
+        <div className="h-[calc(100vh-64px)] bg-gray-50/50 overflow-y-auto overflow-x-hidden print:bg-white print:p-0 print:overflow-visible flex flex-col" ref={containerRef}>
             <style>
                 {`
                 @page {
@@ -284,7 +317,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             </style>
 
             {/* Action Bar (Hidden saat Print/Capture) */}
-            <div className="max-w-[297mm] mx-auto mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center print:hidden px-4 gap-6 z-50 relative" data-html2canvas-ignore>
+            <div className="max-w-[297mm] mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-center print:hidden px-4 py-6 gap-6 z-50 relative shrink-0" data-html2canvas-ignore>
                 <div className="flex items-center gap-4 w-full lg:w-auto">
                     {onBack && (
                         <button
@@ -294,10 +327,24 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                             <ChevronLeft size={18} /> <span className="hidden sm:inline">Kembali</span>
                         </button>
                     )}
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Slip Gaji Generator</h2>
+                    <div className="flex flex-col">
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Slip Gaji Generator</h2>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 lg:hidden">
+                            <button onClick={handleZoomOut} className="p-1 bg-white rounded border hover:bg-gray-50">Zoom -</button>
+                            <span>{Math.round(scale * 100)}%</span>
+                            <button onClick={handleZoomIn} className="p-1 bg-white rounded border hover:bg-gray-50">Zoom +</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-3 w-full lg:w-auto lg:flex-row lg:items-center">
+                    {/* Zoom Controls (Desktop) */}
+                    <div className="hidden lg:flex items-center gap-2 bg-white/50 backdrop-blur px-2 py-1 rounded-lg border border-gray-200 mr-2">
+                        <button onClick={handleZoomOut} className="p-1 hover:bg-white rounded text-gray-600" title="Zoom Out">-</button>
+                        <span className="text-xs font-mono w-10 text-center">{Math.round(scale * 100)}%</span>
+                        <button onClick={handleZoomIn} className="p-1 hover:bg-white rounded text-gray-600" title="Zoom In">+</button>
+                    </div>
+
                     <select
                         className="w-full lg:w-64 bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 py-2.5 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all cursor-pointer hover:bg-white"
                         onChange={handleEmployeeSelect}
@@ -399,267 +446,279 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 </div>
             </div>
 
-            {/* KERTAS A4 LANDSCAPE (Fixed Size) */}
-            <div
-                ref={payslipRef}
-                className="mx-auto bg-white shadow-2xl print:shadow-none print:mx-0 relative transform transition-transform duration-500 overflow-hidden"
-                style={{ width: '297mm', minHeight: '210mm', padding: '40mm 30mm 30mm 30mm' }}
-            >
+            {/* SCROLLABLE & SCALABLE CONTENT AREA */}
+            <div className="flex-1 overflow-auto flex justify-center p-4 md:p-8">
+                <div
+                    className="origin-top transition-transform duration-300 ease-out"
+                    style={{
+                        transform: `scale(${scale})`,
+                        width: '297mm', // Fixed width for the paper itself
+                        height: '210mm'
+                    }}
+                >
+                    {/* KERTAS A4 LANDSCAPE (Fixed Size) */}
+                    <div
+                        ref={payslipRef}
+                        className="bg-white shadow-2xl print:shadow-none relative overflow-hidden"
+                        style={{ width: '297mm', minHeight: '210mm', padding: '40mm 30mm 30mm 30mm' }}
+                    >
 
-                {/* LEFT BORDER STRIP - Official Look */}
-                <div className="absolute top-0 left-0 bottom-0 w-3 bg-[#ff6b35] z-20 print:block"></div>
+                        {/* LEFT BORDER STRIP - Official Look */}
+                        <div className="absolute top-0 left-0 bottom-0 w-3 bg-[#ff6b35] z-20 print:block"></div>
 
-                {/* TOP-RIGHT: "The Spice Wave" */}
-                <div className="absolute top-0 right-0 pointer-events-none z-0">
-                    <svg width="350" height="350" viewBox="0 0 350 350" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="spiceGradientAdmin" x1="0" y1="0" x2="350" y2="350" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#ff6b35" />
-                                <stop offset="1" stopColor="#e65100" />
-                            </linearGradient>
-                        </defs>
-                        {/* Darker Depth Layer */}
-                        <path d="M350 0 V250 C300 220, 200 150, 150 0 Z" fill="#e65100" />
-                        {/* Main Wave Layer */}
-                        <path d="M350 0 V200 C280 180, 150 100, 100 0 Z" fill="url(#spiceGradientAdmin)" fillOpacity="1" />
-                        {/* Leaf Cutout Accent */}
-                        <path d="M250 50 Q290 50 310 90 Q290 110 250 110 Q230 90 250 50 Z" fill="#ffffff" fillOpacity="0.15" />
-                    </svg>
-                </div>
-
-                {/* BOTTOM-LEFT: "The Foundation" */}
-                <div className="absolute bottom-0 left-0 pointer-events-none z-0 ml-3">
-                    <svg width="250" height="250" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        {/* Geometric Accents */}
-                        <path d="M0 250 L0 120 L130 250 Z" fill="#ff8a65" fillOpacity="0.8" />
-                        <path d="M0 250 L0 180 L70 250 Z" fill="#ff6b35" />
-                    </svg>
-                </div>
-
-
-                {/* HEADER */}
-                <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-10 w-full relative z-10">
-
-                    <div className="flex flex-row items-center gap-6">
-                        <div className="flex-shrink-0 aspect-square">
-                            <Logo size="xl" variant="color" showText={false} />
+                        {/* TOP-RIGHT: "The Spice Wave" */}
+                        <div className="absolute top-0 right-0 pointer-events-none z-0">
+                            <svg width="350" height="350" viewBox="0 0 350 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="spiceGradientAdmin" x1="0" y1="0" x2="350" y2="350" gradientUnits="userSpaceOnUse">
+                                        <stop stopColor="#ff6b35" />
+                                        <stop offset="1" stopColor="#e65100" />
+                                    </linearGradient>
+                                </defs>
+                                {/* Darker Depth Layer */}
+                                <path d="M350 0 V250 C300 220, 200 150, 150 0 Z" fill="#e65100" />
+                                {/* Main Wave Layer */}
+                                <path d="M350 0 V200 C280 180, 150 100, 100 0 Z" fill="url(#spiceGradientAdmin)" fillOpacity="1" />
+                                {/* Leaf Cutout Accent */}
+                                <path d="M250 50 Q290 50 310 90 Q290 110 250 110 Q230 90 250 50 Z" fill="#ffffff" fillOpacity="0.15" />
+                            </svg>
                         </div>
-                        <div className="flex-1 max-w-md">
-                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight antialiased subpixel-antialiased mb-1" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-                                Pawon Salam
-                            </h1>
-                            <p className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-2">Resto & Catering</p>
-                            <div className="text-xs text-gray-900 leading-relaxed antialiased subpixel-antialiased">
-                                <p>Beryl Commercial, Summarecon</p>
-                                <p>Jl. Bulevar Selatan No.78, Cisaranten Kidul</p>
-                                <p>Kec. Gedebage, Kota Bandung</p>
-                                <p>Jawa Barat 40295</p>
+
+                        {/* BOTTOM-LEFT: "The Foundation" */}
+                        <div className="absolute bottom-0 left-0 pointer-events-none z-0 ml-3">
+                            <svg width="250" height="250" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                {/* Geometric Accents */}
+                                <path d="M0 250 L0 120 L130 250 Z" fill="#ff8a65" fillOpacity="0.8" />
+                                <path d="M0 250 L0 180 L70 250 Z" fill="#ff6b35" />
+                            </svg>
+                        </div>
+
+
+                        {/* HEADER */}
+                        <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-10 w-full relative z-10">
+
+                            <div className="flex flex-row items-center gap-6">
+                                <div className="flex-shrink-0 aspect-square">
+                                    <Logo size="xl" variant="color" showText={false} />
+                                </div>
+                                <div className="flex-1 max-w-md">
+                                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight antialiased subpixel-antialiased mb-1" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+                                        Pawon Salam
+                                    </h1>
+                                    <p className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-2">Resto & Catering</p>
+                                    <div className="text-xs text-gray-900 leading-relaxed antialiased subpixel-antialiased">
+                                        <p>Beryl Commercial, Summarecon</p>
+                                        <p>Jl. Bulevar Selatan No.78, Cisaranten Kidul</p>
+                                        <p>Kec. Gedebage, Kota Bandung</p>
+                                        <p>Jawa Barat 40295</p>
+                                    </div>
+                                </div>
+                            </div >
+                            <div className="text-right self-start mt-2">
+                                <h2 className="text-3xl font-black text-[#ff6b35] uppercase tracking-wider mb-1 antialiased subpixel-antialiased" style={{ fontFamily: '"Times New Roman", Times, serif' }}>SLIP GAJI</h2>
+                                <p className="text-sm text-gray-600 antialiased">Periode: <span className="font-bold text-gray-900">{employee.period}</span></p>
+                                <p className="text-xs text-gray-400 mt-1">No: PS/2025/12/001</p>
                             </div>
-                        </div>
-                    </div >
-                    <div className="text-right self-start mt-2">
-                        <h2 className="text-3xl font-black text-[#ff6b35] uppercase tracking-wider mb-1 antialiased subpixel-antialiased" style={{ fontFamily: '"Times New Roman", Times, serif' }}>SLIP GAJI</h2>
-                        <p className="text-sm text-gray-600 antialiased">Periode: <span className="font-bold text-gray-900">{employee.period}</span></p>
-                        <p className="text-xs text-gray-400 mt-1">No: PS/2025/12/001</p>
-                    </div>
-                </div >
+                        </div >
 
-                {/* EMPLOYEE INFO GRID */}
-                < div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-8 text-sm w-full" >
-                    <div className="space-y-2">
-                        <div className="flex justify-between border-b border-gray-100 pb-1">
-                            <span className="text-gray-500">Nama</span>
-                            <div
-                                contentEditable
-                                suppressContentEditableWarning
-                                onBlur={(e) => handleTextChange('employee', null, 'name', e.currentTarget.textContent || '')}
-                                className="font-bold text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased break-words whitespace-pre-wrap min-h-[24px] py-1"
-                            >
-                                {employee.name}
-                            </div>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 pb-1">
-                            <span className="text-gray-500">Jabatan</span>
-                            <div
-                                contentEditable
-                                suppressContentEditableWarning
-                                onBlur={(e) => handleTextChange('employee', null, 'role', e.currentTarget.textContent || '')}
-                                className="font-medium text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased break-words whitespace-pre-wrap min-h-[24px] py-1"
-                            >
-                                {employee.role}
-                            </div>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 pb-1">
-                            <span className="text-gray-500">Departemen</span>
-                            <span className="font-medium text-gray-900 antialiased">{employee.department}</span>
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="flex justify-between border-b border-gray-100 pb-1">
-                            <span className="text-gray-500">NIK / ID</span>
-                            <span className="font-medium text-gray-900 antialiased">{employee.nik}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 pb-1">
-                            <span className="text-gray-500">Status</span>
-                            <span className="font-medium text-gray-900 antialiased">{employee.status}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 pb-1">
-                            <span className="text-gray-500">Grade / Gol</span>
-                            <span className="font-medium text-gray-900 antialiased">{employee.grade}</span>
-                        </div>
-                    </div>
-                </div >
-
-                {/* FINANCIAL SPLIT */}
-                < div className="grid grid-cols-2 gap-8 mb-8 w-full" >
-
-                    {/* EARNINGS COLUMN */}
-                    < div >
-                        <div className="bg-[#ff6b35] text-white px-3 py-4 text-sm font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
-                            Penerimaan
-                        </div>
-                        <div className="space-y-2 min-h-[150px]">
-                            {earnings.map((item) => (
-                                <div key={item.id} className="flex items-start justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
+                        {/* EMPLOYEE INFO GRID */}
+                        < div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-8 text-sm w-full" >
+                            <div className="space-y-2">
+                                <div className="flex justify-between border-b border-gray-100 pb-1">
+                                    <span className="text-gray-500">Nama</span>
                                     <div
                                         contentEditable
                                         suppressContentEditableWarning
-                                        onBlur={(e) => handleTextChange('earning', item.id, 'label', e.currentTarget.textContent || '')}
-                                        className="w-full bg-transparent h-auto py-1 leading-relaxed text-gray-800 focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                        onBlur={(e) => handleTextChange('employee', null, 'name', e.currentTarget.textContent || '')}
+                                        className="font-bold text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased break-words whitespace-pre-wrap min-h-[24px] py-1"
                                     >
-                                        {item.label}
-                                    </div>
-                                    <div className="flex items-start gap-2">
-                                        <div
-                                            contentEditable
-                                            suppressContentEditableWarning
-                                            onBlur={(e) => handleAmountBlur('earning', item.id, e.currentTarget.textContent || '')}
-                                            className="text-right font-mono text-gray-700 w-32 bg-transparent h-auto py-1 leading-relaxed focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
-                                        >
-                                            {formatRupiah(item.amount)}
-                                        </div>
-                                        <button
-                                            onClick={() => deleteRow('earning', item.id)}
-                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity mt-1"
-                                            data-html2canvas-ignore
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
+                                        {employee.name}
                                     </div>
                                 </div>
-                            ))}
-
-                            <button
-                                onClick={() => addRow('earning')}
-                                className="text-xs text-[#ff6b35] font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden transition-all"
-                                data-html2canvas-ignore
-                            >
-                                <Plus size={14} /> Tambah Item
-                            </button>
-                        </div>
-
-                        <div className="flex justify-between items-center bg-gray-50 px-6 py-4 rounded mt-4 border border-gray-200">
-                            <span className="font-bold text-gray-600 text-sm">Total Penerimaan</span>
-                            <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalEarnings)}</span>
-                        </div>
-                    </div >
-
-                    {/* DEDUCTIONS COLUMN */}
-                    < div >
-                        <div className="bg-[#d64518] text-white px-3 py-4 text-sm font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
-                            Potongan
-                        </div>
-                        <div className="space-y-2 min-h-[150px]">
-                            {deductions.map((item) => (
-                                <div key={item.id} className="flex items-start justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
+                                <div className="flex justify-between border-b border-gray-100 pb-1">
+                                    <span className="text-gray-500">Jabatan</span>
                                     <div
                                         contentEditable
                                         suppressContentEditableWarning
-                                        onBlur={(e) => handleTextChange('deduction', item.id, 'label', e.currentTarget.textContent || '')}
-                                        className="w-full bg-transparent h-auto py-1 leading-relaxed text-gray-800 focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                        onBlur={(e) => handleTextChange('employee', null, 'role', e.currentTarget.textContent || '')}
+                                        className="font-medium text-right text-gray-900 focus:outline-none focus:bg-orange-50 px-1 rounded w-1/2 transition-colors antialiased break-words whitespace-pre-wrap min-h-[24px] py-1"
                                     >
-                                        {item.label}
-                                    </div>
-                                    <div className="flex items-start gap-2">
-                                        <div
-                                            contentEditable
-                                            suppressContentEditableWarning
-                                            onBlur={(e) => handleAmountBlur('deduction', item.id, e.currentTarget.textContent || '')}
-                                            className="text-right font-mono text-gray-700 w-32 bg-transparent h-auto py-1 leading-relaxed focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
-                                        >
-                                            {formatRupiah(item.amount)}
-                                        </div>
-                                        <button
-                                            onClick={() => deleteRow('deduction', item.id)}
-                                            className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity mt-1"
-                                            data-html2canvas-ignore
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
+                                        {employee.role}
                                     </div>
                                 </div>
-                            ))}
+                                <div className="flex justify-between border-b border-gray-100 pb-1">
+                                    <span className="text-gray-500">Departemen</span>
+                                    <span className="font-medium text-gray-900 antialiased">{employee.department}</span>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between border-b border-gray-100 pb-1">
+                                    <span className="text-gray-500">NIK / ID</span>
+                                    <span className="font-medium text-gray-900 antialiased">{employee.nik}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-gray-100 pb-1">
+                                    <span className="text-gray-500">Status</span>
+                                    <span className="font-medium text-gray-900 antialiased">{employee.status}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-gray-100 pb-1">
+                                    <span className="text-gray-500">Grade / Gol</span>
+                                    <span className="font-medium text-gray-900 antialiased">{employee.grade}</span>
+                                </div>
+                            </div>
+                        </div >
 
-                            <button
-                                onClick={() => addRow('deduction')}
-                                className="text-xs text-red-500 font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden transition-all"
-                                data-html2canvas-ignore
-                            >
-                                <Plus size={14} /> Tambah Item
-                            </button>
-                        </div>
+                        {/* FINANCIAL SPLIT */}
+                        < div className="grid grid-cols-2 gap-8 mb-8 w-full" >
 
-                        <div className="flex justify-between items-center bg-gray-50 px-6 py-4 rounded mt-4 border border-gray-200">
-                            <span className="font-bold text-gray-600 text-sm">Total Potongan</span>
-                            <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalDeductions)}</span>
-                        </div>
+                            {/* EARNINGS COLUMN */}
+                            < div >
+                                <div className="bg-[#ff6b35] text-white px-3 py-4 text-sm font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
+                                    Penerimaan
+                                </div>
+                                <div className="space-y-2 min-h-[150px]">
+                                    {earnings.map((item) => (
+                                        <div key={item.id} className="flex items-start justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
+                                            <div
+                                                contentEditable
+                                                suppressContentEditableWarning
+                                                onBlur={(e) => handleTextChange('earning', item.id, 'label', e.currentTarget.textContent || '')}
+                                                className="w-full bg-transparent h-auto py-1 leading-relaxed text-gray-800 focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                            >
+                                                {item.label}
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <div
+                                                    contentEditable
+                                                    suppressContentEditableWarning
+                                                    onBlur={(e) => handleAmountBlur('earning', item.id, e.currentTarget.textContent || '')}
+                                                    className="text-right font-mono text-gray-700 w-32 bg-transparent h-auto py-1 leading-relaxed focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                                >
+                                                    {formatRupiah(item.amount)}
+                                                </div>
+                                                <button
+                                                    onClick={() => deleteRow('earning', item.id)}
+                                                    className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity mt-1"
+                                                    data-html2canvas-ignore
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <button
+                                        onClick={() => addRow('earning')}
+                                        className="text-xs text-[#ff6b35] font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden transition-all"
+                                        data-html2canvas-ignore
+                                    >
+                                        <Plus size={14} /> Tambah Item
+                                    </button>
+                                </div>
+
+                                <div className="flex justify-between items-center bg-gray-50 px-6 py-4 rounded mt-4 border border-gray-200">
+                                    <span className="font-bold text-gray-600 text-sm">Total Penerimaan</span>
+                                    <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalEarnings)}</span>
+                                </div>
+                            </div >
+
+                            {/* DEDUCTIONS COLUMN */}
+                            < div >
+                                <div className="bg-[#d64518] text-white px-3 py-4 text-sm font-bold uppercase tracking-widest rounded-t mb-2 shadow-sm antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
+                                    Potongan
+                                </div>
+                                <div className="space-y-2 min-h-[150px]">
+                                    {deductions.map((item) => (
+                                        <div key={item.id} className="flex items-start justify-between group text-sm py-1 border-b border-gray-100 border-dashed hover:border-orange-200 transition-colors">
+                                            <div
+                                                contentEditable
+                                                suppressContentEditableWarning
+                                                onBlur={(e) => handleTextChange('deduction', item.id, 'label', e.currentTarget.textContent || '')}
+                                                className="w-full bg-transparent h-auto py-1 leading-relaxed text-gray-800 focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                            >
+                                                {item.label}
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <div
+                                                    contentEditable
+                                                    suppressContentEditableWarning
+                                                    onBlur={(e) => handleAmountBlur('deduction', item.id, e.currentTarget.textContent || '')}
+                                                    className="text-right font-mono text-gray-700 w-32 bg-transparent h-auto py-1 leading-relaxed focus:outline-none focus:bg-orange-50 rounded px-1 transition-all antialiased break-words whitespace-pre-wrap min-h-[24px]"
+                                                >
+                                                    {formatRupiah(item.amount)}
+                                                </div>
+                                                <button
+                                                    onClick={() => deleteRow('deduction', item.id)}
+                                                    className="text-red-400 opacity-0 group-hover:opacity-100 hover:text-red-600 print:hidden transition-opacity mt-1"
+                                                    data-html2canvas-ignore
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <button
+                                        onClick={() => addRow('deduction')}
+                                        className="text-xs text-red-500 font-semibold flex items-center gap-1 mt-3 hover:underline print:hidden transition-all"
+                                        data-html2canvas-ignore
+                                    >
+                                        <Plus size={14} /> Tambah Item
+                                    </button>
+                                </div>
+
+                                <div className="flex justify-between items-center bg-gray-50 px-6 py-4 rounded mt-4 border border-gray-200">
+                                    <span className="font-bold text-gray-600 text-sm">Total Potongan</span>
+                                    <span className="font-bold text-gray-900 antialiased">{formatRupiah(totalDeductions)}</span>
+                                </div>
+                            </div >
+                        </div >
+
+                        {/* TAKE HOME PAY */}
+                        < div className="flex items-center mb-8 w-full shadow-sm rounded overflow-hidden" >
+                            <div className="bg-[#ff6b35] text-white font-bold px-6 py-4 text-sm tracking-widest uppercase w-1/3 flex items-center antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
+                                TAKE HOME PAY
+                            </div>
+                            <div className="bg-orange-50 flex-1 py-4 px-6 text-right border border-[#ff6b35]">
+                                <span className="text-xl font-black text-[#ff6b35] antialiased subpixel-antialiased">{formatRupiah(takeHomePay)}</span>
+                            </div>
+                        </div >
+
+                        {/* FOOTER INFO & SIGNATURE */}
+                        < div className="flex flex-row justify-between items-end mt-auto w-full gap-4" >
+                            <div className="flex-1 basis-0 text-sm text-gray-600">
+                                <p className="font-bold text-gray-800 mb-2 uppercase text-xs tracking-wide antialiased">Ditransfer Ke:</p>
+                                <div className="bg-gray-50 p-3 rounded border border-gray-200">
+                                    <p className="font-bold text-gray-900 antialiased">BCA (Bank Central Asia)</p>
+                                    <p className="font-mono text-gray-800 my-1 antialiased">123-456-7890</p>
+                                    <p className="text-xs uppercase text-gray-700 antialiased">a.n. {employee.name}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 basis-0 text-center text-xs">
+                                <div className="mb-4 flex flex-col items-center">
+                                    <p className="font-semibold text-gray-500 mb-2">Disetujui Oleh,</p>
+                                    <div className="h-32 w-full"></div> {/* Space for signature */}
+                                    <p className="font-bold text-gray-900 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px] antialiased subpixel-antialiased">HRD Manager</p>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 basis-0 text-center text-xs">
+                                <div className="mb-4 flex flex-col items-center">
+                                    <p className="font-semibold text-gray-500 mb-2">Diterima Oleh,</p>
+                                    <div className="h-32 w-full"></div> {/* Space for signature */}
+                                    <p className="font-bold text-gray-900 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px] antialiased subpixel-antialiased">{employee.name}</p>
+                                </div>
+                            </div>
+                        </div >
+
+                        {/* FOOTER COPYRIGHT */}
+                        < div className="absolute bottom-4 left-0 w-full text-center" >
+                            <p className="text-[10px] text-gray-400 antialiased">Dicetak secara otomatis oleh sistem Pawon Salam Payroll</p>
+                        </div >
+
                     </div >
-                </div >
-
-                {/* TAKE HOME PAY */}
-                < div className="flex items-center mb-8 w-full shadow-sm rounded overflow-hidden" >
-                    <div className="bg-[#ff6b35] text-white font-bold px-6 py-4 text-sm tracking-widest uppercase w-1/3 flex items-center antialiased flex-shrink-0 whitespace-nowrap leading-relaxed">
-                        TAKE HOME PAY
-                    </div>
-                    <div className="bg-orange-50 flex-1 py-4 px-6 text-right border border-[#ff6b35]">
-                        <span className="text-xl font-black text-[#ff6b35] antialiased subpixel-antialiased">{formatRupiah(takeHomePay)}</span>
-                    </div>
-                </div >
-
-                {/* FOOTER INFO & SIGNATURE */}
-                < div className="flex flex-row justify-between items-end mt-auto w-full gap-4" >
-                    <div className="flex-1 basis-0 text-sm text-gray-600">
-                        <p className="font-bold text-gray-800 mb-2 uppercase text-xs tracking-wide antialiased">Ditransfer Ke:</p>
-                        <div className="bg-gray-50 p-3 rounded border border-gray-200">
-                            <p className="font-bold text-gray-900 antialiased">BCA (Bank Central Asia)</p>
-                            <p className="font-mono text-gray-800 my-1 antialiased">123-456-7890</p>
-                            <p className="text-xs uppercase text-gray-700 antialiased">a.n. {employee.name}</p>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 basis-0 text-center text-xs">
-                        <div className="mb-4 flex flex-col items-center">
-                            <p className="font-semibold text-gray-500 mb-2">Disetujui Oleh,</p>
-                            <div className="h-32 w-full"></div> {/* Space for signature */}
-                            <p className="font-bold text-gray-900 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px] antialiased subpixel-antialiased">HRD Manager</p>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 basis-0 text-center text-xs">
-                        <div className="mb-4 flex flex-col items-center">
-                            <p className="font-semibold text-gray-500 mb-2">Diterima Oleh,</p>
-                            <div className="h-32 w-full"></div> {/* Space for signature */}
-                            <p className="font-bold text-gray-900 border-t border-gray-300 pt-2 px-4 inline-block min-w-[150px] antialiased subpixel-antialiased">{employee.name}</p>
-                        </div>
-                    </div>
-                </div >
-
-                {/* FOOTER COPYRIGHT */}
-                < div className="absolute bottom-4 left-0 w-full text-center" >
-                    <p className="text-[10px] text-gray-400 antialiased">Dicetak secara otomatis oleh sistem Pawon Salam Payroll</p>
-                </div >
-
-            </div >
-        </div >
+                </div>
+            </div>
+        </div>
     );
 };
