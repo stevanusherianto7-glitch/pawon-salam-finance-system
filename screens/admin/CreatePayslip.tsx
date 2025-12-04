@@ -9,6 +9,7 @@ import { useNotificationStore } from '../../store/notificationStore';
 import { mapRoleToDetails } from '../../utils/payslipMapper';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { sendPayslip } from '../../hooks/usePayslipStorage';
 
 interface FinancialItem {
     id: number;
@@ -205,8 +206,10 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         }
     }, [employee.name, employee.period, employees, getPayslipsByEmployee]);
 
+
+
     // Handler: Send Payslip to Employee
-    const handleSendPayslip = async () => {
+    const handleSendPayslip = () => {
         // Validation
         if (!employee.name || !employee.role || earnings.length === 0) {
             alert('Lengkapi data slip gaji sebelum mengirim!');
@@ -224,48 +227,29 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         const isConfirmed = window.confirm(`Kirim slip gaji bulan ${employee.period} ke ${employee.name}?`);
         if (!isConfirmed) return;
 
-        try {
-            setSendingStatus('uploading');
+        // PURE LOGIC EXECUTION (No Try-Catch)
+        sendPayslip({
+            employeeId: selectedEmp.id,
+            employeeName: employee.name,
+            period: employee.period,
+            earnings,
+            deductions,
+            takeHomePay,
+            pdfBlob: 'GENERATE_ON_CLIENT'
+        });
 
-            // Part A: Data Dispatch (ONLY)
-            // We do NOT generate PDF here. We send a flag.
+        // UI Feedback
+        setSendingStatus('success');
+        showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name}`, 'success');
+        alert('Sukses! Data slip gaji berhasil dikirim.');
 
-            // Save to Store
-            addPayslip({
-                id: Date.now().toString(),
-                employeeId: selectedEmp.id,
-                employeeName: employee.name,
-                period: employee.period,
-                pdfBlob: 'GENERATE_ON_CLIENT', // Flag for client-side generation
-                sentAt: Date.now(),
-                earnings,
-                deductions,
-                takeHomePay
-            });
-
-            // Send Notification (Non-blocking attempt)
-            if (user) {
-                try {
-                    await sendMessage(
-                        user as any,
-                        `📄 Slip Gaji ${employee.period} Anda sudah tersedia. Silakan cek di menu Slip Gaji.`,
-                        'individual' as any
-                    );
-                } catch (notifyError) {
-                    console.warn('Failed to send notification:', notifyError);
-                    // Continue execution, don't block success
-                }
-            }
-
-            // Success Feedback
-            setSendingStatus('success');
-            showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name}`, 'success');
-            alert('Sukses! Data slip gaji berhasil dikirim.');
-
-        } catch (error: any) {
-            console.error('Error sending payslip:', error);
-            alert("Gagal mengirim data: " + (error.message || String(error)));
-            setSendingStatus('idle');
+        // Optional: Send Notification via MessageStore (Fire and Forget)
+        if (user) {
+            sendMessage(
+                user as any,
+                `📄 Slip Gaji ${employee.period} Anda sudah tersedia.`,
+                'individual' as any
+            ).catch(console.warn);
         }
     };
 
