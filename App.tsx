@@ -28,17 +28,18 @@ import { ShiftSchedulerScreen } from './screens/admin/ShiftSchedulerScreen';
 import { SystemSettingsScreen } from './screens/admin/SystemSettingsScreen';
 import { AuditLogScreen } from './screens/admin/AuditLogScreen';
 import { CertificateScreen } from './screens/admin/CertificateScreen';
+import { CertificateManager } from './screens/admin/CertificateManager';
 import { AdminLeaveRequestScreen } from './screens/admin/AdminLeaveRequestScreen';
 import { BottomTab } from './components/BottomTab';
 import { ImpersonationBanner } from './components/ImpersonationBanner';
 import { ToastContainer } from './components/Toast';
 import { SpecialNotificationBanner } from './components/SpecialNotificationBanner';
 import { OfflineIndicator } from './components/OfflineIndicator';
-import { UserRole } from './types';
+import { UserRole, Employee } from './types';
 import { colors } from './theme/colors';
 
 import { FinanceInputScreen } from './screens/finance/FinanceInputScreen';
-import { FinanceDashboardScreen } from './screens/admin/FinanceDashboardScreen'; // NEW IMPORT
+import { FinanceDashboardScreen } from './screens/admin/FinanceDashboardScreen';
 import { ReportFinancialScreen } from './screens/admin/ReportFinancialScreen';
 import { ReportRevenueCostScreen } from './screens/admin/ReportRevenueCostScreen';
 import { ReportOperationalScreen } from './screens/admin/ReportOperationalScreen';
@@ -53,7 +54,7 @@ import { CreatePayslip } from './screens/admin/CreatePayslip';
 import { PayslipGeneratorScreen } from './screens/admin/PayslipGeneratorScreen';
 import { OfflineBanner } from './components/OfflineBanner';
 
-// Initialize Axios Interceptor (must import to activate)
+// Initialize Axios Interceptor
 import './services/axiosConfig';
 
 import { useNotificationStore } from './store/notificationStore';
@@ -86,6 +87,7 @@ const App = () => {
   const [currentScreen, setCurrentScreen] = useState('dashboard');
   const [screenParams, setScreenParams] = useState<any>(null);
   const [selectedEmpId, setSelectedEmpId] = useState<string | null>(null);
+  const [certificateEmployee, setCertificateEmployee] = useState<Employee | null>(null);
 
   const handleNavigate = (screen: string, params?: any) => {
     if (params) setScreenParams(params);
@@ -94,7 +96,6 @@ const App = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Determine default screen based on EFFECTIVE role (impersonated or real)
       const role = user?.role || UserRole.EMPLOYEE;
 
       if (role === UserRole.FINANCE_MANAGER) {
@@ -118,91 +119,71 @@ const App = () => {
         case 'adminAttendance': return <AdminAttendanceListScreen />;
         case 'broadcast': return <BroadcastScreen />;
 
-        // Specialized Panels (Legacy, kept for Finance & Marketing)
         case 'financePanel': return <FinancePanel onBack={() => setCurrentScreen('adminDashboard')} />;
-        case 'financeDashboard': return <FinanceDashboardScreen onNavigate={handleNavigate} />; // NEW ROUTE
-        case 'financeInput': return <FinanceInputScreen onBack={() => setCurrentScreen('adminDashboard')} />; // NEW ROUTE
+        case 'financeDashboard': return <FinanceDashboardScreen onNavigate={handleNavigate} />;
+        case 'financeInput': return <FinanceInputScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'marketingPanel': return <MarketingPanel onBack={() => setCurrentScreen('adminDashboard')} />;
 
-        // This screen is now part of AdminDashboard, but we keep the route for modularity if needed
         case 'hrPerformance': return <AdminDashboardScreen onNavigate={handleNavigate} />;
-
         case 'hrSpCoachingForm': return <HRSpCoachingFormScreen onBack={() => setCurrentScreen('adminDashboard')} />;
-
         case 'hrTrendReport': return <HRTrendReportScreen onBack={() => setCurrentScreen('adminDashboard')} />;
-
         case 'hrTopPerformance': return <HRTopPerformanceScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
-        case 'shiftScheduler':
-          return <ShiftSchedulerScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'shiftScheduler': return <ShiftSchedulerScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'adminLeaveRequest': return <AdminLeaveRequestScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
-        case 'adminLeaveRequest':
-          return <AdminLeaveRequestScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'performanceForm': return <PerformanceFormScreen employeeId={selectedEmpId!} onBack={() => setCurrentScreen('adminEmployees')} />;
+        case 'performanceDetail': return <PerformanceDetailScreen employeeId={selectedEmpId!} onBack={() => setCurrentScreen('adminEmployees')} />;
 
-        case 'performanceForm':
-          return <PerformanceFormScreen employeeId={selectedEmpId!} onBack={() => setCurrentScreen('adminEmployees')} />;
+        case 'dailyChecklistList': return <DailyChecklistListScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
+        case 'dailyChecklistForm': return <DailyChecklistFormScreen employeeId={screenParams?.employeeId} date={screenParams?.date} onBack={() => setCurrentScreen('dailyChecklistList')} />;
 
-        case 'performanceDetail':
-          return <PerformanceDetailScreen employeeId={selectedEmpId!} onBack={() => setCurrentScreen('adminEmployees')} />;
+        case 'jobdeskMonitor': return <JobdeskMonitorScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'hrDailyMonitorHub': return <HRDailyMonitorHubScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
 
-        case 'dailyChecklistList':
-          return <DailyChecklistListScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
-        case 'dailyChecklistForm':
-          return <DailyChecklistFormScreen
-            employeeId={screenParams?.employeeId}
-            date={screenParams?.date}
-            onBack={() => setCurrentScreen('dailyChecklistList')}
-          />;
+        case 'payslipList': return <PayslipListScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
+        case 'payslipForm': return <PayslipFormScreen onBack={() => setCurrentScreen('payslipList')} payslipId={screenParams?.payslipId} isNew={screenParams?.isNew} initialMonth={screenParams?.month} initialYear={screenParams?.year} />;
+        case 'createPayslip': return <CreatePayslip onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'payslipGenerator': return <PayslipGeneratorScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
-        // NEW: Jobdesk Monitor for Resto Manager
-        case 'jobdeskMonitor':
-          return <JobdeskMonitorScreen onBack={() => setCurrentScreen('adminDashboard')} />;
-
-        // NEW: Hub for HR/Owner
-        case 'hrDailyMonitorHub':
-          return <HRDailyMonitorHubScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
-
-
-
-        // ... existing imports
-
-        // Payroll - Admin/HR/Finance
-        case 'payslipList':
-          return <PayslipListScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
-        case 'payslipForm':
-          return <PayslipFormScreen
-            onBack={() => setCurrentScreen('payslipList')}
-            payslipId={screenParams?.payslipId}
-            isNew={screenParams?.isNew}
-            initialMonth={screenParams?.month}
-            initialYear={screenParams?.year}
-          />;
-        case 'createPayslip': // NEW ROUTE
-          return <CreatePayslip onBack={() => setCurrentScreen('adminDashboard')} />;
-        case 'payslipGenerator':
-          return <PayslipGeneratorScreen onBack={() => setCurrentScreen('adminDashboard')} />;
-
-        // Super Admin Tools
         case 'systemSettings': return <SystemSettingsScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'auditLogs': return <AuditLogScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
-        case 'certificate':
-          return <CertificateScreen onBack={() => {
-            // Determine where to go back based on role
-            if (user?.role === UserRole.HR_MANAGER) setCurrentScreen('adminDashboard');
-            else setCurrentScreen('dashboard');
-          }} />;
+        // CERTIFICATE ROUTES
+        case 'certificateManager':
+          return <CertificateManager
+            onBack={() => setCurrentScreen('adminDashboard')}
+            onSelectEmployee={(emp) => {
+              setCertificateEmployee(emp);
+              setCurrentScreen('certificateDetail');
+            }}
+          />;
 
-        // New Business Owner Reports
+        case 'certificateDetail':
+          const empToRender = screenParams?.employee || certificateEmployee;
+          if (!empToRender) return <CertificateManager onBack={() => setCurrentScreen('adminDashboard')} onSelectEmployee={(emp) => { setCertificateEmployee(emp); setCurrentScreen('certificateDetail'); }} />;
+
+          return <CertificateScreen
+            employee={empToRender}
+            onBack={() => setCurrentScreen('certificateManager')}
+          />;
+
+        case 'certificate': // Legacy/Direct route mapped to Manager
+          return <CertificateManager
+            onBack={() => setCurrentScreen('adminDashboard')}
+            onSelectEmployee={(emp) => {
+              setCertificateEmployee(emp);
+              setCurrentScreen('certificateDetail');
+            }}
+          />;
+
         case 'reportFinancial': return <ReportFinancialScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportRevenueCost': return <ReportRevenueCostScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportOperational': return <ReportOperationalScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportMarketing': return <ReportMarketingScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportHR': return <ReportHRScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
-        // Shared Employee Features for Managers
-        case 'employeePayslips':
-          return <MyPayslips onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'employeePayslips': return <MyPayslips onBack={() => setCurrentScreen('adminDashboard')} />;
 
         default: return <AdminDashboardScreen onNavigate={handleNavigate} />;
       }
@@ -216,21 +197,24 @@ const App = () => {
       case 'leaveRequest': return <LeaveRequestScreen onBack={() => setCurrentScreen('dashboard')} />;
       case 'profile': return <ProfileScreen />;
       case 'dailyJobdesk': return <DailyJobdeskScreen onBack={() => setCurrentScreen('dashboard')} />;
-      case 'performanceDetail':
-        return <PerformanceDetailScreen employeeId={user!.id} onBack={() => setCurrentScreen('dashboard')} />;
+      case 'performanceDetail': return <PerformanceDetailScreen employeeId={user!.id} onBack={() => setCurrentScreen('dashboard')} />;
 
-      // Payroll - Employee
-      case 'employeePayslips':
-        return <MyPayslips onBack={() => setCurrentScreen('dashboard')} />;
-      case 'employeePayslipList':
-        return <EmployeePayslipListScreen onBack={() => setCurrentScreen('dashboard')} onNavigate={handleNavigate} />;
-      case 'employeePayslipDetail':
-        return <EmployeePayslipDetailScreen payslipId={screenParams?.payslipId} onBack={() => setCurrentScreen('employeePayslips')} />;
+      case 'employeePayslips': return <MyPayslips onBack={() => setCurrentScreen('dashboard')} />;
+      case 'employeePayslipList': return <EmployeePayslipListScreen onBack={() => setCurrentScreen('dashboard')} onNavigate={handleNavigate} />;
+      case 'employeePayslipDetail': return <EmployeePayslipDetailScreen payslipId={screenParams?.payslipId} onBack={() => setCurrentScreen('employeePayslips')} />;
 
-      // Shared Reports for Employee (Access from Dashboard)
       case 'hrTrendReport': return <HRTrendReportScreen onBack={() => setCurrentScreen('dashboard')} />;
       case 'hrTopPerformance': return <HRTopPerformanceScreen onBack={() => setCurrentScreen('dashboard')} />;
-      case 'certificate': return <CertificateScreen onBack={() => setCurrentScreen('dashboard')} />;
+
+      // Employee Certificate View (View Only? Or maybe just list their own?)
+      // For now, let's just show the screen if they have one, but currently CertificateScreen is for creating/editing.
+      // Employees probably shouldn't access the generator. 
+      // If they click 'certificate', maybe show a list of THEIR certificates?
+      // For now, I'll map it to dashboard to prevent unauthorized access, or leave as is if it was intended.
+      // The previous code had: case 'certificate': return <CertificateScreen onBack={() => setCurrentScreen('dashboard')} />;
+      // But CertificateScreen requires an employee prop now.
+      // So I will remove it for employees for now to avoid crash, or map to dashboard.
+      case 'certificate': return <EmployeeDashboardScreen onNavigate={handleNavigate} />;
 
       default: return <EmployeeDashboardScreen onNavigate={handleNavigate} />;
     }
@@ -244,13 +228,13 @@ const App = () => {
     'systemSettings', 'auditLogs', 'dailyJobdesk', 'certificate',
     'hrSpCoachingForm', 'hrTrendReport', 'hrTopPerformance',
     'adminLeaveRequest',
-    'jobdeskMonitor', // Add here
-    'hrDailyMonitorHub', // Add new Hub here
-    'createPayslip', // Exclude from BottomTab
-    // New report screens
+    'jobdeskMonitor',
+    'hrDailyMonitorHub',
+    'createPayslip',
+    'certificateManager',
+    'certificateDetail',
     'reportFinancial', 'reportRevenueCost', 'reportOperational', 'reportHR', 'reportMarketing'
   ];
-
 
   return (
     <ErrorBoundary>

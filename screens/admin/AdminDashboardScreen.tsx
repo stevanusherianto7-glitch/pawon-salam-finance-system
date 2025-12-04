@@ -14,7 +14,7 @@ import { RestaurantManagerPanel } from './RestaurantManagerPanel';
 import { MarketingManagerPanel } from './MarketingManagerPanel';
 
 interface AdminDashboardProps {
-    onNavigate?: (screen: string) => void;
+    onNavigate?: (screen: string, params?: any) => void;
 }
 
 const getRoleDisplayName = (role: UserRole) => {
@@ -106,11 +106,6 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
         late: logs.filter(l => l.status === AttendanceStatus.LATE).length,
     };
 
-    const handlePeriodChange = (period: { month: number; year: number }) => {
-        setMonth(period.month);
-        setYear(period.year);
-    };
-
     const handleDateChange = (date: Date) => {
         setMonth(date.getMonth() + 1);
         setYear(date.getFullYear());
@@ -200,7 +195,7 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
                     {/* Performance Summary */}
                     <div className="space-y-2.5">
                         {eotm && (
-                            <div onClick={() => onNavigate && onNavigate('certificate')} className="bg-gradient-to-r from-amber-50 to-white rounded-xl p-2.5 border border-amber-100 flex items-center justify-between cursor-pointer active:scale-98 transition-transform shadow-sm">
+                            <div onClick={() => onNavigate && onNavigate('certificateDetail', { employee: eotm })} className="bg-gradient-to-r from-amber-50 to-white rounded-xl p-2.5 border border-amber-100 flex items-center justify-between cursor-pointer active:scale-98 transition-transform shadow-sm">
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
                                         <img src={eotm.avatarUrl} className="w-7 h-7 rounded-full object-cover border border-orange-200" />
@@ -275,21 +270,13 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
 
                     {/* Quick Actions Grid - PREMIUM GLASS STYLE */}
                     <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-gray-800 mb-2.5 text-xs uppercase tracking-wider">Menu Utama</h3>
-                        <div className="grid grid-cols-2 gap-2">
-                            {user?.role === UserRole.HR_MANAGER && <>
-                                <PremiumGlassCard title="Payroll" subtitle="Slip Gaji" icon={Banknote} onClick={() => onNavigate && onNavigate('createPayslip')} themeColor="green" />
-
-                                <PremiumGlassCard title="Shift" subtitle="Penjadwalan Staff" icon={Calendar} onClick={() => onNavigate && onNavigate('shiftScheduler')} themeColor="blue" />
-                                <PremiumGlassCard title="SP/Coach" subtitle="Catatan HR" icon={Users} onClick={() => onNavigate && onNavigate('hrSpCoachingForm')} themeColor="red" />
-                                <PremiumGlassCard title="Cuti" subtitle="Izin Karyawan" icon={FilePlus} onClick={() => onNavigate && onNavigate('adminLeaveRequest')} themeColor="teal" />
-                                <PremiumGlassCard title="Monitoring Harian" subtitle="Checklist & Jobdesk" icon={Eye} onClick={() => onNavigate && onNavigate('hrDailyMonitorHub')} themeColor="purple" />
-                            </>}
-                            {user?.role === UserRole.FINANCE_MANAGER && <>
-                                <PremiumGlassCard title="Input Keuangan" subtitle="Tambah Transaksi" icon={DollarSign} onClick={() => onNavigate && onNavigate('financeInput')} themeColor="green" />
-                                <PremiumGlassCard title="Laporan" subtitle="Cek Laporan" icon={ClipboardList} onClick={() => onNavigate && onNavigate('reportFinancial')} themeColor="blue" />
-                                <PremiumGlassCard title="Slip Gaji Saya" subtitle="Riwayat Gaji" icon={Banknote} onClick={() => onNavigate && onNavigate('employeePayslips')} themeColor="teal" />
-                            </>}
+                        <div className="grid grid-cols-4 gap-3">
+                            <button onClick={() => onNavigate && onNavigate('certificateManager')} className="flex flex-col items-center gap-1.5 group">
+                                <div className="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100 group-active:scale-95 transition-all shadow-sm">
+                                    <Award size={18} />
+                                </div>
+                                <span className="text-[9px] font-bold text-gray-600 text-center leading-tight">Penghargaan</span>
+                            </button>
                         </div>
                     </div>
 
@@ -309,7 +296,7 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
                         ) : (
                             <>
                                 {eotm && (
-                                    <div onClick={() => onNavigate && onNavigate('certificate')} className="bg-gradient-to-br from-white to-amber-100 rounded-2xl p-3.5 border border-amber-200/50 flex items-center justify-between cursor-pointer active:scale-98 transition-transform hover:shadow-xl hover:-translate-y-1">
+                                    <div onClick={() => onNavigate && onNavigate('certificateDetail', { employee: eotm })} className="bg-gradient-to-br from-white to-amber-100 rounded-2xl p-3.5 border border-amber-200/50 flex items-center justify-between cursor-pointer active:scale-98 transition-transform hover:shadow-xl hover:-translate-y-1">
                                         <div className="flex items-center gap-3">
                                             <img src={eotm.avatarUrl} className="w-10 h-10 rounded-full object-cover border-2 border-orange-100 bg-gray-200" />
                                             <div>
@@ -345,6 +332,10 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
                     </div>
                 </div>
             )}
+
+            {/* Decorative Shine */}
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent opacity-50"></div>
+            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all duration-700"></div>
 
             {/* Render Modal at the end */}
             <StockOpnameModal

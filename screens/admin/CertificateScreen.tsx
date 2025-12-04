@@ -1,38 +1,29 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { ArrowLeft, Download, Share2, Loader2 } from 'lucide-react';
-import { colors } from '../../theme/colors';
-import { performanceApi } from '../../services/api';
-import { EmployeeOfTheMonth } from '../../types';
+import { ArrowLeft, Download, Loader2 } from 'lucide-react';
+import { Employee } from '../../types';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Logo } from '../../components/Logo';
 
 interface Props {
     onBack: () => void;
+    employee: Employee; // Accept employee data directly
 }
 
-export const CertificateScreen: React.FC<Props> = ({ onBack }) => {
+export const CertificateScreen: React.FC<Props> = ({ onBack, employee }) => {
     const certificateRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const [data, setData] = useState<EmployeeOfTheMonth | null>(null);
-    const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
     const [scale, setScale] = useState(1);
 
+    // Editable State
+    const [recipientName, setRecipientName] = useState(employee.name);
+    const [awardTitle, setAwardTitle] = useState('Employee of the Month');
+    const [awardDescription, setAwardDescription] = useState('Atas kinerja, dedikasi, dan kontribusi yang luar biasa sebagai');
+
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            const res = await performanceApi.getEmployeeOfTheMonth(currentMonth, currentYear);
-            if (res.success && res.data) {
-                setData(res.data);
-            }
-            setLoading(false);
-        };
-        fetchData();
-    }, []);
+    const monthName = new Date(currentYear, currentMonth - 1, 1).toLocaleDateString('id-ID', { month: 'long' });
 
     useEffect(() => {
         const handleResize = () => {
@@ -47,18 +38,28 @@ export const CertificateScreen: React.FC<Props> = ({ onBack }) => {
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, [loading]);
+    }, []);
 
     const handleDownloadPDF = async () => {
         if (!certificateRef.current) return;
         setDownloading(true);
 
         try {
-            const canvas = await html2canvas(certificateRef.current, { scale: 3, useCORS: true, backgroundColor: null }); // Increased scale for better quality
+            // Wait for fonts
+            await document.fonts.ready;
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const canvas = await html2canvas(certificateRef.current, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: null,
+                logging: false
+            });
+
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
             pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-            pdf.save(`Sertifikat_${data?.name.replace(/\s+/g, '_')}_${data?.periodMonth}_${data?.periodYear}.pdf`);
+            pdf.save(`Sertifikat_${recipientName.replace(/\s+/g, '_')}_${monthName}_${currentYear}.pdf`);
         } catch (error) {
             console.error("PDF Generation failed", error);
             alert("Gagal mengunduh sertifikat.");
@@ -66,19 +67,6 @@ export const CertificateScreen: React.FC<Props> = ({ onBack }) => {
             setDownloading(false);
         }
     };
-
-    if (loading) {
-        return <div className="flex justify-center items-center h-screen bg-gray-100 text-gray-400 flex-col gap-3">
-            <Loader2 size={32} className="animate-spin text-orange-500" />
-            <p className="text-xs">Generating Certificate...</p>
-        </div>;
-    }
-
-    if (!data) {
-        return <div className="flex justify-center items-center h-screen bg-gray-100 text-gray-400">Data tidak tersedia.</div>;
-    }
-
-    const monthName = new Date(currentYear, currentMonth - 1, 1).toLocaleDateString('id-ID', { month: 'long' });
 
     return (
         <div className="bg-gray-200 min-h-screen flex flex-col overflow-hidden">
@@ -132,10 +120,38 @@ export const CertificateScreen: React.FC<Props> = ({ onBack }) => {
                                 <div className="w-48 h-px bg-stone-300 my-4"></div>
 
                                 <p className="text-base text-stone-600">Dengan bangga diberikan kepada:</p>
-                                <h2 className="font-heading text-4xl font-bold text-amber-900 mt-2 tracking-wide drop-shadow-sm">{data.name}</h2>
 
-                                <p className="text-base text-stone-600 mt-4">Atas kinerja, dedikasi, dan kontribusi yang luar biasa sebagai</p>
-                                <h3 className="font-script text-5xl text-orange-700 my-2 tracking-wider" style={{ fontFamily: '"Great Vibes", cursive' }}>Employee of the Month</h3>
+                                {/* EDITABLE RECIPIENT NAME */}
+                                <div
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) => setRecipientName(e.currentTarget.textContent || '')}
+                                    className="font-heading text-4xl font-bold text-amber-900 mt-2 tracking-wide drop-shadow-sm min-w-[200px] px-2 py-1 rounded hover:bg-amber-100/50 focus:bg-amber-100/50 focus:outline-none transition-colors border border-transparent hover:border-amber-200/50 focus:border-amber-300 cursor-text"
+                                >
+                                    {recipientName}
+                                </div>
+
+                                {/* EDITABLE DESCRIPTION */}
+                                <div
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) => setAwardDescription(e.currentTarget.textContent || '')}
+                                    className="text-base text-stone-600 mt-4 px-2 py-0.5 rounded hover:bg-amber-100/50 focus:bg-amber-100/50 focus:outline-none transition-colors border border-transparent hover:border-amber-200/50 focus:border-amber-300 cursor-text"
+                                >
+                                    {awardDescription}
+                                </div>
+
+                                {/* EDITABLE TITLE */}
+                                <div
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) => setAwardTitle(e.currentTarget.textContent || '')}
+                                    className="font-script text-5xl text-orange-700 my-2 tracking-wider px-4 py-1 rounded hover:bg-amber-100/50 focus:bg-amber-100/50 focus:outline-none transition-colors border border-transparent hover:border-amber-200/50 focus:border-amber-300 cursor-text"
+                                    style={{ fontFamily: '"Great Vibes", cursive' }}
+                                >
+                                    {awardTitle}
+                                </div>
+
                                 <p className="text-sm font-bold text-stone-700 uppercase tracking-widest">Periode {monthName} {currentYear}</p>
                             </div>
 
