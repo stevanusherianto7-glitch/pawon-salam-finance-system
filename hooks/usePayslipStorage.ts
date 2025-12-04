@@ -15,25 +15,31 @@ export interface PayslipData {
 
 const STORAGE_KEY = 'payslip_storage_v2';
 
-// PURE FUNCTION: Send Payslip (No Try-Catch, Always Success)
+// FUNCTION: Send Payslip (With Error Handling)
 export const sendPayslip = (data: Omit<PayslipData, 'id' | 'sentAt' | 'isRead'>): boolean => {
-    // 1. Get existing data
-    const existingDataStr = localStorage.getItem(STORAGE_KEY);
-    const existingData: PayslipData[] = existingDataStr ? JSON.parse(existingDataStr) : [];
+    try {
+        // 1. Get existing data
+        const existingDataStr = localStorage.getItem(STORAGE_KEY);
+        const existingData: PayslipData[] = existingDataStr ? JSON.parse(existingDataStr) : [];
 
-    // 2. Create new object
-    const newPayslip: PayslipData = {
-        ...data,
-        id: Date.now().toString(),
-        sentAt: Date.now(),
-        isRead: false
-    };
+        // 2. Create new object
+        const newPayslip: PayslipData = {
+            ...data,
+            id: Date.now().toString(),
+            sentAt: Date.now(),
+            isRead: false
+        };
 
-    // 3. Push & Save
-    existingData.push(newPayslip);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existingData));
+        // 3. Push & Save
+        existingData.push(newPayslip);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(existingData));
 
-    return true;
+        return true;
+    } catch (error) {
+        // Handle localStorage errors (quota exceeded, blocked, etc.)
+        console.error('localStorage error in sendPayslip:', error);
+        throw error; // Re-throw to be caught by caller
+    }
 };
 
 // HOOK: Read Payslips

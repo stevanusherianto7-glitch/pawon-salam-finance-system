@@ -227,29 +227,39 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         const isConfirmed = window.confirm(`Kirim slip gaji bulan ${employee.period} ke ${employee.name}?`);
         if (!isConfirmed) return;
 
-        // PURE LOGIC EXECUTION (No Try-Catch)
-        sendPayslip({
-            employeeId: selectedEmp.id,
-            employeeName: employee.name,
-            period: employee.period,
-            earnings,
-            deductions,
-            takeHomePay,
-            pdfBlob: 'GENERATE_ON_CLIENT'
-        });
+        // SEND PAYSLIP WITH ERROR HANDLING
+        try {
+            const success = sendPayslip({
+                employeeId: selectedEmp.id,
+                employeeName: employee.name,
+                period: employee.period,
+                earnings,
+                deductions,
+                takeHomePay,
+                pdfBlob: 'GENERATE_ON_CLIENT'
+            });
 
-        // UI Feedback
-        setSendingStatus('success');
-        showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name}`, 'success');
-        alert('Sukses! Data slip gaji berhasil dikirim.');
+            if (success) {
+                // UI Feedback - SUCCESS
+                showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name}`, 'success');
+                alert('Sukses! Data slip gaji berhasil dikirim.');
 
-        // Optional: Send Notification via MessageStore (Fire and Forget)
-        if (user) {
-            sendMessage(
-                user as any,
-                `📄 Slip Gaji ${employee.period} Anda sudah tersedia.`,
-                'individual' as any
-            ).catch(console.warn);
+                // Optional: Send Notification via MessageStore (Fire and Forget)
+                if (user) {
+                    sendMessage(
+                        user as any,
+                        `📄 Slip Gaji ${employee.period} Anda sudah tersedia.`,
+                        'individual' as any
+                    ).catch(console.warn);
+                }
+            } else {
+                throw new Error('sendPayslip returned false');
+            }
+        } catch (error) {
+            // UI Feedback - ERROR
+            console.error('Error sending payslip:', error);
+            showNotification('Gagal mengirim slip gaji. Silakan coba lagi.', 'error');
+            alert('Gagal mengirim slip gaji. Silakan coba lagi.');
         }
     };
 
