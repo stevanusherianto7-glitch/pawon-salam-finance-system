@@ -246,14 +246,16 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                 // Optional: Send Notification via MessageStore (Fire and Forget)
                 if (user) {
-                    sendMessage(
-                        user as any,
-                        `📄 Slip Gaji ${employee.period} Anda sudah tersedia.`,
-                        'individual' as any
-                    ).catch(console.warn);
+                    try {
+                        sendMessage(
+                            user as any,
+                            `📄 Slip Gaji ${employee.period} Anda sudah tersedia.`,
+                            'individual' as any
+                        ).catch(console.warn);
+                    } catch (msgError) {
+                        console.warn('Failed to initiate message sending:', msgError);
+                    }
                 }
-            } else {
-                throw new Error('sendPayslip returned false');
             }
         } catch (error) {
             // UI Feedback - ERROR
