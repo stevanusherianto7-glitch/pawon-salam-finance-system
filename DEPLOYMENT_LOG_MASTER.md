@@ -6,6 +6,21 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] Fix: Deployment Submodule Error
+**Status:** ✅ Pushed to Master
+**Commit:** Fix: Remove broken submodule reference causing deployment fail
+**URL:** https://pawonsalam-finance.pages.dev
+
+### Summary
+Removed broken git submodule reference `pawon-salam-enterprise-app` that was causing Cloudflare deployment failures.
+
+### Key Changes
+*   **Git:** Removed cached submodule reference.
+*   **Config:** Removed `.gitmodules` file.
+
+### Verification
+*   Pushed to `master` branch.
+
 ## [2025-12-04] Refactor: Modals to Screens (Fix)
 **Status:** ✅ Pushed to Master
 **Commit:** refactor: Replace Modals with Screens (StockOpname, HPP, SmartOpEx)
