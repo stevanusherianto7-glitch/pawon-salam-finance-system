@@ -1,28 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, Users, Utensils, Megaphone, FileText, Calendar, Clock, ChevronRight, ClipboardList, Banknote, CheckSquare, AlertCircle, Package } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, Utensils, Megaphone, FileText, Calendar, Clock, ChevronRight, ClipboardList, Banknote, CheckSquare, AlertCircle, Package, Shield } from 'lucide-react';
 import { colors } from '../../theme/colors';
 import { performanceApi, jobdeskApi, employeeApi, payrollApi } from '../../services/api';
 import { Payslip, Employee } from '../../types';
-import { StockOpnameModal } from '../../components/features/StockOpnameModal';
+import { PanelHeader } from '../../components/PanelHeader';
 
 interface PanelProps {
     onBack: () => void;
     onNavigate?: (screen: string) => void;
 }
 
-const PanelHeader = ({ title, icon: Icon, onBack }: { title: string, icon: any, onBack: () => void }) => (
-    <div className="pt-10 pb-8 px-4 rounded-b-[2rem] shadow-sm relative z-0 mb-4 overflow-hidden" style={{ background: colors.gradientMain }}>
-        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/food.png")' }}></div>
-        <div className="flex items-center gap-3 text-white relative z-10">
-            <button onClick={onBack} className="p-1.5 bg-white/20 rounded-full hover:bg-white/30 transition-colors backdrop-blur-sm"><ArrowLeft size={18} /></button>
-            <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm"><Icon size={16} /></div>
-                <h2 className="text-base font-bold">{title}</h2>
-            </div>
-        </div>
-    </div>
-);
+
 
 // Reusable Action Card for Bento Grid
 const ActionCard = ({ onClick, icon: Icon, title, subtitle, colorClass }: any) => (
@@ -176,7 +165,6 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     const [sales, setSales] = useState('');
     const [notes, setNotes] = useState('');
     const [jobdeskStats, setJobdeskStats] = useState({ fohCount: 0, bohCount: 0 });
-    const [showStockOpname, setShowStockOpname] = useState(false);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -234,6 +222,22 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
                     />
                 </div>
 
+                {/* NEW FEATURES GRID */}
+                <div className="grid grid-cols-3 gap-2">
+                    <ActionCard
+                        onClick={() => onNavigate && onNavigate('hppCalculator')}
+                        icon={Shield} title="HPP Calc" subtitle="Profit Protection" colorClass="bg-green-500 text-white"
+                    />
+                    <ActionCard
+                        onClick={() => onNavigate && onNavigate('smartOpex')}
+                        icon={TrendingUp} title="Smart OpEx" subtitle="Cost Tracker" colorClass="bg-purple-500 text-white"
+                    />
+                    <ActionCard
+                        onClick={() => onNavigate && onNavigate('stockOpname')}
+                        icon={Package} title="Stock Opname" subtitle="Inventory" colorClass="bg-amber-500 text-white"
+                    />
+                </div>
+
                 {/* Report Form */}
                 <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100">
                     <h3 className="font-bold text-xs text-gray-800 mb-2.5">Laporan Omzet Harian</h3>
@@ -247,26 +251,6 @@ export const RestoPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
                     </div>
                 </div>
             </div>
-
-            {/* Floating Action Button for Stock Opname */}
-            <div className="fixed bottom-6 left-0 right-0 z-[60] flex justify-center pointer-events-none">
-                <div className="w-full max-w-md px-4 flex justify-end">
-                    <button
-                        onClick={() => setShowStockOpname(true)}
-                        className="pointer-events-auto flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full shadow-2xl shadow-orange-500/40 hover:shadow-orange-500/60 hover:scale-105 transition-all active:scale-95 group"
-                    >
-                        <Package size={20} className="group-hover:rotate-12 transition-transform" />
-                        <span className="font-bold text-base">Stock Opname</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Stock Opname Modal */}
-            <StockOpnameModal
-                isOpen={showStockOpname}
-                onClose={() => setShowStockOpname(false)}
-                isReadOnly={false}
-            />
         </div>
     );
 };

@@ -52,6 +52,9 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { CreatePayslip } from './screens/admin/CreatePayslip';
 import { PayslipGeneratorScreen } from './screens/admin/PayslipGeneratorScreen';
+import { HPPCalculatorScreen } from './screens/admin/HPPCalculatorScreen';
+import { SmartOpExScreen } from './screens/admin/SmartOpExScreen';
+import { StockOpnameScreen } from './screens/admin/StockOpnameScreen';
 import { OfflineBanner } from './components/OfflineBanner';
 
 // Initialize Axios Interceptor
@@ -183,6 +186,10 @@ const App = () => {
         case 'reportMarketing': return <ReportMarketingScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportHR': return <ReportHRScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
+        case 'hppCalculator': return <HPPCalculatorScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'smartOpex': return <SmartOpExScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'stockOpname': return <StockOpnameScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+
         case 'employeePayslips': return <MyPayslips onBack={() => setCurrentScreen('adminDashboard')} />;
 
         default: return <AdminDashboardScreen onNavigate={handleNavigate} />;
@@ -233,7 +240,8 @@ const App = () => {
     'createPayslip',
     'certificateManager',
     'certificateDetail',
-    'reportFinancial', 'reportRevenueCost', 'reportOperational', 'reportHR', 'reportMarketing'
+    'reportFinancial', 'reportRevenueCost', 'reportOperational', 'reportHR', 'reportMarketing',
+    'hppCalculator', 'smartOpex', 'stockOpname'
   ];
 
   return (
