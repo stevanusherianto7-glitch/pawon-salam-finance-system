@@ -13,7 +13,9 @@ import { getScoreColor, getScoreLabel } from '../../utils/scoreUtils';
 import { UserRole, EmployeeOfTheMonth, Employee, DashboardAnalytics } from '../../types';
 import { Logo } from '../../components/Logo';
 import { useMessageStore } from '../../store/messageStore';
+import { useMessageStore } from '../../store/messageStore';
 import { useNotificationStore } from '../../store/notificationStore';
+import { usePayslipStore } from '../../store/payslipStore';
 import { performanceApi, employeeApi } from '../../services/api';
 import { PremiumGlassCard } from '../../components/PremiumGlassCard';
 
@@ -27,6 +29,8 @@ export const EmployeeDashboardScreen: React.FC<DashboardProps> = ({ onNavigate }
   const { currentSnapshot, fetchDailySnapshot, reviews, fetchReviews, currentJobdesk, fetchJobdesk } = usePerformanceStore();
   const { showNotification, showSpecialNotification } = useNotificationStore();
   const { unreadCount, fetchMessages } = useMessageStore();
+  const { getUnreadCount } = usePayslipStore();
+  const payslipUnreadCount = user ? getUnreadCount(user.id) : 0;
 
   const [locationStatus, setLocationStatus] = useState<'idle' | 'locating' | 'error'>('idle');
   const [currentDistance, setCurrentDistance] = useState<number | null>(null);
@@ -383,10 +387,11 @@ export const EmployeeDashboardScreen: React.FC<DashboardProps> = ({ onNavigate }
           />
           <PremiumGlassCard
             title="Slip Gaji"
-            subtitle="Riwayat Pendapatan"
+            subtitle={payslipUnreadCount > 0 ? `${payslipUnreadCount} Slip Baru` : "Riwayat Pendapatan"}
             icon={Banknote}
             themeColor="green"
             onClick={() => onNavigate && onNavigate('employeePayslips')}
+            badgeCount={payslipUnreadCount}
           />
           <PremiumGlassCard
             title="Pengumuman"

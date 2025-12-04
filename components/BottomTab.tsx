@@ -3,6 +3,7 @@ import { Home, Clock, User, Users, FileText, CalendarCheck, MessageSquare } from
 import { UserRole } from '../types';
 import { useMessageStore } from '../store/messageStore';
 import { useAuthStore } from '../store/authStore';
+import { usePayslipStore } from '../store/payslipStore';
 
 interface BottomTabProps {
   role: UserRole;
@@ -14,6 +15,10 @@ export const BottomTab: React.FC<BottomTabProps> = ({ role, currentScreen, onNav
   const isActive = (screenName: string) => currentScreen === screenName;
   const { user } = useAuthStore();
   const { unreadCount, fetchMessages } = useMessageStore();
+  const { getUnreadCount } = usePayslipStore();
+
+  const payslipUnread = user ? getUnreadCount(user.id) : 0;
+  const totalUnread = unreadCount + payslipUnread;
 
   useEffect(() => {
     if (user) {
@@ -68,14 +73,14 @@ export const BottomTab: React.FC<BottomTabProps> = ({ role, currentScreen, onNav
         {!isManagement ? (
           <>
             {renderIcon('dashboard', Home, 'Home')}
-            {renderIcon('broadcast', MessageSquare, 'Pesan', unreadCount)}
+            {renderIcon('broadcast', MessageSquare, 'Pesan', totalUnread)}
             {renderIcon('history', Clock, 'Riwayat')}
             {renderIcon('profile', User, 'Profil')}
           </>
         ) : (
           <>
             {renderIcon('adminDashboard', Home, 'Home')}
-            {renderIcon('broadcast', MessageSquare, 'Pesan', unreadCount)}
+            {renderIcon('broadcast', MessageSquare, 'Pesan', totalUnread)}
             {renderIcon('adminEmployees', Users, 'Staff')}
             {renderIcon('adminAttendance', CalendarCheck, 'Absensi')}
           </>

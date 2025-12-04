@@ -7,6 +7,7 @@ import { AttendanceHistoryScreen } from './screens/employee/AttendanceHistoryScr
 import { ProfileScreen } from './screens/employee/ProfileScreen';
 import { LeaveRequestScreen } from './screens/employee/LeaveRequestScreen';
 import { DailyJobdeskScreen } from './screens/employee/DailyJobdeskScreen';
+import { MyPayslips } from './screens/employee/MyPayslips';
 import { AdminDashboardScreen } from './screens/admin/AdminDashboardScreen';
 import { AdminEmployeeListScreen } from './screens/admin/AdminEmployeeListScreen';
 import { AdminAttendanceListScreen } from './screens/admin/AdminAttendanceListScreen';
@@ -207,7 +208,7 @@ const App = () => {
     switch (currentScreen) {
       case 'dashboard': return <EmployeeDashboardScreen onNavigate={handleNavigate} />;
       case 'history': return <AttendanceHistoryScreen />;
-      case 'broadcast': return <BroadcastScreen />;
+      case 'broadcast': return <BroadcastScreen onBack={() => setCurrentScreen('dashboard')} />;
       case 'leaveRequest': return <LeaveRequestScreen onBack={() => setCurrentScreen('dashboard')} />;
       case 'profile': return <ProfileScreen />;
       case 'dailyJobdesk': return <DailyJobdeskScreen onBack={() => setCurrentScreen('dashboard')} />;
@@ -216,6 +217,8 @@ const App = () => {
 
       // Payroll - Employee
       case 'employeePayslips':
+        return <MyPayslips onBack={() => setCurrentScreen('dashboard')} />;
+      case 'employeePayslipList':
         return <EmployeePayslipListScreen onBack={() => setCurrentScreen('dashboard')} onNavigate={handleNavigate} />;
       case 'employeePayslipDetail':
         return <EmployeePayslipDetailScreen payslipId={screenParams?.payslipId} onBack={() => setCurrentScreen('employeePayslips')} />;
