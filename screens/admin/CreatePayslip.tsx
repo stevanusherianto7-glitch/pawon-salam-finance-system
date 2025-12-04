@@ -284,22 +284,22 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             </style>
 
             {/* Action Bar (Hidden saat Print/Capture) */}
-            <div className="max-w-[297mm] mx-auto mb-8 flex flex-col md:flex-row justify-between items-center print:hidden px-4 gap-4" data-html2canvas-ignore>
-                <div className="flex items-center gap-6 w-full md:w-auto">
+            <div className="max-w-[297mm] mx-auto mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center print:hidden px-4 gap-6 z-50 relative" data-html2canvas-ignore>
+                <div className="flex items-center gap-4 w-full lg:w-auto">
                     {onBack && (
                         <button
                             onClick={onBack}
-                            className="glass px-4 py-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-white/50 transition-all duration-300 flex items-center gap-2 font-medium shadow-sm hover:shadow-md active:scale-95"
+                            className="glass px-3 py-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-white/50 transition-all duration-300 flex items-center gap-2 font-medium shadow-sm hover:shadow-md active:scale-95 text-sm md:text-base"
                         >
-                            <ChevronLeft size={20} /> Kembali
+                            <ChevronLeft size={18} /> <span className="hidden sm:inline">Kembali</span>
                         </button>
                     )}
-                    <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Slip Gaji Generator</h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Slip Gaji Generator</h2>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                <div className="flex flex-col gap-3 w-full lg:w-auto lg:flex-row lg:items-center">
                     <select
-                        className="bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 py-2.5 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all cursor-pointer hover:bg-white"
+                        className="w-full lg:w-64 bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 py-2.5 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all cursor-pointer hover:bg-white"
                         onChange={handleEmployeeSelect}
                         defaultValue=""
                     >
@@ -309,91 +309,93 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         ))}
                     </select>
 
-                    <button
-                        onClick={handleDownloadPDF}
-                        disabled={isGenerating}
-                        className={`
-                            relative overflow-hidden group
-                            glass bg-gradient-to-br from-orange-500/90 to-orange-600/90 
-                            text-white px-6 py-2.5 rounded-xl 
-                            shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30
-                            transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
-                            flex items-center justify-center gap-2 font-medium min-w-[140px]
-                            border-white/20
-                            ${isGenerating ? 'opacity-70 cursor-not-allowed' : ''}
-                        `}
-                    >
-                        {isGenerating ? (
-                            <span className="flex items-center gap-2">
-                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Generating...
-                            </span>
-                        ) : (
-                            <>
-                                <Download size={18} className="group-hover:scale-110 transition-transform" />
-                                <span>Save PDF</span>
-                            </>
-                        )}
-                        <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
-                    </button>
+                    <div className="grid grid-cols-2 gap-3 w-full lg:w-auto lg:flex lg:gap-3">
+                        <button
+                            onClick={handleDownloadPDF}
+                            disabled={isGenerating}
+                            className={`
+                                relative overflow-hidden group
+                                glass bg-gradient-to-br from-orange-500/90 to-orange-600/90 
+                                text-white px-4 py-2.5 rounded-xl 
+                                shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30
+                                transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
+                                flex items-center justify-center gap-2 font-medium w-full lg:w-auto
+                                border-white/20 text-sm md:text-base
+                                ${isGenerating ? 'opacity-70 cursor-not-allowed' : ''}
+                            `}
+                        >
+                            {isGenerating ? (
+                                <span className="flex items-center gap-2">
+                                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span className="hidden sm:inline">Generating...</span>
+                                </span>
+                            ) : (
+                                <>
+                                    <Download size={18} className="group-hover:scale-110 transition-transform" />
+                                    <span>PDF</span>
+                                </>
+                            )}
+                            <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
+                        </button>
 
-                    <button
-                        onClick={handleSendPayslip}
-                        disabled={sendingStatus !== 'idle' || !employee.name}
-                        className={`
-                            relative overflow-hidden group
-                            glass 
-                            ${sendingStatus === 'success'
-                                ? 'bg-green-500/90 hover:bg-green-600/90 cursor-not-allowed'
-                                : 'bg-gradient-to-br from-blue-500/90 to-blue-600/90 hover:shadow-blue-500/30'}
-                            text-white px-6 py-2.5 rounded-xl 
-                            shadow-lg 
-                            transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
-                            flex items-center justify-center gap-2 font-medium min-w-[160px]
-                            border-white/20
-                            ${(sendingStatus === 'generating' || sendingStatus === 'uploading') ? 'opacity-90 cursor-wait' : ''}
-                            ${(!employee.name && sendingStatus === 'idle') ? 'opacity-50 cursor-not-allowed' : ''}
-                        `}
-                    >
-                        {sendingStatus === 'generating' && (
-                            <span className="flex items-center gap-2 text-sm">
-                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Generating PDF...
-                            </span>
-                        )}
+                        <button
+                            onClick={handleSendPayslip}
+                            disabled={sendingStatus !== 'idle' || !employee.name}
+                            className={`
+                                relative overflow-hidden group
+                                glass 
+                                ${sendingStatus === 'success'
+                                    ? 'bg-green-500/90 hover:bg-green-600/90 cursor-not-allowed'
+                                    : 'bg-gradient-to-br from-blue-500/90 to-blue-600/90 hover:shadow-blue-500/30'}
+                                text-white px-4 py-2.5 rounded-xl 
+                                shadow-lg 
+                                transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
+                                flex items-center justify-center gap-2 font-medium w-full lg:w-auto
+                                border-white/20 text-sm md:text-base
+                                ${(sendingStatus === 'generating' || sendingStatus === 'uploading') ? 'opacity-90 cursor-wait' : ''}
+                                ${(!employee.name && sendingStatus === 'idle') ? 'opacity-50 cursor-not-allowed' : ''}
+                            `}
+                        >
+                            {sendingStatus === 'generating' && (
+                                <span className="flex items-center gap-2 text-xs">
+                                    <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Gen...
+                                </span>
+                            )}
 
-                        {sendingStatus === 'uploading' && (
-                            <span className="flex items-center gap-2 text-sm">
-                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Sending...
-                            </span>
-                        )}
+                            {sendingStatus === 'uploading' && (
+                                <span className="flex items-center gap-2 text-xs">
+                                    <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Send...
+                                </span>
+                            )}
 
-                        {sendingStatus === 'success' && (
-                            <span className="flex items-center gap-2">
-                                <Send size={18} className="text-white" />
-                                <span>Terkirim ✓</span>
-                            </span>
-                        )}
+                            {sendingStatus === 'success' && (
+                                <span className="flex items-center gap-2">
+                                    <Send size={18} className="text-white" />
+                                    <span>Sent</span>
+                                </span>
+                            )}
 
-                        {sendingStatus === 'idle' && (
-                            <>
-                                <Send size={18} className="group-hover:scale-110 transition-transform" />
-                                <span>Kirim Slip</span>
-                            </>
-                        )}
+                            {sendingStatus === 'idle' && (
+                                <>
+                                    <Send size={18} className="group-hover:scale-110 transition-transform" />
+                                    <span>Kirim</span>
+                                </>
+                            )}
 
-                        <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
-                    </button>
+                            <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
+                        </button>
+                    </div>
                 </div>
             </div>
 
