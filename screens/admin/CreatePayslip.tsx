@@ -5,6 +5,7 @@ import { usePayslipStore } from '../../store/payslipStore';
 import { useMessageStore } from '../../store/messageStore';
 import { useAuthStore } from '../../store/authStore';
 import { Logo } from '../../components/Logo';
+import { mapRoleToDetails } from '../../utils/payslipMapper';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -68,14 +69,15 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         const selectedId = e.target.value;
         const selectedEmp = employees.find(emp => emp.id === selectedId);
         if (selectedEmp) {
+            const details = mapRoleToDetails(selectedEmp);
             setEmployee(prev => ({
                 ...prev,
                 name: selectedEmp.name,
-                role: selectedEmp.role.replace(/_/g, ' '),
+                role: details.role,
                 nik: selectedEmp.id, // Using ID as NIK placeholder if NIK not available
-                department: 'Operasional', // Default or fetch if available
-                status: 'Karyawan Tetap',
-                grade: '-',
+                department: details.department,
+                status: details.status,
+                grade: details.grade,
                 section: 'Outlet'
             }));
         }
@@ -473,7 +475,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 < div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-8 text-sm w-full" >
                     <div className="space-y-2">
                         <div className="flex justify-between border-b border-gray-100 pb-1">
-                            <span className="text-gray-500">Nama Karyawan</span>
+                            <span className="text-gray-500">Nama</span>
                             <div
                                 contentEditable
                                 suppressContentEditableWarning

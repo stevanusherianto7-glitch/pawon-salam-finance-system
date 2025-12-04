@@ -6,6 +6,22 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] Payslip Data Logic Refactor
+**Status:** ✅ Committed (Local)
+**Commit:** feat: Refactor Payslip Data Logic (Role Mapping & Status)
+**URL:** https://pawonsalam-finance.pages.dev
+
+### Summary
+Refactored Payslip Generator to map system roles to formal job titles and categorize employment status.
+
+### Key Features
+*   **Role Mapping:** Auto-maps Super Admin -> IT Engineer, Owner -> Executive, etc.
+*   **Status & Grade:** Auto-assigns "Karyawan Tetap/Kontrak" and Grades (A-D).
+*   **UI:** Renamed "Nama Karyawan" to "Nama".
+
+### Verification
+*   Verified via Walkthrough.
+
 ## [2025-12-04] Payslip Send & Manager Access
 **Status:** ✅ Success
 **Commit:** feat: Add Send Payslip button and enable Manager Payslip access
