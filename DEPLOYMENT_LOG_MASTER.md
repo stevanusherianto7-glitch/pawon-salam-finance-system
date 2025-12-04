@@ -6,6 +6,23 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] UI Redesign: Bold Payslip Motifs
+**Status:** ✅ Success
+**Commit:** style: Replace Payslip Motifs with Bold Brand Graphics
+**URL:** https://pawon-salam-finance.pages.dev
+
+### Summary
+Replaced subtle watermarks with high-contrast, sharp SVG elements ("Spice Wave" & "Foundation") to align with brand identity.
+
+### Key Changes
+*   **Top-Right:** "The Spice Wave" - Dynamic wave with leaf accent (Gradient Orange).
+*   **Bottom-Left:** "The Foundation" - Geometric triangular accent.
+*   **Left Border:** Added solid orange strip for official look.
+*   **Style:** Removed blur, increased opacity for bold impact.
+
+### Verification
+*   Verified via Walkthrough.
+
 ## [2025-12-04] UI Polish: Payslip Margins
 **Status:** ✅ Success
 **Commit:** style: Polish Payslip Margins (A4 Standard)

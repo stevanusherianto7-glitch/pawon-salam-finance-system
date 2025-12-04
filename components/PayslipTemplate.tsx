@@ -49,61 +49,33 @@ export const PayslipTemplate = React.forwardRef<HTMLDivElement, PayslipData>(({
             style={{ width: '297mm', minHeight: '210mm', padding: '40mm 30mm 30mm 30mm' }}
         >
 
-            {/* DECORATIVE MOTIF (Organic Watermark) */}
+            {/* LEFT BORDER STRIP - Official Look */}
+            <div className="absolute top-0 left-0 bottom-0 w-3 bg-[#ff6b35] z-20 print:block"></div>
+
+            {/* TOP-RIGHT: "The Spice Wave" */}
             <div className="absolute top-0 right-0 pointer-events-none z-0">
-                <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-90">
-                    <path d="M400 0H200C200 0 240 80 300 120C360 160 400 250 400 250V0Z" fill="#ff6b35" fillOpacity="0.15" />
-                    <path d="M400 0H300C300 0 320 40 360 60C400 80 400 120 400 120V0Z" fill="#ff6b35" fillOpacity="0.1" />
-                    <g stroke="#ff6b35" strokeWidth="0.5" strokeOpacity="0.4">
-                        <path d="M380 20 C360 60, 320 120, 280 160" />
-                        <path d="M360 60 Q380 50 390 40" />
-                        <path d="M350 80 Q330 90 320 100" />
-                        <path d="M340 100 Q360 90 370 80" />
-                        <path d="M330 120 Q310 130 300 140" />
-                        <path d="M320 140 Q340 130 350 120" />
-                        <path d="M390 40 Q385 45 365 55" strokeOpacity="0.2" />
-                        <path d="M320 100 Q325 95 345 85" strokeOpacity="0.2" />
-                    </g>
-                    <circle cx="380" cy="180" r="2" fill="#ff6b35" fillOpacity="0.2" />
-                    <circle cx="360" cy="200" r="3" fill="#ff6b35" fillOpacity="0.15" />
-                    <circle cx="390" cy="220" r="1.5" fill="#ff6b35" fillOpacity="0.2" />
+                <svg width="350" height="350" viewBox="0 0 350 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="spiceGradient" x1="0" y1="0" x2="350" y2="350" gradientUnits="userSpaceOnUse">
+                            <stop stopColor="#ff6b35" />
+                            <stop offset="1" stopColor="#e65100" />
+                        </linearGradient>
+                    </defs>
+                    {/* Darker Depth Layer */}
+                    <path d="M350 0 V250 C300 220, 200 150, 150 0 Z" fill="#e65100" />
+                    {/* Main Wave Layer */}
+                    <path d="M350 0 V200 C280 180, 150 100, 100 0 Z" fill="url(#spiceGradient)" fillOpacity="1" />
+                    {/* Leaf Cutout Accent */}
+                    <path d="M250 50 Q290 50 310 90 Q290 110 250 110 Q230 90 250 50 Z" fill="#ffffff" fillOpacity="0.15" />
                 </svg>
             </div>
 
-            {/* Secondary Motif (Top Left - Subtle) */}
-            <div className="absolute top-0 left-0 pointer-events-none z-0">
-                <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-90">
-                    <circle cx="0" cy="0" r="120" fill="#ff6b35" fillOpacity="0.05" />
-                    <circle cx="20" cy="20" r="80" fill="#ff6b35" fillOpacity="0.05" />
-                    <circle cx="10" cy="80" r="4" fill="#ff6b35" fillOpacity="0.1" />
-                    <circle cx="60" cy="40" r="2" fill="#ff6b35" fillOpacity="0.1" />
-                </svg>
-            </div>
-
-            {/* CENTER WATERMARK - Very Faint Logo */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                <svg width="384" height="384" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 opacity-[0.03]">
-                    <circle cx="50" cy="50" r="44" />
-                    <path d="M28 72 Q 28 28 72 28 Q 72 72 28 72 Z" />
-                    <line x1="28" y1="72" x2="72" y2="28" />
-                    <line x1="28" y1="72" x2="19" y2="81" />
-                </svg>
-            </div>
-
-            {/* BOTTOM-LEFT CULINARY PATTERN */}
-            <div className="absolute bottom-0 left-0 pointer-events-none z-0">
-                <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-200">
-                    <path d="M20 140 Q20 120 35 110 Q50 100 50 80 L50 30" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4" />
-                    <ellipse cx="50" cy="25" rx="8" ry="12" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.4" />
-                    <path d="M90 30 L90 110 Q90 125 100 135" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4" />
-                    <line x1="82" y1="30" x2="82" y2="70" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-                    <line x1="90" y1="30" x2="90" y2="70" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-                    <line x1="98" y1="30" x2="98" y2="70" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-                    <path d="M130 100 Q140 80 150 100 Q140 120 130 100 Z" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.3" />
-                    <line x1="140" y1="80" x2="140" y2="120" stroke="currentColor" strokeWidth="1" opacity="0.2" />
-                    <circle cx="60" cy="150" r="2" fill="currentColor" opacity="0.2" />
-                    <circle cx="75" cy="155" r="1.5" fill="currentColor" opacity="0.2" />
-                    <circle cx="120" cy="145" r="2" fill="currentColor" opacity="0.2" />
+            {/* BOTTOM-LEFT: "The Foundation" */}
+            <div className="absolute bottom-0 left-0 pointer-events-none z-0 ml-3">
+                <svg width="250" height="250" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Geometric Accents */}
+                    <path d="M0 250 L0 120 L130 250 Z" fill="#ff8a65" fillOpacity="0.8" />
+                    <path d="M0 250 L0 180 L70 250 Z" fill="#ff6b35" />
                 </svg>
             </div>
 
