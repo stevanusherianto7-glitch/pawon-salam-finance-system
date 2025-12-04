@@ -22,7 +22,6 @@ export const CertificateScreen: React.FC<Props> = ({ onBack, employee }) => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [selectedDay, setSelectedDay] = useState(new Date().getDate());
-    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const monthName = new Date(selectedYear, selectedMonth - 1, 1).toLocaleDateString('id-ID', { month: 'long' });
     const formattedDate = `${selectedDay} ${monthName} ${selectedYear}`;
@@ -124,30 +123,26 @@ export const CertificateScreen: React.FC<Props> = ({ onBack, employee }) => {
                     {/* Date Picker */}
                     <div>
                         <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Tanggal</label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={formattedDate}
-                                onClick={() => setShowDatePicker(!showDatePicker)}
-                                readOnly
-                                placeholder="Pilih tanggal..."
-                                className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium text-gray-800 cursor-pointer focus:outline-none focus:border-orange-500 transition-colors"
-                            />
-                            {showDatePicker && (
-                                <div className="absolute top-full mt-2 left-0 z-50">
-                                    <GlassMonthPicker
-                                        selectedMonth={selectedMonth}
-                                        selectedYear={selectedYear}
-                                        onMonthChange={(month) => {
-                                            setSelectedMonth(month);
-                                            setShowDatePicker(false);
-                                        }}
-                                        onYearChange={setSelectedYear}
-                                        onClose={() => setShowDatePicker(false)}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                        <GlassMonthPicker
+                            value={`${monthName} ${selectedYear}`}
+                            onChange={(val) => {
+                                const parts = val.split(' ');
+                                if (parts.length === 2) {
+                                    const mName = parts[0];
+                                    const y = parseInt(parts[1]);
+                                    const months = [
+                                        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                                        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+                                    ];
+                                    const mIndex = months.indexOf(mName) + 1;
+                                    if (mIndex > 0 && !isNaN(y)) {
+                                        setSelectedMonth(mIndex);
+                                        setSelectedYear(y);
+                                    }
+                                }
+                            }}
+                            variant="light"
+                        />
                     </div>
                 </div>
             </div>
