@@ -208,8 +208,8 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
 
 
-    // Handler: Send Payslip to Employee
-    const handleSendPayslip = () => {
+    // Handler: Send Payslip (V2 - Robust Path)
+    const handleSendPayslip = async () => {
         // Validation
         if (!employee.name || !employee.role || earnings.length === 0) {
             alert('Lengkapi data slip gaji sebelum mengirim!');
@@ -227,8 +227,12 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         const isConfirmed = window.confirm(`Kirim slip gaji bulan ${employee.period} ke ${employee.name}?`);
         if (!isConfirmed) return;
 
-        // SEND PAYSLIP WITH ERROR HANDLING
+        setSendingStatus('uploading');
+
+        // JALUR BARU (V2): Prioritize Data Save
         try {
+            // 1. Simpan Data ke LocalStorage (Critical Path)
+            // Kita simpan DATA JSON-nya, bukan file PDF (Hemat Memori)
             const success = sendPayslip({
                 employeeId: selectedEmp.id,
                 employeeName: employee.name,
@@ -240,29 +244,42 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             });
 
             if (success) {
-                // UI Feedback - SUCCESS
+                // 2. UI Feedback - IMMEDIATE SUCCESS
+                // Jika data tersimpan, kita anggap SUKSES 100% bagi user.
+                setSendingStatus('success');
                 showNotification(`Data Slip Gaji berhasil dikirim ke ${employee.name}`, 'success');
                 alert('Sukses! Data slip gaji berhasil dikirim.');
 
-                // Optional: Send Notification via MessageStore (Fire and Forget)
+                // 3. Background Process: Send Notification (Non-Blocking)
+                // Jika ini gagal, jangan batalkan status sukses utama.
                 if (user) {
-                    try {
-                        sendMessage(
-                            user as any,
-                            `📄 Slip Gaji ${employee.period} Anda sudah tersedia.`,
-                            'individual' as any
-                        ).catch(console.warn);
-                    } catch (msgError) {
-                        console.warn('Failed to initiate message sending:', msgError);
-                    }
+                    setTimeout(async () => {
+                        try {
+                            await sendMessage(
+                                user as any,
+                                `📄 Slip Gaji ${employee.period} Anda sudah tersedia.`,
+                                'individual' as any
+                            );
+                            console.log('Notification message sent successfully');
+                        } catch (msgError) {
+                            // Silent fail for message - Data is already safe
+                            console.warn('Background notification failed (non-critical):', msgError);
+                        }
+                    }, 100);
                 }
             }
         } catch (error: any) {
-            // UI Feedback - ERROR
-            console.error('Error sending payslip:', error);
+            // Critical Error (Storage Full / System Error)
+            console.error('Critical error in sendPayslip V2:', error);
+            setSendingStatus('idle');
             const errorMessage = error?.message || 'Unknown error';
-            showNotification(`Gagal mengirim slip gaji: ${errorMessage}`, 'error');
-            alert(`Gagal mengirim slip gaji. Detail: ${errorMessage}`);
+
+            // Show specific error to help diagnosis
+            if (errorMessage.includes('QuotaExceeded')) {
+                alert('Gagal: Memori HP Penuh. Hapus beberapa slip gaji lama di menu "Riwayat".');
+            } else {
+                alert(`Gagal menyimpan data: ${errorMessage}`);
+            }
         }
     };
 
