@@ -257,11 +257,12 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                     }
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             // UI Feedback - ERROR
             console.error('Error sending payslip:', error);
-            showNotification('Gagal mengirim slip gaji. Silakan coba lagi.', 'error');
-            alert('Gagal mengirim slip gaji. Silakan coba lagi.');
+            const errorMessage = error?.message || 'Unknown error';
+            showNotification(`Gagal mengirim slip gaji: ${errorMessage}`, 'error');
+            alert(`Gagal mengirim slip gaji. Detail: ${errorMessage}`);
         }
     };
 
