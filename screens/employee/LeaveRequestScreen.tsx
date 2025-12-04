@@ -88,46 +88,46 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
   };
 
   return (
-    <div className="bg-gray-50 pb-24 relative">
+    <div className="bg-gradient-to-br from-slate-50 via-white to-slate-50/50 pb-24 relative">
       {/* Header */}
       <div
-        className="px-6 pt-10 pb-10 rounded-b-[2.5rem] shadow-md relative z-0 overflow-hidden"
-        style={{ background: colors.gradientMain }}
+        className="px-6 pt-10 pb-10 rounded-b-[2.5rem] shadow-2xl shadow-slate-900/10 relative z-0 overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' }}
       >
         {/* Watermark */}
-        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/food.png")' }}></div>
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/food.png")' }}></div>
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 text-white mb-2">
-            <button onClick={onBack} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors backdrop-blur-sm">
+            <button onClick={onBack} className="p-2 bg-white/10 hover:bg-white/20 rounded-xl backdrop-blur-sm border border-white/20 active:scale-95 transition-all duration-300">
               <ArrowLeft size={18} />
             </button>
-            <h2 className="text-lg font-bold">Pengajuan Izin</h2>
+            <h2 className="text-lg font-bold tracking-tight">Pengajuan Izin</h2>
           </div>
-          <p className="text-orange-100 text-xs pl-11 opacity-90">Isi formulir untuk mengajukan cuti atau izin.</p>
+          <p className="text-slate-200 text-xs pl-11 opacity-90 font-medium">Isi formulir untuk mengajukan cuti atau izin.</p>
         </div>
       </div>
 
       <div className="px-4 -mt-8 relative z-10 space-y-6">
 
         {/* FORM CARD */}
-        <div className="bg-white rounded-2xl shadow-lg p-4 border border-orange-50">
+        <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 p-4 border border-slate-100">
           <form onSubmit={handleSubmit} className="space-y-3">
 
             {/* Leave Type */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Jenis Izin</label>
+              <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Jenis Izin</label>
               <div className="relative">
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as LeaveType })}
-                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors font-medium text-xs"
+                  className="w-full appearance-none bg-slate-50 border-2 border-slate-200 text-slate-700 py-2.5 px-3 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all font-medium text-xs"
                 >
                   <option value={LeaveType.SICK}>🤒 Sakit</option>
                   <option value={LeaveType.ANNUAL}>🌴 Cuti Tahunan</option>
                   <option value={LeaveType.OTHER}>⚡ Lainnya</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                   <ChevronDown size={14} />
                 </div>
               </div>
@@ -136,7 +136,7 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
             {/* Date Range */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Dari Tanggal</label>
+                <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Dari Tanggal</label>
                 <div className="relative">
                   <GlassDatePicker
                     selectedDate={formData.startDate ? new Date(formData.startDate) : null}
@@ -151,7 +151,7 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Sampai</label>
+                <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Sampai</label>
                 <div className="relative">
                   <GlassDatePicker
                     selectedDate={formData.endDate ? new Date(formData.endDate) : null}
@@ -169,14 +169,14 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
 
             {/* Reason */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Alasan / Keterangan</label>
+              <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Alasan / Keterangan</label>
               <textarea
                 required
                 rows={3}
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 placeholder="Jelaskan alasan pengajuan anda secara detail..."
-                className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 transition-colors text-xs resize-none"
+                className="w-full bg-slate-50 border-2 border-slate-200 text-slate-700 py-2.5 px-3 rounded-xl focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all text-xs resize-none"
               />
             </div>
 
@@ -184,8 +184,7 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all flex justify-center items-center gap-2 mt-1"
-              style={{ background: colors.gradientMain, boxShadow: colors.shadowOrange }}
+              className="w-full py-3 rounded-xl font-bold text-white shadow-lg shadow-orange-500/30 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300 flex justify-center items-center gap-2 mt-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -200,7 +199,7 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
 
         {/* HISTORY SECTION */}
         <div>
-          <h3 className="font-bold text-gray-700 mb-3 flex items-center gap-2 text-sm">
+          <h3 className="font-bold text-slate-700 mb-3 flex items-center gap-2 text-sm tracking-tight">
             <FileText size={18} className="text-orange-500" /> Riwayat Pengajuan
           </h3>
 
@@ -208,12 +207,17 @@ export const LeaveRequestScreen: React.FC<LeaveRequestScreenProps> = ({ onBack }
             {isLoading && requests.length === 0 ? (
               <div className="text-center py-8 text-gray-400 text-xs">Memuat riwayat...</div>
             ) : requests.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
-                <p className="text-[10px]">Belum ada riwayat pengajuan.</p>
+              <div className="bg-white rounded-2xl p-12 text-center shadow-lg shadow-slate-200/50 border border-slate-100">
+                {/* Empty State Illustration */}
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-slate-100 to-slate-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                  <FileText size={48} className="text-slate-300" strokeWidth={1.5} />
+                </div>
+                <h4 className="text-base font-bold text-slate-800 mb-2 tracking-tight">Belum Ada Riwayat</h4>
+                <p className="text-sm text-slate-500 font-medium">Pengajuan izin Anda akan muncul di sini.</p>
               </div>
             ) : (
               requests.map((item) => (
-                <div key={item.id} className="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2 active:scale-98 transition-transform">
+                <div key={item.id} className="bg-white p-3.5 rounded-xl border border-slate-100 shadow-md shadow-slate-200/50 flex flex-col gap-2 hover:shadow-lg hover:-translate-y-0.5 active:scale-98 transition-all duration-300">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
                       <span className={`text-xs font-bold ${item.type === LeaveType.SICK ? 'text-red-600' : item.type === LeaveType.ANNUAL ? 'text-blue-600' : 'text-gray-700'}`}>
