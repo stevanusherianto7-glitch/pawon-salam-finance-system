@@ -6,6 +6,24 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] Send Payslip Refinement
+**Status:** ✅ Success
+**Commit:** feat: Refine Send Payslip workflow (PDF Gen, Upload Sim, UI Feedback)
+**URL:** https://pawonsalam-finance.pages.dev
+
+### Summary
+Refined the "Send Payslip" workflow to include automatic PDF generation, simulated upload, and detailed UI feedback.
+
+### Key Features
+*   **PDF Generation:** Auto-triggers on send.
+*   **Upload Simulation:** Realistic "Sending..." state.
+*   **UI Feedback:** "Generating" -> "Sending" -> "Terkirim ✓".
+*   **Persistence:** Prevents double-sending.
+
+### Verification
+*   Build Passed.
+*   Verified via Walkthrough.
+
 ## [2025-12-04] Payslip Data Logic Refactor
 **Status:** ✅ Committed (Local)
 **Commit:** feat: Refactor Payslip Data Logic (Role Mapping & Status)

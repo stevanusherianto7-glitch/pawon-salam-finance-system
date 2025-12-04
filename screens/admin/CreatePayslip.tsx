@@ -5,6 +5,7 @@ import { usePayslipStore } from '../../store/payslipStore';
 import { useMessageStore } from '../../store/messageStore';
 import { useAuthStore } from '../../store/authStore';
 import { Logo } from '../../components/Logo';
+import { useNotificationStore } from '../../store/notificationStore';
 import { mapRoleToDetails } from '../../utils/payslipMapper';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -28,12 +29,14 @@ interface EmployeeData {
 
 export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const { employees, fetchEmployees } = useEmployeeStore();
-    const { addPayslip } = usePayslipStore();
+    const { addPayslip, getPayslipsByEmployee } = usePayslipStore();
     const { sendMessage } = useMessageStore();
     const { user } = useAuthStore();
+    const { showNotification } = useNotificationStore();
     const payslipRef = useRef<HTMLDivElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSending, setIsSending] = useState(false);
+    const [isSent, setIsSent] = useState(false);
 
     // State Data Karyawan
     const [employee, setEmployee] = useState<EmployeeData>({
@@ -184,11 +187,35 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         }
     };
 
+    const [sendingStatus, setSendingStatus] = useState<'idle' | 'generating' | 'uploading' | 'success'>('idle');
+
+    // Check if already sent
+    useEffect(() => {
+        if (employee.name && employee.period) {
+            const selectedEmp = employees.find(emp => emp.name === employee.name);
+            if (selectedEmp) {
+                const existingPayslips = getPayslipsByEmployee(selectedEmp.id);
+                const isAlreadySent = existingPayslips.some(p => p.period === employee.period);
+                if (isAlreadySent) {
+                    setSendingStatus('success');
+                } else {
+                    setSendingStatus('idle');
+                }
+            }
+        }
+    }, [employee.name, employee.period, employees, getPayslipsByEmployee]);
+
     // Handler: Send Payslip to Employee
     const handleSendPayslip = async () => {
         if (!payslipRef.current) return;
 
-        //Find selected employee
+        // Validation
+        if (!employee.name || !employee.role || earnings.length === 0) {
+            alert('Lengkapi data slip gaji sebelum mengirim!');
+            return;
+        }
+
+        // Find selected employee
         const selectedEmp = employees.find(emp => emp.name === employee.name);
         if (!selectedEmp) {
             alert('Employee tidak ditemukan!');
@@ -199,13 +226,13 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
         const isConfirmed = window.confirm(`Kirim slip gaji bulan ${employee.period} ke ${employee.name}?`);
         if (!isConfirmed) return;
 
-        setIsSending(true);
-
         try {
+            // 1. Generating PDF
+            setSendingStatus('generating');
+
             // Wait for any potential re-renders or font loads
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            // Generate PDF
             const canvas = await html2canvas(payslipRef.current, {
                 scale: 2,
                 useCORS: true,
@@ -226,7 +253,11 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             // Get PDF as base64 data URL
             const pdfBlob = pdf.output('dataurlstring');
 
-            // Save to payslip store
+            // 2. Simulating Upload
+            setSendingStatus('uploading');
+            await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5s delay
+
+            // 3. Save to Store
             addPayslip({
                 id: Date.now().toString(),
                 employeeId: selectedEmp.id,
@@ -239,7 +270,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 takeHomePay
             });
 
-            // Send announcement notification
+            // 4. Send Notification
             if (user) {
                 await sendMessage(
                     user as any,
@@ -248,12 +279,14 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                 );
             }
 
-            alert(`Slip gaji berhasil dikirim ke ${employee.name}!`);
+            // 5. Success Feedback
+            showNotification(`Dokumen PDF Slip Gaji berhasil dibuat dan dikirim ke ${employee.name}`, 'success');
+            setSendingStatus('success');
+
         } catch (error) {
             console.error('Error sending payslip:', error);
-            alert('Gagal mengirim slip gaji. Silakan coba lagi.');
-        } finally {
-            setIsSending(false);
+            showNotification('Gagal mengirim slip gaji. Silakan coba lagi.', 'error');
+            setSendingStatus('idle');
         }
     };
 
@@ -333,32 +366,56 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
 
                     <button
                         onClick={handleSendPayslip}
-                        disabled={isSending || !employee.name}
+                        disabled={sendingStatus !== 'idle' || !employee.name}
                         className={`
                             relative overflow-hidden group
-                            glass bg-gradient-to-br from-blue-500/90 to-blue-600/90 
+                            glass 
+                            ${sendingStatus === 'success'
+                                ? 'bg-green-500/90 hover:bg-green-600/90 cursor-not-allowed'
+                                : 'bg-gradient-to-br from-blue-500/90 to-blue-600/90 hover:shadow-blue-500/30'}
                             text-white px-6 py-2.5 rounded-xl 
-                            shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30
+                            shadow-lg 
                             transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
-                            flex items-center justify-center gap-2 font-medium min-w-[140px]
+                            flex items-center justify-center gap-2 font-medium min-w-[160px]
                             border-white/20
-                            ${isSending ? 'opacity-70 cursor-not-allowed' : ''}
+                            ${(sendingStatus === 'generating' || sendingStatus === 'uploading') ? 'opacity-90 cursor-wait' : ''}
+                            ${(!employee.name && sendingStatus === 'idle') ? 'opacity-50 cursor-not-allowed' : ''}
                         `}
                     >
-                        {isSending ? (
-                            <span className="flex items-center gap-2">
-                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        {sendingStatus === 'generating' && (
+                            <span className="flex items-center gap-2 text-sm">
+                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                Mengirim...
+                                Generating PDF...
                             </span>
-                        ) : (
+                        )}
+
+                        {sendingStatus === 'uploading' && (
+                            <span className="flex items-center gap-2 text-sm">
+                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Sending...
+                            </span>
+                        )}
+
+                        {sendingStatus === 'success' && (
+                            <span className="flex items-center gap-2">
+                                <Send size={18} className="text-white" />
+                                <span>Terkirim ✓</span>
+                            </span>
+                        )}
+
+                        {sendingStatus === 'idle' && (
                             <>
                                 <Send size={18} className="group-hover:scale-110 transition-transform" />
                                 <span>Kirim Slip</span>
                             </>
                         )}
+
                         <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />
                     </button>
                 </div>
