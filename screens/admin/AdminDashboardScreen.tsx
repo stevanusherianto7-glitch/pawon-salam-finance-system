@@ -288,6 +288,7 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
                             {user?.role === UserRole.FINANCE_MANAGER && <>
                                 <PremiumGlassCard title="Input Keuangan" subtitle="Tambah Transaksi" icon={DollarSign} onClick={() => onNavigate && onNavigate('financeInput')} themeColor="green" />
                                 <PremiumGlassCard title="Laporan" subtitle="Cek Laporan" icon={ClipboardList} onClick={() => onNavigate && onNavigate('reportFinancial')} themeColor="blue" />
+                                <PremiumGlassCard title="Slip Gaji Saya" subtitle="Riwayat Gaji" icon={Banknote} onClick={() => onNavigate && onNavigate('employeePayslips')} themeColor="teal" />
                             </>}
                         </div>
                     </div>

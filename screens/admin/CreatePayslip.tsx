@@ -193,6 +193,10 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             return;
         }
 
+        // Confirmation Dialog
+        const isConfirmed = window.confirm(`Kirim slip gaji bulan ${employee.period} ke ${employee.name}?`);
+        if (!isConfirmed) return;
+
         setIsSending(true);
 
         try {
@@ -330,9 +334,9 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         disabled={isSending || !employee.name}
                         className={`
                             relative overflow-hidden group
-                            glass bg-gradient-to-br from-green-500/90 to-green-600/90 
+                            glass bg-gradient-to-br from-blue-500/90 to-blue-600/90 
                             text-white px-6 py-2.5 rounded-xl 
-                            shadow-lg shadow-green-500/20 hover:shadow-green-500/30
+                            shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30
                             transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0
                             flex items-center justify-center gap-2 font-medium min-w-[140px]
                             border-white/20
@@ -350,7 +354,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         ) : (
                             <>
                                 <Send size={18} className="group-hover:scale-110 transition-transform" />
-                                <span>Kirim</span>
+                                <span>Kirim Slip</span>
                             </>
                         )}
                         <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 group-hover:ring-white/30 transition-all" />

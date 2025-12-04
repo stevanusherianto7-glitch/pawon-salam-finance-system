@@ -237,8 +237,14 @@ export const BroadcastScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) =
                                         ref={textareaRef}
                                         value={content}
                                         onChange={handleContentChange}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSendMessage();
+                                            }
+                                        }}
                                         rows={3}
-                                        placeholder="Ketik pesan... Gunakan @ untuk mention"
+                                        placeholder="Ketik pesan... (Enter untuk kirim, Shift+Enter untuk baris baru)"
                                         className="w-full bg-gray-50 text-gray-800 placeholder:text-gray-400 border border-gray-200 rounded-xl p-2.5 text-xs outline-none focus:border-orange-400 focus:bg-white transition-all resize-none"
                                     />
 

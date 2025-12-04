@@ -9,7 +9,7 @@ interface PanelProps {
     onNavigate?: (screen: string) => void;
 }
 
-export const MarketingManagerPanel: React.FC<PanelProps> = ({ onBack }) => {
+export const MarketingManagerPanel: React.FC<PanelProps> = ({ onBack, onNavigate }) => {
     const [showBudgetModal, setShowBudgetModal] = useState(false);
     const { getRemainingBudget, budget } = useMarketingStore();
 
@@ -72,6 +72,27 @@ export const MarketingManagerPanel: React.FC<PanelProps> = ({ onBack }) => {
                             <span className="text-[10px] font-bold text-gray-400 uppercase">Reach</span>
                         </div>
                         <p className="text-xl font-black text-gray-800">45K</p>
+                    </div>
+                </div>
+
+                {/* Additional Menu */}
+                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mt-3">
+                    <div
+                        onClick={() => onNavigate && onNavigate('employeePayslips')}
+                        className="flex items-center justify-between cursor-pointer active:scale-95 transition-transform"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-teal-50 text-teal-600 rounded-lg">
+                                <BarChart3 size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-gray-800 text-sm">Slip Gaji Saya</h3>
+                                <p className="text-[10px] text-gray-400">Riwayat Pembayaran</p>
+                            </div>
+                        </div>
+                        <div className="p-1.5 bg-gray-50 rounded-lg text-gray-400">
+                            <ArrowLeft size={16} className="rotate-180" />
+                        </div>
                     </div>
                 </div>
 

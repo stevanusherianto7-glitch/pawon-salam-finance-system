@@ -29,6 +29,7 @@ export const RestaurantManagerPanel: React.FC<Props> = ({ onNavigate }) => {
                     <PremiumGlassCard title="Stock Opname" subtitle="Input Stok Fisik" icon={Package} onClick={() => setShowStockOpname(true)} themeColor="green" />
                     <PremiumGlassCard title="Kalkulator HPP" subtitle="Simulasi Menu" icon={Calculator} onClick={() => setShowHPP(true)} themeColor="orange" />
                     <PremiumGlassCard title="Laporan Biaya" subtitle="Smart OPEX" icon={Wallet} onClick={() => setShowSmartOpex(true)} themeColor="purple" />
+                    <PremiumGlassCard title="Slip Gaji Saya" subtitle="Riwayat Gaji" icon={Wallet} onClick={() => onNavigate('employeePayslips')} themeColor="teal" />
                 </div>
             </div>
 

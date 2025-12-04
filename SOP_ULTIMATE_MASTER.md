@@ -11,6 +11,16 @@ Purpose: Single source of truth untuk AI-Human collaboration
 CRITICAL: This is THE definitive guide untuk semua development work!
 
 ================================================================================
+PROJECT INFORMATION & DEPLOYMENT
+================================================================================
+
+📍 DEPLOYMENT URL (Live Site):
+   https://pawonsalam-finance.pages.dev
+
+📍 GITHUB REPOSITORY:
+   https://github.com/stevanusherianto7-glitch/pawon-salam-finance-system
+
+================================================================================
 PART 1: COLLABORATION PHILOSOPHY & ROLES
 ================================================================================
 

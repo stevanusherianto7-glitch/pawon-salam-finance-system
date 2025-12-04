@@ -200,6 +200,10 @@ const App = () => {
         case 'reportMarketing': return <ReportMarketingScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportHR': return <ReportHRScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
+        // Shared Employee Features for Managers
+        case 'employeePayslips':
+          return <MyPayslips onBack={() => setCurrentScreen('adminDashboard')} />;
+
         default: return <AdminDashboardScreen onNavigate={handleNavigate} />;
       }
     }
