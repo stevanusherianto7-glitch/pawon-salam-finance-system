@@ -29,20 +29,29 @@ export const EmployeePayslipDetailScreen: React.FC<Props> = ({ payslipId, onBack
             // Wait for fonts to load
             await document.fonts.ready;
 
+            // CRITICAL: Small delay to ensure SVG decorations fully render
+            await new Promise(resolve => setTimeout(resolve, 500));
+
             const canvas = await html2canvas(printableRef.current, {
-                scale: 2,
+                scale: 3, // 🔥 UPGRADED: 288 DPI for ultra-sharp text
                 useCORS: true,
+                allowTaint: false, // Prevent cross-origin issues with logo
                 logging: false,
                 backgroundColor: '#ffffff',
                 windowWidth: 1123, // A4 Landscape width in px (approx)
-                windowHeight: 794
+                windowHeight: 794,
+                // Additional options for better quality
+                removeContainer: true,
+                imageTimeout: 0,
+                foreignObjectRendering: false // Better SVG rendering
             });
 
-            const imgData = canvas.toDataURL('image/png');
+            const imgData = canvas.toDataURL('image/png', 1.0); // Max quality
             const pdf = new jsPDF({
                 orientation: 'landscape',
                 unit: 'mm',
-                format: 'a4'
+                format: 'a4',
+                compress: true // Enable PDF compression to keep file size reasonable
             });
 
             pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);

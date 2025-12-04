@@ -52,8 +52,10 @@ export const Logo: React.FC<LogoProps> = ({
     <div className={`flex flex-col items-center justify-center ${className}`}>
 
       {/* --- BAGIAN IKON (SVG VEKTOR) --- */}
-      <div className={`${sizeClasses[size]} ${colorClass} drop-shadow-sm relative flex items-center justify-center transition-transform hover:scale-105 duration-300`}>
+      <div className={`${sizeClasses[size]} ${colorClass} drop-shadow-sm relative flex items-center justify-center transition-transform hover:scale-105 duration-300 aspect-square`}>
         <svg
+          width="100"
+          height="100"
           viewBox="0 0 100 100"
           preserveAspectRatio="xMidYMid meet"
           fill="none"
@@ -61,7 +63,8 @@ export const Logo: React.FC<LogoProps> = ({
           strokeWidth="6"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-full h-auto"
+          className="w-full h-full object-contain"
+          style={{ maxWidth: '100%', maxHeight: '100%' }}
         >
           {/* Lingkaran Luar */}
           <circle cx="50" cy="50" r="44" />
