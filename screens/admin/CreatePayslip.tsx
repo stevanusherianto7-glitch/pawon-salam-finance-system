@@ -317,7 +317,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
     const handleZoomOut = () => setScale(prev => Math.max(0.3, prev - 0.1));
 
     return (
-        <div className="h-[calc(100vh-64px)] bg-gray-50/50 overflow-y-auto overflow-x-hidden print:bg-white print:p-0 print:overflow-visible flex flex-col" ref={containerRef}>
+        <div className="h-[calc(100vh-64px)] bg-gray-50/50 flex flex-col print:bg-white print:h-auto print:overflow-visible" ref={containerRef}>
             <style>
                 {`
                 @page {
@@ -330,11 +330,30 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         print-color-adjust: exact;
                     }
                 }
+                /* Custom Scrollbar for Laptop Usability */
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 12px;
+                    height: 12px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: rgba(0,0,0,0.05);
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(0,0,0,0.2);
+                    border-radius: 6px;
+                    border: 3px solid transparent;
+                    background-clip: content-box;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: rgba(0,0,0,0.3);
+                    border: 3px solid transparent;
+                    background-clip: content-box;
+                }
                 `}
             </style>
 
             {/* Action Bar (Hidden saat Print/Capture) */}
-            <div className="max-w-[297mm] mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-center print:hidden px-4 py-6 gap-6 z-50 relative shrink-0" data-html2canvas-ignore>
+            <div className="w-full flex flex-col lg:flex-row justify-between items-start lg:items-center print:hidden px-4 py-4 gap-4 z-50 relative shrink-0 bg-white/50 backdrop-blur-sm border-b border-gray-200/50" data-html2canvas-ignore>
                 <div className="flex items-center gap-4 w-full lg:w-auto">
                     {onBack && (
                         <button
@@ -466,7 +485,7 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
             </div>
 
             {/* SCROLLABLE & SCALABLE CONTENT AREA */}
-            <div className="flex-1 overflow-auto flex justify-center p-4 md:p-8">
+            <div className="flex-1 overflow-auto flex justify-center p-4 md:p-8 custom-scrollbar w-full">
                 <div
                     className="origin-top transition-transform duration-300 ease-out"
                     style={{
