@@ -328,7 +328,9 @@ export const CreatePayslip: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
                         </button>
                     )}
                     <div className="flex flex-col">
-                        <h2 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Slip Gaji Generator</h2>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
+                            Slip Gaji Generator <span className="text-xs font-normal text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full align-middle">v1.2</span>
+                        </h2>
                         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 lg:hidden">
                             <button onClick={handleZoomOut} className="p-1 bg-white rounded border hover:bg-gray-50">Zoom -</button>
                             <span>{Math.round(scale * 100)}%</span>
