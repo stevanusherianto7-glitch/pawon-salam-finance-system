@@ -6,12 +6,12 @@ import { ArrowLeft, DollarSign, Activity, Utensils, TrendingUp, TrendingDown, Fi
 import { OwnerDashboardData, TrendData } from '../../types';
 import { BackgroundPattern } from '../../components/layout/BackgroundPattern';
 import { GlassDatePicker } from '../../components/ui/GlassDatePicker';
-import { StockOpnameModal } from '../../components/features/StockOpnameModal';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 interface Props {
   onBack: () => void;
+  onNavigate?: (screen: string, params?: any) => void;
 }
 
 // Helper Components
@@ -57,11 +57,11 @@ const KPICard = ({ label, value, trend, icon: Icon, colorClass, subValue, gradie
 
 const formatCurrency = (val: number) => `Rp ${val.toLocaleString('id-ID')} `;
 
-export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
+export const ReportOperationalScreen: React.FC<Props> = ({ onBack, onNavigate }) => {
   const [data, setData] = useState<OwnerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
-  const [showStockOpname, setShowStockOpname] = useState(false);
+
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -193,7 +193,7 @@ export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
       <div className="fixed bottom-6 left-0 right-0 z-[60] flex justify-center pointer-events-none">
         <div className="w-full max-w-md px-4 flex justify-end">
           <button
-            onClick={() => setShowStockOpname(true)}
+            onClick={() => onNavigate && onNavigate('stockOpname', { isReadOnly: true })}
             className="pointer-events-auto flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full shadow-2xl shadow-orange-500/40 hover:shadow-orange-500/60 hover:scale-105 transition-all active:scale-95 group"
           >
             <Package size={20} className="group-hover:rotate-12 transition-transform" />
@@ -202,12 +202,7 @@ export const ReportOperationalScreen: React.FC<Props> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Stock Opname Modal */}
-      <StockOpnameModal
-        isOpen={showStockOpname}
-        onClose={() => setShowStockOpname(false)}
-        isReadOnly={true}
-      />
+
     </div>
   );
 };

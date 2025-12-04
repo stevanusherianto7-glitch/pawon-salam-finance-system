@@ -1,19 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Calculator, CheckSquare, Calendar, FilePlus, AlertTriangle, Package, TrendingUp, Users, ChevronRight, Wallet } from 'lucide-react';
 import { PremiumGlassCard } from '../../components/PremiumGlassCard';
-import { HPPCalculatorModal } from '../../components/features/HPPCalculatorModal';
-import { StockOpnameModal } from '../../components/features/StockOpnameModal';
-import { SmartOpexModal } from '../../components/features/SmartOpexModal';
+
 
 interface Props {
     onNavigate: (screen: string) => void;
 }
 
 export const RestaurantManagerPanel: React.FC<Props> = ({ onNavigate }) => {
-    const [showHPP, setShowHPP] = useState(false);
-    const [showStockOpname, setShowStockOpname] = useState(false);
-    const [showSmartOpex, setShowSmartOpex] = useState(false);
-
     return (
         <div className="px-4 -mt-6 relative z-10 space-y-3">
 
@@ -26,9 +20,9 @@ export const RestaurantManagerPanel: React.FC<Props> = ({ onNavigate }) => {
                     <PremiumGlassCard title="Shift" subtitle="Jadwal Staff" icon={Calendar} onClick={() => onNavigate('shiftScheduler')} themeColor="blue" />
                     <PremiumGlassCard title="Cuti" subtitle="Input Izin" icon={FilePlus} onClick={() => onNavigate('adminLeaveRequest')} themeColor="teal" />
                     <PremiumGlassCard title="Monitoring" subtitle="Laporan Staff" icon={AlertTriangle} onClick={() => onNavigate('jobdeskMonitor')} themeColor="red" />
-                    <PremiumGlassCard title="Stock Opname" subtitle="Input Stok Fisik" icon={Package} onClick={() => setShowStockOpname(true)} themeColor="green" />
-                    <PremiumGlassCard title="Kalkulator HPP" subtitle="Simulasi Menu" icon={Calculator} onClick={() => setShowHPP(true)} themeColor="orange" />
-                    <PremiumGlassCard title="Laporan Biaya" subtitle="Smart OPEX" icon={Wallet} onClick={() => setShowSmartOpex(true)} themeColor="purple" />
+                    <PremiumGlassCard title="Stock Opname" subtitle="Input Stok Fisik" icon={Package} onClick={() => onNavigate('stockOpname')} themeColor="green" />
+                    <PremiumGlassCard title="Kalkulator HPP" subtitle="Simulasi Menu" icon={Calculator} onClick={() => onNavigate('hppCalculator')} themeColor="orange" />
+                    <PremiumGlassCard title="Laporan Biaya" subtitle="Smart OPEX" icon={Wallet} onClick={() => onNavigate('smartOpex')} themeColor="purple" />
                     <PremiumGlassCard title="Slip Gaji Saya" subtitle="Riwayat Gaji" icon={Wallet} onClick={() => onNavigate('employeePayslips')} themeColor="teal" />
                 </div>
             </div>
@@ -42,17 +36,6 @@ export const RestaurantManagerPanel: React.FC<Props> = ({ onNavigate }) => {
                     <Users size={14} /> Top Performance
                 </button>
             </div>
-
-            {/* Modals */}
-            <HPPCalculatorModal isOpen={showHPP} onClose={() => setShowHPP(false)} />
-
-            <StockOpnameModal
-                isOpen={showStockOpname}
-                onClose={() => setShowStockOpname(false)}
-                isReadOnly={false}
-            />
-
-            <SmartOpexModal isOpen={showSmartOpex} onClose={() => setShowSmartOpex(false)} />
         </div>
     );
 };

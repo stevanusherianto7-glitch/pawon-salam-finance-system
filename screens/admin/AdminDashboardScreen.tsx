@@ -9,7 +9,7 @@ import { useNotificationStore } from '../../store/notificationStore';
 import { PeriodFilter } from '../../components/PeriodFilter';
 import { GlassDatePicker } from '../../components/ui/GlassDatePicker';
 import { PremiumGlassCard } from '../../components/PremiumGlassCard';
-import { StockOpnameModal } from '../../components/features/StockOpnameModal';
+
 import { RestaurantManagerPanel } from './RestaurantManagerPanel';
 import { MarketingManagerPanel } from './MarketingManagerPanel';
 
@@ -42,7 +42,7 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
     const [loading, setLoading] = useState(true);
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
-    const [showStockOpname, setShowStockOpname] = useState(false);
+
 
     const isManagerWithPerformanceView = user && [UserRole.HR_MANAGER, UserRole.RESTAURANT_MANAGER, UserRole.FINANCE_MANAGER, UserRole.MARKETING_MANAGER, UserRole.BUSINESS_OWNER].includes(user.role);
 
@@ -337,12 +337,6 @@ export const AdminDashboardScreen: React.FC<AdminDashboardProps> = ({ onNavigate
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent opacity-50"></div>
             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all duration-700"></div>
 
-            {/* Render Modal at the end */}
-            <StockOpnameModal
-                isOpen={showStockOpname}
-                onClose={() => setShowStockOpname(false)}
-                isReadOnly={false}
-            />
         </div>
     );
 };

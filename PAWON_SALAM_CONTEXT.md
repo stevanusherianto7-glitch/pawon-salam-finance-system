@@ -40,3 +40,10 @@ We are perfecting the **Salary Slip Generator**. It must look exactly like a for
 *   Professional Margins (3cm/30mm padding).
 *   No visual bugs (no squashed text, no blurry fonts).
 *   Subtle decorative background elements (watermarks) for brand identity.
+
+### **6. DEPLOYMENT & REPOSITORY (SOURCE OF TRUTH)**
+*   **GitHub Repository:** [https://github.com/stevanusherianto7-glitch/pawon-salam-finance-system](https://github.com/stevanusherianto7-glitch/pawon-salam-finance-system)
+    *   *Role:* Source Code & Version Control.
+*   **Cloudflare Pages (Live Site):** [https://pawonsalam-finance.pages.dev](https://pawonsalam-finance.pages.dev)
+    *   *Role:* Production Environment for HR & Staff.
+    *   *Debug Protocol:* Always check this URL (Incognito) to verify deployments.

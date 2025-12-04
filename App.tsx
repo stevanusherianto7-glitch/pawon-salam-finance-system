@@ -182,13 +182,13 @@ const App = () => {
 
         case 'reportFinancial': return <ReportFinancialScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportRevenueCost': return <ReportRevenueCostScreen onBack={() => setCurrentScreen('adminDashboard')} />;
-        case 'reportOperational': return <ReportOperationalScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'reportOperational': return <ReportOperationalScreen onBack={() => setCurrentScreen('adminDashboard')} onNavigate={handleNavigate} />;
         case 'reportMarketing': return <ReportMarketingScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'reportHR': return <ReportHRScreen onBack={() => setCurrentScreen('adminDashboard')} />;
 
         case 'hppCalculator': return <HPPCalculatorScreen onBack={() => setCurrentScreen('adminDashboard')} />;
         case 'smartOpex': return <SmartOpExScreen onBack={() => setCurrentScreen('adminDashboard')} />;
-        case 'stockOpname': return <StockOpnameScreen onBack={() => setCurrentScreen('adminDashboard')} />;
+        case 'stockOpname': return <StockOpnameScreen onBack={() => setCurrentScreen('adminDashboard')} isReadOnly={screenParams?.isReadOnly} />;
 
         case 'employeePayslips': return <MyPayslips onBack={() => setCurrentScreen('adminDashboard')} />;
 
