@@ -6,6 +6,23 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] Refactor: Modals to Screens (Fix)
+**Status:** ✅ Pushed to Master
+**Commit:** refactor: Replace Modals with Screens (StockOpname, HPP, SmartOpEx)
+**URL:** https://pawonsalam-finance.pages.dev
+
+### Summary
+Fixed deployment issue where local changes were not pushed. Refactored Stock Opname, HPP Calculator, and Smart OpEx from Modals to dedicated Screens.
+
+### Key Changes
+*   **Refactor:** Converted `StockOpnameModal`, `HPPCalculatorModal`, `SmartOpexModal` to Screens.
+*   **Navigation:** Updated `AdminDashboard`, `RestaurantManagerPanel`, `ReportOperational` to navigate to new screens.
+*   **Cleanup:** Deleted unused modal components.
+
+### Verification
+*   Local Build Passed.
+*   Pushed to `master` branch.
+
 ## [2025-12-04] Hardcore Rewrite: Payslip System V2
 **Status:** ✅ Success
 **Commit:** feat: Rewrite Payslip System (Pure Logic + New UI)
