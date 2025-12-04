@@ -6,6 +6,22 @@ This file tracks all deployments to production.
 
 ---
 
+## [2025-12-04] UI Polish: Payslip Margins
+**Status:** ✅ Success
+**Commit:** style: Polish Payslip Margins (A4 Standard)
+**URL:** https://pawon-salam-finance.pages.dev
+
+### Summary
+Refined the Payslip layout to follow professional A4 standards with increased margins and better vertical spacing.
+
+### Key Changes
+*   **Margins:** Increased top padding to 40mm (Standard Kop Surat).
+*   **Spacing:** Added breathing room between Header and Content.
+*   **Footer:** Balanced signature section to sit at the bottom.
+
+### Verification
+*   Verified via Walkthrough.
+
 ## [2025-12-04] Final Fix: Send Payslip False Negative
 **Status:** ✅ Success
 **Commit:** fix: Remove mock delay and ensure Send Payslip success

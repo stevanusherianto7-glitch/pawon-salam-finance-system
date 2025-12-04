@@ -46,8 +46,9 @@ export const PayslipTemplate = React.forwardRef<HTMLDivElement, PayslipData>(({
         <div
             ref={ref}
             className="bg-white shadow-none relative overflow-hidden text-gray-900"
-            style={{ width: '297mm', minHeight: '210mm', padding: '30mm' }}
+            style={{ width: '297mm', minHeight: '210mm', padding: '40mm 30mm 30mm 30mm' }}
         >
+
             {/* DECORATIVE MOTIF (Organic Watermark) */}
             <div className="absolute top-0 right-0 pointer-events-none z-0">
                 <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-90">
@@ -107,7 +108,8 @@ export const PayslipTemplate = React.forwardRef<HTMLDivElement, PayslipData>(({
             </div>
 
             {/* HEADER */}
-            <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-6 w-full relative z-10">
+            <div className="flex justify-between items-center border-b-4 border-[#ff6b35] pb-6 mb-10 w-full relative z-10">
+
                 <div className="flex flex-row items-center gap-6">
                     <div className="flex-shrink-0 aspect-square">
                         <Logo size="xl" variant="color" showText={false} />
